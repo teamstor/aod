@@ -5,11 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TeamStor.Engine.Graphics;
+using TeamStor.Engine.Tween;
 
 namespace TeamStor.RPG.Menu
 {
     public class MenuButton
     {
+        protected TweenedDouble _offset;
+        
         public string Text;
         public Font Font;
 
@@ -32,12 +35,15 @@ namespace TeamStor.RPG.Menu
         public MenuButton(string text, Font font = null)
         {
             Text = text;
-            Font = font != null ? font : Controller.Game.Assets.Get<Font>("fonts/bitcell.ttf");
+            Font = font;
         }
 
         public virtual void OnSelected(MenuButton previous)
         {
             IsSelected = true;
+            
+            _offset = new TweenedDouble(Controller.Game, -4);
+            _offset.TweenTo(0, TweenEaseType.EaseOutSine, 0.1);
         }
 
         public virtual void OnDeselected(MenuButton next)
@@ -47,17 +53,16 @@ namespace TeamStor.RPG.Menu
 
         public virtual void Update(MenuController controller, double deltaTime, double totalTime, long count)
         {
-
         }
 
         public virtual Vector2 Measure()
         {
-            return Font.Measure(8, Text);
+            return Font.Measure(16, Text);
         }
 
         public virtual void Draw(SpriteBatch batch, Vector2 pos)
         {
-
+            batch.Text(Font, 16, Text, pos + new Vector2(0, _offset.CompletionTime < 0.1 ? 0 : (int)_offset), Color.White);
         }
     }
 }

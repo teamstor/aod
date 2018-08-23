@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework.Input;
 using TeamStor.Engine;
 using TeamStor.Engine.Graphics;
 
@@ -40,14 +41,30 @@ namespace TeamStor.RPG.Menu
                 _buttons.Add(btn);
             else
                 _buttons.Insert(at, btn);
-
+            
             btn.Controller = this;
+
+            if(btn.Font == null)
+                btn.Font = Game.Assets.Get<Font>("fonts/Alkhemikal.ttf");
+            
+            if(_buttons.Count == 1)
+                _buttons[SelectedIndex].OnSelected(null);
         }
 
         public void Remove(MenuButton btn)
         {
             if(_buttons.Contains(btn))
+            {
                 _buttons.Remove(btn);
+
+                if(SelectedIndex > _buttons.Count - 1)
+                {
+                    SelectedIndex = Math.Max(0, _buttons.Count - 1);
+
+                    if(_buttons.Count > 0)
+                        _buttons[SelectedIndex].OnSelected(btn);
+                }
+            }
         }
 
         public void Remove(int at)
@@ -69,6 +86,33 @@ namespace TeamStor.RPG.Menu
         {
             foreach(MenuButton button in _buttons)
                 button.Update(this, deltaTime, totalTime, count);
+
+            MenuButton currentBtn = _buttons.Count > 0 ? _buttons[SelectedIndex] : null;
+
+            if(currentBtn != null)
+            {
+                if(Game.Input.KeyPressed(Keys.Up))
+                {
+                    SelectedIndex--;
+                    
+                    if(SelectedIndex < 0)
+                        SelectedIndex = _buttons.Count - 1;
+                    
+                    currentBtn.OnDeselected(_buttons[SelectedIndex]);
+                    _buttons[SelectedIndex].OnSelected(currentBtn);
+                }
+                
+                if(Game.Input.KeyPressed(Keys.Down))
+                {
+                    SelectedIndex++;
+                    
+                    if(SelectedIndex > _buttons.Count - 1)
+                        SelectedIndex = 0;
+                    
+                    currentBtn.OnDeselected(_buttons[SelectedIndex]);
+                    _buttons[SelectedIndex].OnSelected(currentBtn);
+                }
+            }
         }
 
         public Vector2 Measure()
@@ -83,7 +127,7 @@ namespace TeamStor.RPG.Menu
                     measure.X = measureBtn.X;
 
                 if(measure.Y != 0)
-                    measure.Y += 4;
+                    measure.Y += 2;
                 measure.Y += measureBtn.Y;
             }
 
@@ -106,7 +150,7 @@ namespace TeamStor.RPG.Menu
                 button.Draw(batch, new Vector2(x, y));
 
                 if(y != 0)
-                    y += 4;
+                    y += 2;
                 y += (int)sizeOfBtn.Y;
             }
         }
