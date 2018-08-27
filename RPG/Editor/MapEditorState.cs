@@ -30,7 +30,7 @@ namespace TeamStor.RPG.Map.Editor
 
 		private MapEditorModeState _state;
 		
-		public MapData MapData;
+		public Map MapData;
 		public Dictionary<string, Button> Buttons = new Dictionary<string, Button>();
 		public Dictionary<string, SelectionMenu> SelectionMenus = new Dictionary<string, SelectionMenu>();
 		public Dictionary<string, TextField> TextFields = new Dictionary<string, TextField>();
@@ -65,7 +65,7 @@ namespace TeamStor.RPG.Map.Editor
         public override void OnEnter(GameState previousState)
 		{
             Game.IsMouseVisible = true;
-			MapData = new MapData(new MapInfo { Name = "Unnamed", Creator = "Unknown" }, 50, 50);
+			MapData = new Map(new MapInfo { Name = "Unnamed", Creator = "Unknown" }, 50, 50);
 			
 			Camera = new Camera(this);
 
