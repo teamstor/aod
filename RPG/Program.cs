@@ -8,10 +8,17 @@ namespace TeamStor.RPG
 {
     static class Program
     {
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool SetProcessDPIAware();
+
         public static RenderTarget2D RenderTarget { get; private set; }
         
         private static void Main()
         {
+            // http://crsouza.com/2015/04/13/how-to-fix-blurry-windows-forms-windows-in-high-dpi-settings/
+            if(Environment.OSVersion.Version.Major >= 6)
+                SetProcessDPIAware();
+
             using(Game game = Game.Run(new Menu.MenuState(), "data", false))
             {
                 game.Run();
