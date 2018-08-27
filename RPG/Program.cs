@@ -1,8 +1,11 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TeamStor.Engine;
 using Game = TeamStor.Engine.Game;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
+using Microsoft.Xna.Framework.Input;
+using TeamStor.RPG.Map.Editor;
 
 namespace TeamStor.RPG
 {
@@ -21,8 +24,19 @@ namespace TeamStor.RPG
 
             using(Game game = Game.Run(new Menu.MenuState(), "data", false))
             {
+                game.OnUpdateAfterState += OnUpdate;
                 game.Run();
             }
+        }
+
+        private static void OnUpdate(object sender, Game.UpdateEventArgs e)
+        {
+            Game game = sender as Game;
+
+            if(game.Input.Key(Keys.LeftShift) && 
+                game.Input.KeyPressed(Keys.F8) && 
+                game.CurrentState.GetType() != typeof(MapEditorState))
+                game.CurrentState = new MapEditorState();
         }
 
         public static Vector2 ScaleBatch(SpriteBatch batch)

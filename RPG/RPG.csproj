@@ -53,6 +53,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Editor\Button.cs" />
+    <Compile Include="Editor\Camera.cs" />
+    <Compile Include="Editor\MapEditorState.cs" />
+    <Compile Include="Editor\SelectionMenu.cs" />
+    <Compile Include="Editor\States\MapEditorEditInfoState.cs" />
+    <Compile Include="Editor\States\MapEditorModeState.cs" />
+    <Compile Include="Editor\States\MapEditorShowKeybindsState.cs" />
+    <Compile Include="Editor\States\MapEditorSpawnPointEditState.cs" />
+    <Compile Include="Editor\States\MapEditorTerrainEditState.cs" />
+    <Compile Include="Editor\TextField.cs" />
     <Compile Include="Menu\MenuButton.cs" />
     <Compile Include="Menu\MenuController.cs" />
     <Compile Include="Menu\MenuState.cs" />
