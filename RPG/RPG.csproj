@@ -63,6 +63,8 @@
     <Compile Include="Editor\States\MapEditorSpawnPointEditState.cs" />
     <Compile Include="Editor\States\MapEditorTerrainEditState.cs" />
     <Compile Include="Editor\TextField.cs" />
+    <Compile Include="Map\Map.cs" />
+    <Compile Include="Map\Tile.cs" />
     <Compile Include="Menu\MenuButton.cs" />
     <Compile Include="Menu\MenuController.cs" />
     <Compile Include="Menu\MenuState.cs" />

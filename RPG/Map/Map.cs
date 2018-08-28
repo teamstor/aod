@@ -100,6 +100,7 @@ namespace TeamStor.RPG.Map
         public int Width
         {
             get;
+            private set;
         }
 
         /// <summary>
@@ -108,6 +109,7 @@ namespace TeamStor.RPG.Map
         public int Height
         {
             get;
+            private set;
         }
 
         /// <summary>
@@ -142,7 +144,7 @@ namespace TeamStor.RPG.Map
                 LayerToTileArray(layer)[(y * Width) + x] = value;
             }
         }
-
+        
         /// <param name="layer">The layer the tile is on.</param>
         /// <param name="x">The X position of the tile.</param>
         /// <param name="y">The Y position of the tile.</param>
@@ -167,7 +169,7 @@ namespace TeamStor.RPG.Map
         public string GetMetadata(Tile.Layer layer, int x, int y)
         {
             if(HasMetadata(layer, x, y))
-                return LayerToMetadataArray(layer)[GetMetadataSlot(layer, x, y)];
+                return LayerToMetadataArray(layer)[GetMetadataSlot(layer, x, y) - 1];
 
             return "";
         }
@@ -192,7 +194,7 @@ namespace TeamStor.RPG.Map
                     if((LayerToTileArray(layer)[i] & 0xff00) > slot)
                     {
                         LayerToTileArray(layer)[i] = (short)(
-                            (LayerToTileArray(layer)[i] & 0xff) + 
+                            (LayerToTileArray(layer)[i] & 0xff) | 
                             (LayerToTileArray(layer)[i] & 0xff00) - 1);
                     }
                 }
@@ -202,9 +204,43 @@ namespace TeamStor.RPG.Map
             {
                 LayerToMetadataArray(layer).Add(metadata);
                 LayerToTileArray(layer)[(y * Width) + x] = (short)(
-                    (LayerToTileArray(layer)[(y * Width) + x & 0xff) +
-                    (LayerToTileArray(layer)[(y * Width) + x] & 0xff00) - 1));
+                    (LayerToTileArray(layer)[(y * Width) + x] & 0xff) |
+                    ((LayerToMetadataArray(layer).Count) << 8));
             }
         }
+        
+        /// <summary>
+		/// Resizes this map.
+		/// </summary>
+		/// <param name="newWidth">The new width</param>
+		/// <param name="newHeight">The new height</param>
+		public void Resize(int newWidth, int newHeight, int xOffset = int.MinValue, int yOffset = int.MinValue)
+		{
+            int oldWidth = Width;
+            int oldHeight = Height;
+
+            int xOffset_ = xOffset != int.MinValue ? xOffset : (int)Math.Floor((newWidth - oldWidth) / 2.0);
+            int yOffset_ = yOffset != int.MinValue ? yOffset : (int)Math.Floor((newHeight - oldHeight) / 2.0);
+
+            Width = newWidth;
+			Height = newHeight;
+			
+			short[] tiles = Tiles;
+		    short[] oldTiles = new short[oldWidth * oldHeight];
+            Array.Copy(tiles, oldTiles, oldWidth * oldHeight);
+
+			Array.Resize(ref tiles, newWidth * newHeight);
+
+            Tiles = tiles;
+            for(int i = 0; i < Tiles.Length; i++)
+                Tiles[i] = TerrainTile.DeepWater.Id;
+
+            for(int x = 0; x < Math.Min(oldWidth, Width); x++)
+            {
+                for(int y = 0; y < Math.Min(oldHeight, Height); y++)
+                    SetTileIdAt(false, MathHelper.Clamp(x + xOffset_, 0, Width - 1), MathHelper.Clamp(y + yOffset_, 0, Height - 1), oldTiles[(y * oldWidth) + x]);
+            }
+        }
+
     }
 }

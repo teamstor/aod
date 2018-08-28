@@ -17,16 +17,17 @@ namespace TeamStor.RPG.Menu
         {
             _menuController = new MenuController(Game);
             
-            _menuController.Add(new MenuButton("Test"));
-            _menuController.Add(new MenuButton("Test 2"));
-            _menuController.Add(new MenuButton("Test 333"));
-            _menuController.Add(new MenuButton("Test 4"));
+            _menuController.Add(new MenuButton("New Game"));
+            _menuController.Add(new MenuButton("Load Game"));
+            _menuController.Add(new MenuButton("Settings"));
+            _menuController.Add(new MenuButton("Credits"));
+            _menuController.Add(new MenuButton("Exit"));
         }
 
         public override void OnLeave(GameState nextState)
         {
-            
         }
+
 
         public override void Update(double deltaTime, double totalTime, long count)
         {
