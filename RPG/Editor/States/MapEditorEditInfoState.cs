@@ -4,7 +4,7 @@ using TeamStor.Engine;
 using TeamStor.Engine.Tween;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 
-namespace TeamStor.RPG.Map.Editor.States
+namespace TeamStor.RPG.Editor.States
 {
 	public class MapEditorEditInfoState : MapEditorModeState
 	{

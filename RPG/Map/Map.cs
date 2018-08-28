@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
 
 namespace TeamStor.RPG.Map
 {
@@ -38,6 +39,12 @@ namespace TeamStor.RPG.Map
         /// </summary>
         public class Information
         {
+            public Information(string name, Environment environment, Weather weather)
+            {
+                Name = name;
+                Environment = environment;
+            }
+            
             /// <summary>
             /// Name of the map that will be shown when you enter it.
             /// </summary>
@@ -47,6 +54,11 @@ namespace TeamStor.RPG.Map
             /// Environment the map is in.
             /// </summary>
             public Environment Environment;
+            
+            /// <summary>
+            /// Weather of the map.
+            /// </summary>
+            public Weather Weather;
         }
 
         // The lower 8 bits of the layer arrays are the ID of the tile. The higher 8 bits are the position into the metadata array.
@@ -54,40 +66,40 @@ namespace TeamStor.RPG.Map
         private short[] _layerTerrain, _layerDecoration, _layerNPC, _layerControl;
         private List<string> _metadataTerrain, _metadataDecoration, _metadataNPC, _metadataControl;
 
-        private short[] LayerToTileArray(Tile.Layer layer)
+        private short[] LayerToTileArray(Tile.MapLayer layer)
         {
             switch(layer)
             {
-                case Tile.Layer.Terrain:
+                case Tile.MapLayer.Terrain:
                     return _layerTerrain;
 
-                case Tile.Layer.Decoration:
+                case Tile.MapLayer.Decoration:
                     return _layerDecoration;
 
-                case Tile.Layer.NPC:
+                case Tile.MapLayer.NPC:
                     return _layerNPC;
 
-                case Tile.Layer.Control:
+                case Tile.MapLayer.Control:
                     return _layerControl;
             }
 
             return null;
         }
 
-        private List<string> LayerToMetadataArray(Tile.Layer layer)
+        private List<string> LayerToMetadataArray(Tile.MapLayer layer)
         {
             switch(layer)
             {
-                case Tile.Layer.Terrain:
+                case Tile.MapLayer.Terrain:
                     return _metadataTerrain;
 
-                case Tile.Layer.Decoration:
+                case Tile.MapLayer.Decoration:
                     return _metadataDecoration;
 
-                case Tile.Layer.NPC:
+                case Tile.MapLayer.NPC:
                     return _metadataNPC;
 
-                case Tile.Layer.Control:
+                case Tile.MapLayer.Control:
                     return _metadataControl;
             }
 
@@ -132,7 +144,7 @@ namespace TeamStor.RPG.Map
             _metadataControl = new List<string>();
         }
 
-        public byte this[Tile.Layer layer, int x, int y]
+        public byte this[Tile.MapLayer layer, int x, int y]
         {
             get
             {
@@ -149,12 +161,12 @@ namespace TeamStor.RPG.Map
         /// <param name="x">The X position of the tile.</param>
         /// <param name="y">The Y position of the tile.</param>
         /// <returns>If the tile has any metadata attached to it.</returns>
-        public bool HasMetadata(Tile.Layer layer, int x, int y)
+        public bool HasMetadata(Tile.MapLayer layer, int x, int y)
         {
             return GetMetadataSlot(layer, x, y) != 0;
         }
 
-        private byte GetMetadataSlot(Tile.Layer layer, int x, int y)
+        private byte GetMetadataSlot(Tile.MapLayer layer, int x, int y)
         {
             return (byte)(LayerToTileArray(layer)[(y * Width) + x] & 0x00ff);
         }
@@ -166,7 +178,7 @@ namespace TeamStor.RPG.Map
         /// <param name="x">The X position of the tile.</param>
         /// <param name="y">The Y position of the tile.</param>
         /// <returns>The metadata or an empty string.</returns>
-        public string GetMetadata(Tile.Layer layer, int x, int y)
+        public string GetMetadata(Tile.MapLayer layer, int x, int y)
         {
             if(HasMetadata(layer, x, y))
                 return LayerToMetadataArray(layer)[GetMetadataSlot(layer, x, y) - 1];
@@ -181,7 +193,7 @@ namespace TeamStor.RPG.Map
         /// <param name="x">The X position of the tile.</param>
         /// <param name="y">The Y position of the tile.</param>
         /// <param name="metadata">The metadata string, or null.</param>
-        public void SetMetadata(Tile.Layer layer, int x, int y, string metadata)
+        public void SetMetadata(Tile.MapLayer layer, int x, int y, string metadata)
         {
             if(HasMetadata(layer, x, y))
             {
@@ -224,23 +236,42 @@ namespace TeamStor.RPG.Map
 
             Width = newWidth;
 			Height = newHeight;
-			
-			short[] tiles = Tiles;
-		    short[] oldTiles = new short[oldWidth * oldHeight];
-            Array.Copy(tiles, oldTiles, oldWidth * oldHeight);
 
-			Array.Resize(ref tiles, newWidth * newHeight);
+		    foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
+		    {
+		        short[] tiles = LayerToTileArray(layer);
+		        short[] oldTiles = new short[oldWidth * oldHeight];
+		        Array.Copy(tiles, oldTiles, oldWidth * oldHeight);
 
-            Tiles = tiles;
-            for(int i = 0; i < Tiles.Length; i++)
-                Tiles[i] = TerrainTile.DeepWater.Id;
+		        Array.Resize(ref tiles, newWidth * newHeight);
 
-            for(int x = 0; x < Math.Min(oldWidth, Width); x++)
-            {
-                for(int y = 0; y < Math.Min(oldHeight, Height); y++)
-                    SetTileIdAt(false, MathHelper.Clamp(x + xOffset_, 0, Width - 1), MathHelper.Clamp(y + yOffset_, 0, Height - 1), oldTiles[(y * oldWidth) + x]);
-            }
-        }
+		        switch(layer)
+		        {
+		            case Tile.MapLayer.Terrain:
+		                _layerTerrain = tiles;
+		                break;
+		            case Tile.MapLayer.Decoration:
+		                _layerDecoration = tiles;
+		                break;
+		            case Tile.MapLayer.NPC:
+		                _layerNPC = tiles;
+		                break;
+		            case Tile.MapLayer.Control:
+		                _layerControl = tiles;
+		                break;
+		        }
 
+		        for(int x = 0; x < Math.Min(oldWidth, Width); x++)
+		        {
+		            for(int y = 0; y < Math.Min(oldHeight, Height); y++)
+		            {
+		                int xPos = MathHelper.Clamp(x + xOffset_, 0, Width - 1);
+		                int yPos = MathHelper.Clamp(y + yOffset_, 0, Height - 1);
+
+			            LayerToTileArray(layer)[yPos * Width + xPos] = oldTiles[yPos * oldWidth + xPos];
+		            }
+		        }
+		    }
+		}
     }
 }

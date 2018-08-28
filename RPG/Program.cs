@@ -5,7 +5,7 @@ using TeamStor.Engine;
 using Game = TeamStor.Engine.Game;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 using Microsoft.Xna.Framework.Input;
-using TeamStor.RPG.Map.Editor;
+using TeamStor.RPG.Editor;
 
 namespace TeamStor.RPG
 {

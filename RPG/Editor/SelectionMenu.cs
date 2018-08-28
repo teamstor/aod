@@ -5,7 +5,7 @@ using TeamStor.Engine.Graphics;
 using TeamStor.Engine.Tween;
 using Game = TeamStor.Engine.Game;
 
-namespace TeamStor.RPG.Map.Editor
+namespace TeamStor.RPG.Editor
 {
 	public class SelectionMenu
 	{

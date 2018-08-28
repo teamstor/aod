@@ -11,7 +11,7 @@ using TeamStor.Engine.Tween;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 using Game = TeamStor.Engine.Game;
 
-namespace TeamStor.RPG.Map.Editor
+namespace TeamStor.RPG.Editor
 {
     public class Button
     {

@@ -1,6 +1,6 @@
 ﻿using TeamStor.Engine;
 
-namespace TeamStor.RPG.Map.Editor.States
+namespace TeamStor.RPG.Editor.States
 {
 	/// <summary>
 	/// Map editor mode.

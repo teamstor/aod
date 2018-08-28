@@ -6,11 +6,11 @@ using System.Linq;
 using TeamStor.Engine;
 using TeamStor.Engine.Graphics;
 using TeamStor.Engine.Tween;
-using TeamStor.RPG.Map.Editor.States;
+using TeamStor.RPG.Editor.States;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 
-namespace TeamStor.RPG.Map.Editor
+namespace TeamStor.RPG.Editor
 {
 	public class MapEditorState : GameState
 	{

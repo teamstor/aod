@@ -8,7 +8,7 @@ using TeamStor.Engine.Tween;
 using Game = TeamStor.Engine.Game;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 
-namespace TeamStor.RPG.Map.Editor
+namespace TeamStor.RPG.Editor
 {
 	public class TextField
 	{

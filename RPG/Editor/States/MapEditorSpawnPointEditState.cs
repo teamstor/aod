@@ -6,7 +6,7 @@ using TeamStor.Engine.Tween;
 using TeamStor.RPG.Gameplay;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 
-namespace TeamStor.RPG.Map.Editor.States
+namespace TeamStor.RPG.Editor.States
 {
 	public class MapEditorSpawnPointEditState : MapEditorModeState
 	{

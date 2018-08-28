@@ -7,7 +7,7 @@ using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TeamStor.RPG.Map.Editor.States
+namespace TeamStor.RPG.Editor.States
 {
     public enum TerrainTool
     {

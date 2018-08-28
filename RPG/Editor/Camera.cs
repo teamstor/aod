@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Input;
 using TeamStor.Engine;
 using TeamStor.Engine.Tween;
 
-namespace TeamStor.RPG.Map.Editor
+namespace TeamStor.RPG.Editor
 {
 	/// <summary>
 	/// Map editor camera.

@@ -2,7 +2,7 @@
 using TeamStor.Engine;
 using TeamStor.Engine.Graphics;
 
-namespace TeamStor.RPG.Map.Editor.States
+namespace TeamStor.RPG.Editor.States
 {
 	public class MapEditorShowKeybindsState : MapEditorModeState
 	{
