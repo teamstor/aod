@@ -47,20 +47,6 @@ namespace TeamStor.RPG.Editor.States
 				Width = 300
 			});
 			
-			BaseState.TextFields.Add("creator", new TextField
-			{
-				Label = "Creator: ",
-				Text = BaseState.MapData.Info.Creator,
-				Font = Game.DefaultFonts.Bold,
-				Icon = Assets.Get<Texture2D>("textures/editor/info_edit/icon_creator.png"),
-				Position = new TweenedVector2(Game, new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 80 + 36)),
-				FocusChanged = (field, focus) =>
-				{
-					if(!focus) BaseState.MapData.Info.Creator = field.Text.TrimStart();
-				},
-				Width = 300
-			});
-			
 			BaseState.TextFields.Add("size", new TextField
 			{
 				Label = "Size: ",
@@ -86,7 +72,6 @@ namespace TeamStor.RPG.Editor.States
 		public override void OnLeave(GameState nextState)
 		{
 			BaseState.MapData.Info.Name = BaseState.TextFields["name"].Text.TrimStart();
-			BaseState.MapData.Info.Creator = BaseState.TextFields["creator"].Text.TrimStart();
 			
 			BaseState.TextFields.Remove("name");
 			BaseState.TextFields.Remove("creator");

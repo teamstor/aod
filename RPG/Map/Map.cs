@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 
-namespace TeamStor.RPG.Map
+namespace TeamStor.RPG
 {
     /// <summary>
     /// Map data.
@@ -268,6 +268,7 @@ namespace TeamStor.RPG.Map
 		                int xPos = MathHelper.Clamp(x + xOffset_, 0, Width - 1);
 		                int yPos = MathHelper.Clamp(y + yOffset_, 0, Height - 1);
 
+                        // TODO ÄR FEL
 			            LayerToTileArray(layer)[yPos * Width + xPos] = oldTiles[yPos * oldWidth + xPos];
 		            }
 		        }

@@ -9,6 +9,7 @@ using TeamStor.Engine.Tween;
 using TeamStor.RPG.Editor.States;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
+using System.Windows.Forms;
 
 namespace TeamStor.RPG.Editor
 {
@@ -16,8 +17,8 @@ namespace TeamStor.RPG.Editor
 	{
 		private enum EditMode
 		{
-			Terrain,
-			Spawnpoints,
+			Tiles,
+            Attributes,
 			Info,
 			Keybinds
 		}
@@ -26,7 +27,7 @@ namespace TeamStor.RPG.Editor
         private TweenedDouble _fade;
         private TweenedDouble _topTextFade;
 
-        private EditMode _editMode = EditMode.Terrain;
+        private EditMode _editMode = EditMode.Tiles;
 
 		private MapEditorModeState _state;
 		
@@ -65,35 +66,34 @@ namespace TeamStor.RPG.Editor
         public override void OnEnter(GameState previousState)
 		{
             Game.IsMouseVisible = true;
-			MapData = new Map(new MapInfo { Name = "Unnamed", Creator = "Unknown" }, 50, 50);
+			MapData = new Map(50, 50, new Map.Information("Untitled", Map.Environment.Forest, Map.Weather.Sunny));
 			
 			Camera = new Camera(this);
 
-            Buttons.Add("edit-terrain-mode", new Button
+            Buttons.Add("edit-tiles-mode", new Button
             {
                 Text = "",
-                Icon = Assets.Get<Texture2D>("textures/editor/icon_terrain.png"),
+                Icon = Assets.Get<Texture2D>("editor/tiles.png"),
                 Position = new TweenedVector2(Game, new Vector2(-200, 114)),
                 Font = Game.DefaultFonts.Normal,
                 Clicked = (btn) =>
                 {
-	                _editMode = EditMode.Terrain;
-	                CurrentState = new MapEditorTerrainEditState();
+	                _editMode = EditMode.Tiles;
+	                CurrentState = new MapEditorTileEditState();
                 },
 
                 Active = false
             });
 
-            Buttons.Add("edit-spawnpoints-mode", new Button
+            Buttons.Add("edit-attributes-mode", new Button
             {
                 Text = "",
-                Icon = Assets.Get<Texture2D>("textures/editor/icon_spawnpoints.png"),
+                Icon = Assets.Get<Texture2D>("editor/attributes.png"),
 	            Position = new TweenedVector2(Game, new Vector2(-200, 114 + 32)),
                 Font = Game.DefaultFonts.Normal,
                 Clicked = (btn) =>
                 {
-	                _editMode = EditMode.Spawnpoints; 
-	                CurrentState = new MapEditorSpawnPointEditState();
+	                _editMode = EditMode.Attributes; 
                 },
 
                 Active = false
@@ -102,7 +102,7 @@ namespace TeamStor.RPG.Editor
             Buttons.Add("edit-info-mode", new Button
             {
                 Text = "",
-                Icon = Assets.Get<Texture2D>("textures/editor/icon_info.png"),
+                Icon = Assets.Get<Texture2D>("editor/info.png"),
 	            Position = new TweenedVector2(Game, new Vector2(-200, 114 + 32 * 2)),
                 Font = Game.DefaultFonts.Normal,
                 Clicked = (btn) =>
@@ -117,7 +117,7 @@ namespace TeamStor.RPG.Editor
 			Buttons.Add("keybinds-help-mode", new Button
 			{
 				Text = "",
-				Icon = Assets.Get<Texture2D>("textures/editor/icon_keybinds.png"),
+				Icon = Assets.Get<Texture2D>("editor/keybinds.png"),
 				Position = new TweenedVector2(Game, new Vector2(-200, 114 + 32 * 3)),
 				Font = Game.DefaultFonts.Normal,
 				Clicked = (btn) =>
@@ -132,16 +132,16 @@ namespace TeamStor.RPG.Editor
 			Buttons.Add("load", new Button
 			{
 				Text = "",
-				Icon = Assets.Get<Texture2D>("textures/editor/icon_load.png"),
+				Icon = Assets.Get<Texture2D>("editor/load.png"),
 				Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 4)),
 				Font = Game.DefaultFonts.Normal,
 				Clicked = (btn) =>
 				{
 					OpenFileDialog dialog = new OpenFileDialog();
 					
-					dialog.Filter = "Map files (*.tsmap)|*.tsmap|All files (*.*)|*.*";
-					if(dialog.ShowDialog() == DialogResult.OK)
-						MapData = MapData.Load(dialog.FileName);
+					dialog.Filter = "Map files (*.map)|*.map|All files (*.*)|*.*";
+					//if(dialog.ShowDialog() == DialogResult.OK)
+						//MapData = MapData.Load(dialog.FileName); TODO
 					
 					dialog.Dispose();
 					Application.DoEvents();
@@ -153,17 +153,17 @@ namespace TeamStor.RPG.Editor
 			Buttons.Add("save", new Button
 			{
 				Text = "",
-				Icon = Assets.Get<Texture2D>("textures/editor/icon_save.png"),
+				Icon = Assets.Get<Texture2D>("editor/save.png"),
 				Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 5)),
 				Font = Game.DefaultFonts.Normal,
 				Clicked = (btn) =>
 				{
 					SaveFileDialog dialog = new SaveFileDialog();
 					
-					dialog.Filter = "Map files (*.tsmap)|*.tsmap|All files (*.*)|*.*";
-					if(dialog.ShowDialog() == DialogResult.OK)
-						MapData.Save(dialog.FileName);
-					
+					dialog.Filter = "Map files (*.map)|*.map|All files (*.*)|*.*";
+					//if(dialog.ShowDialog() == DialogResult.OK)
+						//MapData.Save(dialog.FileName); TODO
+					 
 					dialog.Dispose();
 					Application.DoEvents();
 				},
@@ -174,7 +174,7 @@ namespace TeamStor.RPG.Editor
 			Buttons.Add("exit", new Button
 			{
 				Text = "",
-				Icon = Assets.Get<Texture2D>("textures/editor/icon_exit.png"),
+				Icon = Assets.Get<Texture2D>("editor/exit.png"),
 				Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 6)),
 				Font = Game.DefaultFonts.Normal,
 				Clicked = (btn) => { },
@@ -182,8 +182,8 @@ namespace TeamStor.RPG.Editor
 				Active = false
 			});
 
-            Buttons["edit-terrain-mode"].Position.TweenTo(new Vector2(10, 114), TweenEaseType.EaseOutQuad, 0.65f);
-            Buttons["edit-spawnpoints-mode"].Position.TweenTo(new Vector2(10, 114 + 32), TweenEaseType.EaseOutQuad, 0.65f);
+            Buttons["edit-tiles-mode"].Position.TweenTo(new Vector2(10, 114), TweenEaseType.EaseOutQuad, 0.65f);
+            Buttons["edit-attributes-mode"].Position.TweenTo(new Vector2(10, 114 + 32), TweenEaseType.EaseOutQuad, 0.65f);
             Buttons["edit-info-mode"].Position.TweenTo(new Vector2(10, 114 + 32 * 2), TweenEaseType.EaseOutQuad, 0.65f);
 			Buttons["keybinds-help-mode"].Position.TweenTo(new Vector2(10, 114 + 32 * 3), TweenEaseType.EaseOutQuad, 0.65f);
 			
@@ -199,7 +199,7 @@ namespace TeamStor.RPG.Editor
 
             _topTextFade = new TweenedDouble(Game, 2.0);
 			
-			CurrentState = new MapEditorTerrainEditState();
+			CurrentState = new MapEditorTileEditState();
         }
 
         public override void OnLeave(GameState nextState)
@@ -214,10 +214,10 @@ namespace TeamStor.RPG.Editor
                 if(CurrentState.CurrentHelpText != "")
                     return CurrentState.CurrentHelpText;
 
-				if(!Buttons["edit-terrain-mode"].Active && Buttons["edit-terrain-mode"].Rectangle.Contains(Input.MousePosition))
-					return "Edit terrain";
-				if(!Buttons["edit-spawnpoints-mode"].Active && Buttons["edit-spawnpoints-mode"].Rectangle.Contains(Input.MousePosition))
-					return "Edit spawn points";
+				if(!Buttons["edit-tiles-mode"].Active && Buttons["edit-tiles-mode"].Rectangle.Contains(Input.MousePosition))
+					return "Edit tiles";
+				if(!Buttons["edit-attributes-mode"].Active && Buttons["edit-attributes-mode"].Rectangle.Contains(Input.MousePosition))
+					return "Edit tile attributes";
 				if(!Buttons["edit-info-mode"].Active && Buttons["edit-info-mode"].Rectangle.Contains(Input.MousePosition))
 					return "Edit map info";
 				if(!Buttons["keybinds-help-mode"].Active && Buttons["keybinds-help-mode"].Rectangle.Contains(Input.MousePosition))
@@ -271,8 +271,8 @@ namespace TeamStor.RPG.Editor
 
             Camera.Update(deltaTime, totalTime);
 			
-            Buttons["edit-terrain-mode"].Active = _editMode == EditMode.Terrain;
-            Buttons["edit-spawnpoints-mode"].Active = _editMode == EditMode.Spawnpoints;
+            Buttons["edit-tiles-mode"].Active = _editMode == EditMode.Tiles;
+            Buttons["edit-attributes-mode"].Active = _editMode == EditMode.Attributes;
             Buttons["edit-info-mode"].Active = _editMode == EditMode.Info;
 			Buttons["keybinds-help-mode"].Active = _editMode == EditMode.Keybinds;
 
@@ -286,8 +286,8 @@ namespace TeamStor.RPG.Editor
 				field.Update(Game);
 
             string str =
-               "TBS Map Editor\n" +
-               "Name: \"" + MapData.Info.Name + "\" (made by \"" + MapData.Info.Creator + "\")\n" +
+               "Map Editor\n" +
+               "Name: \"" + MapData.Info.Name + "\n" +
                "Size: " + MapData.Width + "x" + MapData.Height + "\n" +
 			   "[LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL]";
 
@@ -335,7 +335,7 @@ namespace TeamStor.RPG.Editor
 			batch.Transform = Camera.Transform;
 			batch.SamplerState = SamplerState.PointWrap;
 			
-            MapData.Draw(false, Game, Assets, new Rectangle(
+            /*MapData.Draw(false, Game, Assets, new Rectangle(
                 (int)-(Camera.Translation.X / Camera.Zoom.Value),
                 (int)-(Camera.Translation.Y / Camera.Zoom.Value), 
                 (int)(screenSize.X / Math.Floor(Camera.Zoom.Value)), 
@@ -345,7 +345,7 @@ namespace TeamStor.RPG.Editor
                 (int)-(Camera.Translation.X / Camera.Zoom.Value),
                 (int)-(Camera.Translation.Y / Camera.Zoom.Value),
                 (int)(screenSize.X / Math.Floor(Camera.Zoom.Value)),
-                (int)(screenSize.Y / Math.Floor(Camera.Zoom.Value))));
+                (int)(screenSize.Y / Math.Floor(Camera.Zoom.Value))));*/
 
             batch.Outline(new Rectangle(0, 0, MapData.Width * 16, MapData.Height * 16),
 				Color.White, 1, false);
@@ -357,8 +357,8 @@ namespace TeamStor.RPG.Editor
 			CurrentState.Draw(batch, screenSize);
 			
 			string str = 
-				"TBS Map Editor\n" +
-				"Name: \"" + MapData.Info.Name + "\" (made by \"" + MapData.Info.Creator + "\")\n" +
+				"Map Editor\n" +
+				"Name: \"" + MapData.Info.Name + "\n" +
 				"Size: " + MapData.Width + "x" + MapData.Height + "\n" +
 				"[LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL]";
 
@@ -367,9 +367,9 @@ namespace TeamStor.RPG.Editor
 				Color.Black * (MathHelper.Clamp(_topTextFade, 0, 1) * 0.85f));
 
 			str = str.Replace("[LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL]", CurrentHelpText)
-				.Replace("TBS Map Editor\n", "");
+				.Replace("Map Editor\n", "");
 
-			batch.Text(SpriteBatch.FontStyle.Bold, 15, "TBS Map Editor", new Vector2(20, (int)_topTextY + 10),
+			batch.Text(SpriteBatch.FontStyle.Bold, 15, "Map Editor", new Vector2(20, (int)_topTextY + 10),
 				Color.White * MathHelper.Clamp(_topTextFade, 0, 1));
 			batch.Text(SpriteBatch.FontStyle.Bold, 15, str, new Vector2(20, (int)_topTextY + 10 + (15 * 1.25f)),
 				Color.White * (MathHelper.Clamp(_topTextFade, 0, 1) * 0.8f));

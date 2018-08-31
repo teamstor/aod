@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace TeamStor.RPG.Map
+namespace TeamStor.RPG
 {
 	/// <summary>
 	/// Contains a list of tiles.

@@ -6,7 +6,7 @@ using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TeamStor.RPG.Map
+namespace TeamStor.RPG
 {
     public class Tile
     {
@@ -120,12 +120,12 @@ namespace TeamStor.RPG.Map
             return other.ID < ID && Layer == MapLayer.Terrain;
         }
         
-        private static Dictionary<byte, Tile> _tilesTerrain = new Dictionary<byte, Tile>();
-        private static Dictionary<byte, Tile> _tilesDecoration = new Dictionary<byte, Tile>();
-        private static Dictionary<byte, Tile> _tilesNPC = new Dictionary<byte, Tile>();
-        private static Dictionary<byte, Tile> _tilesControl = new Dictionary<byte, Tile>();
+        private static SortedDictionary<byte, Tile> _tilesTerrain = new SortedDictionary<byte, Tile>();
+        private static SortedDictionary<byte, Tile> _tilesDecoration = new SortedDictionary<byte, Tile>();
+        private static SortedDictionary<byte, Tile> _tilesNPC = new SortedDictionary<byte, Tile>();
+        private static SortedDictionary<byte, Tile> _tilesControl = new SortedDictionary<byte, Tile>();
 
-        private static Dictionary<byte, Tile> LayerToDictionary(MapLayer layer)
+        private static SortedDictionary<byte, Tile> LayerToDictionary(MapLayer layer)
         {
             switch(layer)
             {
@@ -193,6 +193,13 @@ namespace TeamStor.RPG.Map
         public static bool Exists(byte id, MapLayer layer)
         {
             return LayerToDictionary(layer).ContainsKey(id);
+        }
+
+        /// <param name="layer">The layer to get tiles from.</param>
+        /// <returns>All tiles on a specified layer.</returns>
+        public static IEnumerable<Tile> Values(MapLayer layer)
+        {
+            return LayerToDictionary(layer).Values;
         }
     }
 }
