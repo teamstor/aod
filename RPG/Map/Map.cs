@@ -131,6 +131,9 @@ namespace TeamStor.RPG
 
         public Map(int w, int h, Information info)
         {
+            Width = w;
+            Height = h;
+
             Info = info;
 
             _layerTerrain = new short[w * h];
