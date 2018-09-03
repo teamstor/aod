@@ -18,8 +18,8 @@ namespace TeamStor.RPG.Editor.States
 
 	public class MapEditorTileEditState : MapEditorModeState
 	{
-		private EditTool _tool;
-        private bool _decorationLayer;
+		private EditTool _tool = EditTool.PaintOne;
+		private Tile.MapLayer _layer = Tile.MapLayer.Terrain;
 		
 		private float _radius = 4;
 
@@ -71,7 +71,7 @@ namespace TeamStor.RPG.Editor.States
                 BaseState.SelectionMenus.Remove("select-tile-menu");
 
             List<string> tiles = new List<string>();
-            foreach(Tile tile in Tile.Values(Tile.MapLayer.Terrain))
+            foreach(Tile tile in Tile.Values(_layer))
                 tiles.Add(tile.Name());
 
             BaseState.SelectionMenus.Add("select-tile-menu", new SelectionMenu
@@ -114,6 +114,71 @@ namespace TeamStor.RPG.Editor.States
 			});
 			
 			BaseState.Buttons["tool-rectangle"].Position.TweenTo(new Vector2(48, 114 + 31 + 32), TweenEaseType.EaseOutQuad, previousState == null ? 0.65f : 0f);
+			
+			BaseState.Buttons.Add("layer-terrain", new Button
+			{
+				Text = "",
+				Icon = Assets.Get<Texture2D>("editor/tile/terrain.png"),
+				Position = new TweenedVector2(Game, new Vector2(-250, 119 + 31 + 32 * 2)),
+				
+				Active = true,
+				Clicked = (btn) => {
+					_layer = Tile.MapLayer.Terrain;
+					UpdateSelectTileMenu();
+				},
+				Font = Game.DefaultFonts.Normal
+			});
+			
+			BaseState.Buttons["layer-terrain"].Position.TweenTo(new Vector2(48, 119 + 31 + 32 * 2), TweenEaseType.EaseOutQuad, previousState == null ? 0.65f : 0f);
+			
+			BaseState.Buttons.Add("layer-decoration", new Button
+			{
+				Text = "",
+				Icon = Assets.Get<Texture2D>("editor/tile/decoration.png"),
+				Position = new TweenedVector2(Game, new Vector2(-250, 119 + 31 + 32 * 3)),
+				
+				Active = false,
+				Clicked = (btn) => { 					
+					_layer = Tile.MapLayer.Decoration;
+					UpdateSelectTileMenu();
+				},
+				Font = Game.DefaultFonts.Normal
+			});
+			
+			BaseState.Buttons["layer-decoration"].Position.TweenTo(new Vector2(48, 119 + 31 + 32 * 3), TweenEaseType.EaseOutQuad, previousState == null ? 0.65f : 0f);
+
+			BaseState.Buttons.Add("layer-npc", new Button
+			{
+				Text = "",
+				Icon = Assets.Get<Texture2D>("editor/tile/npc.png"),
+				Position = new TweenedVector2(Game, new Vector2(-250, 119 + 31 + 32 * 4)),
+				
+				Active = false,
+				Clicked = (btn) => { 					
+					_layer = Tile.MapLayer.NPC;
+					UpdateSelectTileMenu();
+				},
+				Font = Game.DefaultFonts.Normal
+			});
+			
+			BaseState.Buttons["layer-npc"].Position.TweenTo(new Vector2(48, 119 + 31 + 32 * 4), TweenEaseType.EaseOutQuad, previousState == null ? 0.65f : 0f);
+			
+			BaseState.Buttons.Add("layer-control", new Button
+			{
+				Text = "",
+				Icon = Assets.Get<Texture2D>("editor/tile/control.png"),
+				Position = new TweenedVector2(Game, new Vector2(-250, 119 + 31 + 32 * 5)),
+				
+				Active = false,
+				Clicked = (btn) => { 					
+					_layer = Tile.MapLayer.Control;
+					UpdateSelectTileMenu();
+				},
+				Font = Game.DefaultFonts.Normal
+			});
+			
+			BaseState.Buttons["layer-control"].Position.TweenTo(new Vector2(48, 119 + 31 + 32 * 5), TweenEaseType.EaseOutQuad, previousState == null ? 0.65f : 0f);
+
         }
 
         public override void OnLeave(GameState nextState)
@@ -122,6 +187,11 @@ namespace TeamStor.RPG.Editor.States
 			
 			BaseState.Buttons.Remove("tool-paintone");
 			BaseState.Buttons.Remove("tool-rectangle");
+			
+			BaseState.Buttons.Remove("layer-terrain");
+			BaseState.Buttons.Remove("layer-decoration");
+			BaseState.Buttons.Remove("layer-npc");
+			BaseState.Buttons.Remove("layer-control");
         }
 
         public override void Update(double deltaTime, double totalTime, long count)
@@ -130,6 +200,11 @@ namespace TeamStor.RPG.Editor.States
 	        
 	        BaseState.Buttons["tool-paintone"].Active = _tool == EditTool.PaintOne;
 	        BaseState.Buttons["tool-rectangle"].Active = _tool == EditTool.PaintRectangle;
+	        
+	        BaseState.Buttons["layer-terrain"].Active = _layer == Tile.MapLayer.Terrain;
+	        BaseState.Buttons["layer-decoration"].Active = _layer == Tile.MapLayer.Decoration;
+	        BaseState.Buttons["layer-npc"].Active = _layer == Tile.MapLayer.NPC;
+	        BaseState.Buttons["layer-control"].Active = _layer == Tile.MapLayer.Control;
 
 	        if(BaseState.Buttons["tool-paintone"].Position.IsComplete)
 	        {
@@ -139,7 +214,32 @@ namespace TeamStor.RPG.Editor.States
 		        BaseState.Buttons["tool-rectangle"].Position.TweenTo(new Vector2(48,
 			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Y +
 			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Height + 4 + 32), TweenEaseType.Linear, 0);
-            }
+		        
+		        BaseState.Buttons["layer-terrain"].Position.TweenTo(new Vector2(48,
+			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Y +
+			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Height + 4 + 32 + 5 + 32), TweenEaseType.Linear, 0);
+		        BaseState.Buttons["layer-decoration"].Position.TweenTo(new Vector2(48,
+			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Y +
+			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Height + 4 + 32 + 5 + 32 * 2), TweenEaseType.Linear, 0);
+		        BaseState.Buttons["layer-npc"].Position.TweenTo(new Vector2(48,
+			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Y +
+			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Height + 4 + 32 + 5 + 32 * 3), TweenEaseType.Linear, 0);
+		        BaseState.Buttons["layer-control"].Position.TweenTo(new Vector2(48,
+			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Y +
+			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Height + 4 + 32 + 5 + 32 * 4), TweenEaseType.Linear, 0);
+
+		        float alpha = 1.0f;
+		        if(BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Contains(Input.MousePosition))
+			        alpha = 0.0f;
+
+		        BaseState.Buttons["tool-paintone"].Alpha = MathHelper.Lerp(BaseState.Buttons["tool-paintone"].Alpha, alpha, (float)deltaTime * 25f);
+		        BaseState.Buttons["tool-rectangle"].Alpha = MathHelper.Lerp(BaseState.Buttons["tool-rectangle"].Alpha, alpha, (float)deltaTime * 25f);
+
+		        BaseState.Buttons["layer-terrain"].Alpha = MathHelper.Lerp(BaseState.Buttons["layer-terrain"].Alpha, alpha, (float)deltaTime * 25f);
+		        BaseState.Buttons["layer-decoration"].Alpha = MathHelper.Lerp(BaseState.Buttons["layer-decoration"].Alpha, alpha, (float)deltaTime * 25f);
+		        BaseState.Buttons["layer-npc"].Alpha = MathHelper.Lerp(BaseState.Buttons["layer-npc"].Alpha, alpha, (float)deltaTime * 25f);
+		        BaseState.Buttons["layer-control"].Alpha = MathHelper.Lerp(BaseState.Buttons["layer-control"].Alpha, alpha, (float)deltaTime * 25f);
+	        }
 
             if(!BaseState.IsPointObscured(Input.MousePosition))
 	        {
@@ -183,6 +283,15 @@ namespace TeamStor.RPG.Editor.States
 					return "Place tiles";
 				if(!BaseState.Buttons["tool-rectangle"].Active && BaseState.Buttons["tool-rectangle"].Rectangle.Contains(Input.MousePosition))
 					return "Place in rectangle";
+				
+				if(!BaseState.Buttons["layer-terrain"].Active && BaseState.Buttons["layer-terrain"].Rectangle.Contains(Input.MousePosition))
+					return "Select the terrain layer";
+				if(!BaseState.Buttons["layer-decoration"].Active && BaseState.Buttons["layer-decoration"].Rectangle.Contains(Input.MousePosition))
+					return "Select the decoration layer";
+				if(!BaseState.Buttons["layer-npc"].Active && BaseState.Buttons["layer-npc"].Rectangle.Contains(Input.MousePosition))
+					return "Select the NPC layer";
+				if(!BaseState.Buttons["layer-control"].Active && BaseState.Buttons["layer-control"].Rectangle.Contains(Input.MousePosition))
+					return "Select the control layer";
 
 				return "";
 			}
@@ -206,7 +315,7 @@ namespace TeamStor.RPG.Editor.States
 
 					if(Input.Mouse(MouseButton.Left))
 						alpha = MathHelper.Clamp(alpha + (float)Math.Sin(Game.Time * 10f) * 0.4f, 0, 1);
-							
+
 					if(Input.Mouse(MouseButton.Left) && _tool == EditTool.PaintRectangle)
 						batch.Outline(new Rectangle(_rectangleToolRect.X * 16, _rectangleToolRect.Y * 16, _rectangleToolRect.Width * 16 + 16, _rectangleToolRect.Height * 16 + 16),
 							Color.White * alpha, 1, false);
@@ -216,14 +325,46 @@ namespace TeamStor.RPG.Editor.States
 
 					batch.Reset();
 
-					if(_tool == EditTool.PaintOne)
+					if(!(_tool == EditTool.PaintRectangle && _startingTile.X != -1))
+					{
+						string str = "(" + SelectedTile.X + ", " + SelectedTile.Y + ") ";
+						str += "[" + Tile.Find(BaseState.Map[_layer, SelectedTile.X, SelectedTile.Y], _layer).Name() + "]";
+						
 						batch.Text(
 							SpriteBatch.FontStyle.MonoBold,
-							(uint)(8 * BaseState.Camera.Zoom),
-							"(" + SelectedTile.X + ", " + SelectedTile.Y + ")",
+							(uint) (8 * BaseState.Camera.Zoom),
+							str,
 							new Vector2(SelectedTile.X * 16, SelectedTile.Y * 16) * BaseState.Camera.Zoom + BaseState.Camera.Translation -
 							new Vector2(0, 12 * BaseState.Camera.Zoom),
 							Color.White * alpha);
+					}
+					else
+					{
+						string str = "(" + _startingTile.X + " -> " + SelectedTile.X + ", " + _startingTile.Y + " -> " + SelectedTile.Y + ")";
+						
+						int tilesX = Math.Abs(SelectedTile.X - _startingTile.X) + 1;
+						int tilesY = Math.Abs(SelectedTile.Y - _startingTile.Y) + 1;
+						str += " [" + (tilesX * tilesY) + " tile(s)]";
+
+						Vector2 pos = new Vector2(Math.Min(_startingTile.X, SelectedTile.X) * 16, Math.Min(_startingTile.Y, SelectedTile.Y) * 16) * BaseState.Camera.Zoom + BaseState.Camera.Translation -
+						              new Vector2(0, 12 * BaseState.Camera.Zoom);
+
+						if(pos.X < 5 * BaseState.Camera.Zoom)
+							pos.X = 5 * BaseState.Camera.Zoom;
+
+						if(pos.Y < 5 * BaseState.Camera.Zoom)
+						{
+							pos.Y = 5 * BaseState.Camera.Zoom;
+							pos.X += 3 * BaseState.Camera.Zoom;
+						}
+
+						batch.Text(
+							SpriteBatch.FontStyle.MonoBold,
+							(uint)(8 * BaseState.Camera.Zoom),
+							str,
+							pos,
+							Color.White * alpha);
+					}
 				}
 			}
 		}

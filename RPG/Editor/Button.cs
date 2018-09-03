@@ -19,6 +19,7 @@ namespace TeamStor.RPG.Editor
         public Texture2D Icon;
         public TweenedVector2 Position;
         public Font Font;
+        public float Alpha = 1.0f;
 
         public delegate void OnClicked(Button button);
         public OnClicked Clicked;
@@ -54,13 +55,13 @@ namespace TeamStor.RPG.Editor
             SpriteBatch batch = game.Batch;
             bool hovered = Active || Rectangle.Contains(game.Input.MousePosition);
 
-            batch.Rectangle(Rectangle, Color.Black * 0.8f);
+            batch.Rectangle(Rectangle, Color.Black * 0.8f * Alpha);
 
             if(Icon != null)
-                batch.Texture(new Vector2(Position.Value.X + 4, Position.Value.Y + 4), Icon, Color.White * (hovered ? 1f : 0.6f));
+                batch.Texture(new Vector2(Position.Value.X + 4, Position.Value.Y + 4), Icon, Color.White * (hovered ? 1f : 0.6f) * Alpha);
 
             if(Text != "")
-                batch.Text(Font, 15, Text, new Vector2(Position.Value.X + (Icon != null ? Icon.Width + 8 : 4), Position.Value.Y + 6), Color.White * (hovered ? 1f : 0.6f));
+                batch.Text(Font, 15, Text, new Vector2(Position.Value.X + (Icon != null ? Icon.Width + 8 : 4), Position.Value.Y + 6), Color.White * (hovered ? 1f : 0.6f) * Alpha);
         }
     }
 }

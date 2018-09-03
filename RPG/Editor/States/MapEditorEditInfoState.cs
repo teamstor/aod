@@ -40,7 +40,7 @@ namespace TeamStor.RPG.Editor.States
 				Text = BaseState.Map.Info.Name,
 				Font = Game.DefaultFonts.Bold,
 				Icon = Assets.Get<Texture2D>("editor/info/name.png"),
-				Position = new TweenedVector2(Game, new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 98)),
+				Position = new TweenedVector2(Game, new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 72)),
 				FocusChanged = (field, focus) =>
 				{
 					if(!focus) BaseState.Map.Info.Name = field.Text.TrimStart();
@@ -54,7 +54,7 @@ namespace TeamStor.RPG.Editor.States
 				Text = BaseState.Map.Width + "x" + BaseState.Map.Height,
 				Font = Game.DefaultFonts.Bold,
 				Icon = Assets.Get<Texture2D>("editor/info/size.png"),
-				Position = new TweenedVector2(Game, new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 98 + 36)),
+				Position = new TweenedVector2(Game, new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 72 + 36)),
 				FocusChanged = (field, focus) =>
 				{
 					Vector2? size = ParseSize();
@@ -71,12 +71,13 @@ namespace TeamStor.RPG.Editor.States
 
             BaseState.ChoiceFields.Add("environment", new ChoiceField
             {
+	            Game = Game,
                 Label = "Environment",
                 Choices = Enum.GetNames(typeof(Map.Environment)),
                 Choice = (int)BaseState.Map.Info.Environment,
                 Font = Game.DefaultFonts.Bold,
                 Icon = Assets.Get<Texture2D>("editor/info/environment.png"),
-                Position = new TweenedVector2(Game, new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 98 + 36 * 2)),
+                Position = new TweenedVector2(Game, new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 72 + 36 * 2)),
                 ChoiceChanged = (field, newIndex, newChoice) =>
                 {
                     Enum.TryParse(newChoice, out BaseState.Map.Info.Environment);
@@ -86,12 +87,13 @@ namespace TeamStor.RPG.Editor.States
 
             BaseState.ChoiceFields.Add("weather", new ChoiceField
             {
+	            Game = Game,
                 Label = "Weather",
                 Choices = Enum.GetNames(typeof(Map.Weather)),
                 Choice = (int)BaseState.Map.Info.Weather,
                 Font = Game.DefaultFonts.Bold,
                 Icon = Assets.Get<Texture2D>("editor/info/weather.png"),
-                Position = new TweenedVector2(Game, new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 98 + 36 * 3)),
+                Position = new TweenedVector2(Game, new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 72 + 36 * 3)),
                 ChoiceChanged = (field, newIndex, newChoice) =>
                 {
                     Enum.TryParse(newChoice, out BaseState.Map.Info.Weather);
@@ -106,14 +108,17 @@ namespace TeamStor.RPG.Editor.States
 			
 			BaseState.TextFields.Remove("name");
 			BaseState.TextFields.Remove("size");
+
+			BaseState.ChoiceFields.Remove("environment");
+			BaseState.ChoiceFields.Remove("weather");
 		}
 
 		public override void Update(double deltaTime, double totalTime, long count)
 		{
-			BaseState.TextFields["name"].Position.TweenTo(new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 98), TweenEaseType.Linear, 0);
-			BaseState.TextFields["size"].Position.TweenTo(new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 98 + 36), TweenEaseType.Linear, 0);
-            BaseState.ChoiceFields["environment"].Position.TweenTo(new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 98 + 36 * 2), TweenEaseType.Linear, 0);
-            BaseState.ChoiceFields["weather"].Position.TweenTo(new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 98 + 36 * 3), TweenEaseType.Linear, 0);
+			BaseState.TextFields["name"].Position.TweenTo(new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 72), TweenEaseType.Linear, 0);
+			BaseState.TextFields["size"].Position.TweenTo(new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 72 + 36), TweenEaseType.Linear, 0);
+            BaseState.ChoiceFields["environment"].Position.TweenTo(new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 72 + 36 * 2), TweenEaseType.Linear, 0);
+            BaseState.ChoiceFields["weather"].Position.TweenTo(new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 72 + 36 * 3), TweenEaseType.Linear, 0);
 
             BaseState.TextFields["size"].TextColor = ParseSize().HasValue ? Color.White : Color.DarkRed;
 		}

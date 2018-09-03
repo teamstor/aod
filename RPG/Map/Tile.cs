@@ -146,7 +146,7 @@ namespace TeamStor.RPG
         }
 
         public Tile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false)
-        {
+        {            
             ID = id;
             Layer = layer;
             _name = name;

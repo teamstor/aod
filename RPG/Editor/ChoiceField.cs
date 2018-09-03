@@ -13,6 +13,7 @@ namespace TeamStor.RPG.Editor
 {
 	public class ChoiceField
 	{
+		public Game Game;
 		public string Label;
         public string[] Choices;
         public int Choice;
@@ -33,8 +34,49 @@ namespace TeamStor.RPG.Editor
 			}
 		}
 
+		public Rectangle LeftButtonRectangle
+		{
+			get
+			{
+				Rectangle rect = new Rectangle((int)Position.Value.X + (Icon != null ? Icon.Width + 8 : 8) + (int)Font.Measure(15, Label).X + 12, (int)Position.Value.Y, 32, 32);
+
+				if(rect.X < Position.Value.X + Width / 2.3f)
+					rect.X = (int)(Position.Value.X + Width / 2.3f);
+
+				return rect;
+			}
+		}
+		
+		public Rectangle RightButtonRectangle
+		{
+			get
+			{
+				return new Rectangle(Rectangle.X + Rectangle.Width - 32, (int)Position.Value.Y, 32, 32);
+			}
+		}
+
 		public void Update(Game game)
 		{
+			if(Game.Input.MousePressed(MouseButton.Left))
+			{
+				if(LeftButtonRectangle.Contains(Game.Input.MousePosition))
+				{
+					Choice--;
+					if(Choice < 0)
+						Choice = Choices.Length - 1;
+
+					ChoiceChanged(this, Choice, Choices[Choice]);
+				}
+				
+				if(RightButtonRectangle.Contains(Game.Input.MousePosition))
+				{
+					Choice++;
+					if(Choice > Choices.Length - 1)
+						Choice = 0;
+
+					ChoiceChanged(this, Choice, Choices[Choice]);
+				}
+			}
 		}
 
 		public void Draw(Game game)
@@ -50,6 +92,24 @@ namespace TeamStor.RPG.Editor
 			batch.Text(Font, 15, 
 				Label, 
 				new Vector2(Position.Value.X + (Icon != null ? Icon.Width + 8 : 8), Position.Value.Y + 6), 
+				TextColor * 0.6f);
+			
+			batch.Texture(new Rectangle(LeftButtonRectangle.X + 4, LeftButtonRectangle.Y + 4, 24, 24), 
+				Game.Assets.Get<Texture2D>("editor/arrow.png"), 
+				Color.White * (LeftButtonRectangle.Contains(Game.Input.MousePosition) ? Game.Input.Mouse(MouseButton.Left) ? 1.0f : 0.8f : 0.6f), 
+				null, 0, null, SpriteEffects.FlipHorizontally);
+			batch.Texture(new Rectangle(RightButtonRectangle.X + 4, RightButtonRectangle.Y + 4, 24, 24), 
+				Game.Assets.Get<Texture2D>("editor/arrow.png"), 
+				Color.White * (RightButtonRectangle.Contains(Game.Input.MousePosition) ? Game.Input.Mouse(MouseButton.Left) ? 1.0f : 0.8f : 0.6f));
+
+			Vector2 measure = Font.Measure(13, Choices[Choice]);
+			int width = RightButtonRectangle.X - (LeftButtonRectangle.X + LeftButtonRectangle.Width);
+			width -= 8;
+			Rectangle rect = new Rectangle(LeftButtonRectangle.X + LeftButtonRectangle.Width + 4, LeftButtonRectangle.Y, width, 32);
+			
+			batch.Text(Font, 13, 
+				Choices[Choice], 
+				new Vector2(rect.X + rect.Width / 2 - measure.X / 2, Position.Value.Y + 7), 
 				TextColor * 0.6f);
 		}
 	}

@@ -61,13 +61,13 @@ namespace TeamStor.RPG.Editor
 				if(_state.Input.KeyPressed(Keys.D2))
 				{
 					if(Zoom.TargetValue <= 4)
-						Zoom.TweenTo(Zoom.TargetValue * 2, TweenEaseType.EaseOutCubic, 0.35);
+						Zoom.TweenTo(Zoom.TargetValue * 2, TweenEaseType.EaseInOutCubic, 0.25);
 				}
 
 				if(_state.Input.KeyPressed(Keys.D1))
 				{
 					if(Zoom.TargetValue >= 2)
-						Zoom.TweenTo(Zoom.TargetValue / 2, TweenEaseType.EaseOutCubic, 0.35);
+						Zoom.TweenTo(Zoom.TargetValue / 2, TweenEaseType.EaseInOutCubic, 0.25);
 				}
 
                 if(_state.Input.Mouse(MouseButton.Right))
