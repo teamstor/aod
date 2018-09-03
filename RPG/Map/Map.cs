@@ -269,7 +269,7 @@ namespace TeamStor.RPG
 		                int yPos = MathHelper.Clamp(y + yOffset_, 0, Height - 1);
 
                         // TODO ÄR FEL
-			            LayerToTileArray(layer)[yPos * Width + xPos] = oldTiles[yPos * oldWidth + xPos];
+			            LayerToTileArray(layer)[yPos * Width + xPos] = oldTiles[y * oldWidth + x];
 		            }
 		        }
 		    }
