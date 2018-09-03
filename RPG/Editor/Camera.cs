@@ -21,7 +21,7 @@ namespace TeamStor.RPG.Editor
         {
             get
             {
-                return new Vector2(_state.MapData.Width * 16 * Zoom, _state.MapData.Height * 16 * Zoom);
+                return new Vector2(_state.Map.Width * 16 * Zoom, _state.Map.Height * 16 * Zoom);
             }
         }
 		
@@ -51,7 +51,7 @@ namespace TeamStor.RPG.Editor
 			_state = state;
 			Zoom = new TweenedDouble(state.Game, 2);
             _prevTotalSize = TotalSizeOnScreen;
-            _prevMapSize = new Vector2(state.MapData.Width, state.MapData.Height);
+            _prevMapSize = new Vector2(state.Map.Width, state.Map.Height);
         }
 
 		public void Update(double deltaTime, double totalTime)
@@ -74,7 +74,7 @@ namespace TeamStor.RPG.Editor
                     Translation += _state.Input.MouseDelta;
             }
 
-            Vector2 mapSize = new Vector2(_state.MapData.Width, _state.MapData.Height);
+            Vector2 mapSize = new Vector2(_state.Map.Width, _state.Map.Height);
 
             if(mapSize != _prevMapSize)
                 Translation -= (TotalSizeOnScreen - _prevTotalSize) / 2;
@@ -92,15 +92,15 @@ namespace TeamStor.RPG.Editor
                 Translation.X = 200;
             if(Translation.Y > 200)
                 Translation.Y = 200;
-            if(Translation.X < -(_state.MapData.Width * (16 * Zoom) - _state.Game.GraphicsDevice.Viewport.Bounds.Width) - 200)
-                Translation.X = -(_state.MapData.Width * (16 * Zoom) - _state.Game.GraphicsDevice.Viewport.Bounds.Width) - 200;
-            if(Translation.Y < -(_state.MapData.Height * (16 * Zoom) - _state.Game.GraphicsDevice.Viewport.Bounds.Height) - 200)
-                Translation.Y = -(_state.MapData.Height * (16 * Zoom) - _state.Game.GraphicsDevice.Viewport.Bounds.Height) - 200;
+            if(Translation.X < -(_state.Map.Width * (16 * Zoom) - _state.Game.GraphicsDevice.Viewport.Bounds.Width) - 200)
+                Translation.X = -(_state.Map.Width * (16 * Zoom) - _state.Game.GraphicsDevice.Viewport.Bounds.Width) - 200;
+            if(Translation.Y < -(_state.Map.Height * (16 * Zoom) - _state.Game.GraphicsDevice.Viewport.Bounds.Height) - 200)
+                Translation.Y = -(_state.Map.Height * (16 * Zoom) - _state.Game.GraphicsDevice.Viewport.Bounds.Height) - 200;
 
-            if(_state.Game.GraphicsDevice.Viewport.Bounds.Width / 2 > _state.MapData.Width * 8 * Zoom)
-				Translation.X = _state.Game.GraphicsDevice.Viewport.Bounds.Width / 2 - _state.MapData.Width * 8 * Zoom;
-			if(_state.Game.GraphicsDevice.Viewport.Bounds.Height / 2 > _state.MapData.Height * 8 * Zoom)
-				Translation.Y = _state.Game.GraphicsDevice.Viewport.Bounds.Height / 2 - _state.MapData.Height * 8 * Zoom;
+            if(_state.Game.GraphicsDevice.Viewport.Bounds.Width / 2 > _state.Map.Width * 8 * Zoom)
+				Translation.X = _state.Game.GraphicsDevice.Viewport.Bounds.Width / 2 - _state.Map.Width * 8 * Zoom;
+			if(_state.Game.GraphicsDevice.Viewport.Bounds.Height / 2 > _state.Map.Height * 8 * Zoom)
+				Translation.Y = _state.Game.GraphicsDevice.Viewport.Bounds.Height / 2 - _state.Map.Height * 8 * Zoom;
 		}
 	}
 }

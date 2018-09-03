@@ -31,7 +31,7 @@ namespace TeamStor.RPG.Editor
 
 		private MapEditorModeState _state;
 		
-		public Map MapData;
+		public Map Map;
 		public Dictionary<string, Button> Buttons = new Dictionary<string, Button>();
 		public Dictionary<string, SelectionMenu> SelectionMenus = new Dictionary<string, SelectionMenu>();
 		public Dictionary<string, TextField> TextFields = new Dictionary<string, TextField>();
@@ -66,7 +66,7 @@ namespace TeamStor.RPG.Editor
         public override void OnEnter(GameState previousState)
 		{
             Game.IsMouseVisible = true;
-			MapData = new Map(50, 50, new Map.Information("Untitled", Map.Environment.Forest, Map.Weather.Sunny));
+			Map = new Map(50, 50, new Map.Information("Untitled", Map.Environment.Forest, Map.Weather.Sunny));
 			
 			Camera = new Camera(this);
 
@@ -244,29 +244,29 @@ namespace TeamStor.RPG.Editor
 
                 int yadd = xadd;
 
-                while(MapData.Width + xadd < 1)
+                while(Map.Width + xadd < 1)
                     xadd++;
 
-                while(MapData.Width + xadd > 500)
+                while(Map.Width + xadd > 500)
                     xadd--;
 
-                while(MapData.Height + yadd < 1)
+                while(Map.Height + yadd < 1)
                     yadd++;
 
-                while(MapData.Height + yadd > 500)
+                while(Map.Height + yadd > 500)
                     yadd--;
 
                 if(Input.KeyPressed(Keys.Left))
-                    MapData.Resize(MapData.Width + xadd, MapData.Height, xadd, 0);
+                    Map.Resize(Map.Width + xadd, Map.Height, xadd, 0);
 
                 if(Input.KeyPressed(Keys.Right))
-                    MapData.Resize(MapData.Width + xadd, MapData.Height, 0, 0);
+                    Map.Resize(Map.Width + xadd, Map.Height, 0, 0);
 
                 if(Input.KeyPressed(Keys.Up))
-                    MapData.Resize(MapData.Width, MapData.Height + yadd, 0, yadd);
+                    Map.Resize(Map.Width, Map.Height + yadd, 0, yadd);
 
                 if(Input.KeyPressed(Keys.Down))
-                    MapData.Resize(MapData.Width, MapData.Height + yadd, 0, 0);
+                    Map.Resize(Map.Width, Map.Height + yadd, 0, 0);
             }
 
             Camera.Update(deltaTime, totalTime);
@@ -287,8 +287,8 @@ namespace TeamStor.RPG.Editor
 
             string str =
                "Map Editor\n" +
-               "Name: \"" + MapData.Info.Name + "\n" +
-               "Size: " + MapData.Width + "x" + MapData.Height + "\n" +
+               "Name: \"" + Map.Info.Name + "\n" +
+               "Size: " + Map.Width + "x" + Map.Height + "\n" +
 			   "[LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL]";
 
             Vector2 measure = Game.DefaultFonts.Bold.Measure(15, str);
@@ -347,7 +347,7 @@ namespace TeamStor.RPG.Editor
                 (int)(screenSize.X / Math.Floor(Camera.Zoom.Value)),
                 (int)(screenSize.Y / Math.Floor(Camera.Zoom.Value))));*/
 
-            batch.Outline(new Rectangle(0, 0, MapData.Width * 16, MapData.Height * 16),
+            batch.Outline(new Rectangle(0, 0, Map.Width * 16, Map.Height * 16),
 				Color.White, 1, false);
 			
 			//batch.Texture(new Vector2(64, 64), Assets.Get<Texture2D>("textures/buildings/mine_soviet.png"), Color.White);
@@ -358,8 +358,8 @@ namespace TeamStor.RPG.Editor
 			
 			string str = 
 				"Map Editor\n" +
-				"Name: \"" + MapData.Info.Name + "\n" +
-				"Size: " + MapData.Width + "x" + MapData.Height + "\n" +
+				"Name: \"" + Map.Info.Name + "\n" +
+				"Size: " + Map.Width + "x" + Map.Height + "\n" +
 				"[LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL]";
 
 			Vector2 measure = Game.DefaultFonts.Bold.Measure(15, str);

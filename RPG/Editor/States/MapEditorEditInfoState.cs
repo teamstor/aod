@@ -36,13 +36,13 @@ namespace TeamStor.RPG.Editor.States
 			BaseState.TextFields.Add("name", new TextField
 			{
 				Label = "Name: ",
-				Text = BaseState.MapData.Info.Name,
+				Text = BaseState.Map.Info.Name,
 				Font = Game.DefaultFonts.Bold,
-				Icon = Assets.Get<Texture2D>("textures/editor/info_edit/icon_name.png"),
+				Icon = Assets.Get<Texture2D>("editor/info/name.png"),
 				Position = new TweenedVector2(Game, new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 80)),
 				FocusChanged = (field, focus) =>
 				{
-					if(!focus) BaseState.MapData.Info.Name = field.Text.TrimStart();
+					if(!focus) BaseState.Map.Info.Name = field.Text.TrimStart();
 				},
 				Width = 300
 			});
@@ -50,19 +50,19 @@ namespace TeamStor.RPG.Editor.States
 			BaseState.TextFields.Add("size", new TextField
 			{
 				Label = "Size: ",
-				Text = BaseState.MapData.Width + "x" + BaseState.MapData.Height,
+				Text = BaseState.Map.Width + "x" + BaseState.Map.Height,
 				Font = Game.DefaultFonts.Bold,
-				Icon = Assets.Get<Texture2D>("textures/editor/info_edit/icon_size.png"),
-				Position = new TweenedVector2(Game, new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 80 + 36 * 2)),
+				Icon = Assets.Get<Texture2D>("editor/info/size.png"),
+				Position = new TweenedVector2(Game, new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 80 + 36)),
 				FocusChanged = (field, focus) =>
 				{
 					Vector2? size = ParseSize();
 					if(!focus)
 					{
 						if(size.HasValue)
-							BaseState.MapData.Resize((int)size.Value.X, (int)size.Value.Y);
+							BaseState.Map.Resize((int)size.Value.X, (int)size.Value.Y);
 
-						field.Text = BaseState.MapData.Width + "x" + BaseState.MapData.Height;
+						field.Text = BaseState.Map.Width + "x" + BaseState.Map.Height;
 					}
 				},
 				Width = 300
@@ -71,18 +71,16 @@ namespace TeamStor.RPG.Editor.States
 
 		public override void OnLeave(GameState nextState)
 		{
-			BaseState.MapData.Info.Name = BaseState.TextFields["name"].Text.TrimStart();
+			BaseState.Map.Info.Name = BaseState.TextFields["name"].Text.TrimStart();
 			
 			BaseState.TextFields.Remove("name");
-			BaseState.TextFields.Remove("creator");
 			BaseState.TextFields.Remove("size");
 		}
 
 		public override void Update(double deltaTime, double totalTime, long count)
 		{
 			BaseState.TextFields["name"].Position.TweenTo(new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 80), TweenEaseType.Linear, 0);
-			BaseState.TextFields["creator"].Position.TweenTo(new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 80 + 36), TweenEaseType.Linear, 0);
-			BaseState.TextFields["size"].Position.TweenTo(new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 80 + 36 * 2), TweenEaseType.Linear, 0);
+			BaseState.TextFields["size"].Position.TweenTo(new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 80 + 36), TweenEaseType.Linear, 0);
 
 			BaseState.TextFields["size"].TextColor = ParseSize().HasValue ? Color.White : Color.DarkRed;
 		}

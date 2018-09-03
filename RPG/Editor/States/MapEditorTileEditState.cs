@@ -51,10 +51,10 @@ namespace TeamStor.RPG.Editor.States
 				if(point.Y < 0)
 					point.Y = 0;
 				
-				if(point.X >= BaseState.MapData.Width)
-					point.X = BaseState.MapData.Width - 1;
-				if(point.Y >= BaseState.MapData.Height)
-					point.Y = BaseState.MapData.Height - 1;
+				if(point.X >= BaseState.Map.Width)
+					point.X = BaseState.Map.Width - 1;
+				if(point.Y >= BaseState.Map.Height)
+					point.Y = BaseState.Map.Height - 1;
 
 				return point;
 			}
