@@ -19,8 +19,7 @@ namespace TeamStor.RPG.Menu
             
             _menuController.Add(new MenuButton("New Game"));
             _menuController.Add(new MenuButton("Load Game"));
-            _menuController.Add(new MenuButton("Settings"));
-            _menuController.Add(new MenuButton("Credits"));
+            _menuController.Add(new MenuButton("Options"));
             _menuController.Add(new MenuButton("Exit"));
         }
 

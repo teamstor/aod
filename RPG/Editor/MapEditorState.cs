@@ -35,8 +35,9 @@ namespace TeamStor.RPG.Editor
 		public Dictionary<string, Button> Buttons = new Dictionary<string, Button>();
 		public Dictionary<string, SelectionMenu> SelectionMenus = new Dictionary<string, SelectionMenu>();
 		public Dictionary<string, TextField> TextFields = new Dictionary<string, TextField>();
+        public Dictionary<string, ChoiceField> ChoiceFields = new Dictionary<string, ChoiceField>();
 
-		public Camera Camera { get; private set; }
+        public Camera Camera { get; private set; }
 		
 		/// <summary>
 		/// Current map editor state.
@@ -285,11 +286,14 @@ namespace TeamStor.RPG.Editor
 			foreach(TextField field in TextFields.Values.ToArray())
 				field.Update(Game);
 
+            foreach(ChoiceField field in ChoiceFields.Values.ToArray())
+                field.Update(Game);
+
             string str =
                "Map Editor\n" +
-               "Name: \"" + Map.Info.Name + "\n" +
+               "Name: \"" + Map.Info.Name + "\"\n" +
                "Size: " + Map.Width + "x" + Map.Height + "\n" +
-			   "[LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL]";
+			   "[PLACEHOLDER PLACEHOLDER PLACEHOLDER]";
 
             Vector2 measure = Game.DefaultFonts.Bold.Measure(15, str);
             Rectangle topTextRectangle = new Rectangle(10, (int)_topTextY, (int)(measure.X + 20), (int)(measure.Y + 20));
@@ -321,6 +325,12 @@ namespace TeamStor.RPG.Editor
 				if(field.Rectangle.Contains(point))
 					return true;
 			}
+
+            foreach(ChoiceField field in ChoiceFields.Values)
+            {
+                if(field.Rectangle.Contains(point))
+                    return true;
+            }
 
             return false;
 		}
@@ -358,15 +368,15 @@ namespace TeamStor.RPG.Editor
 			
 			string str = 
 				"Map Editor\n" +
-				"Name: \"" + Map.Info.Name + "\n" +
+				"Name: \"" + Map.Info.Name + "\"\n" +
 				"Size: " + Map.Width + "x" + Map.Height + "\n" +
-				"[LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL]";
+				"[PLACEHOLDER PLACEHOLDER PLACEHOLDER]";
 
 			Vector2 measure = Game.DefaultFonts.Bold.Measure(15, str);
 			batch.Rectangle(new Rectangle(10, (int)_topTextY, (int)(measure.X + 20), (int)(measure.Y + 20)),
 				Color.Black * (MathHelper.Clamp(_topTextFade, 0, 1) * 0.85f));
 
-			str = str.Replace("[LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL]", CurrentHelpText)
+			str = str.Replace("[PLACEHOLDER PLACEHOLDER PLACEHOLDER]", CurrentHelpText)
 				.Replace("Map Editor\n", "");
 
 			batch.Text(SpriteBatch.FontStyle.Bold, 15, "Map Editor", new Vector2(20, (int)_topTextY + 10),
@@ -382,6 +392,9 @@ namespace TeamStor.RPG.Editor
 			
 			foreach(TextField field in TextFields.Values)
 				field.Draw(Game);
+
+            foreach(ChoiceField field in ChoiceFields.Values)
+                field.Draw(Game);
 
             batch.Rectangle(new Rectangle(0, 0, (int)screenSize.X, (int)screenSize.Y), Color.Black * _fade);
 		}

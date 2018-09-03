@@ -62,6 +62,7 @@
     <Compile Include="Editor\States\MapEditorModeState.cs" />
     <Compile Include="Editor\States\MapEditorShowKeybindsState.cs" />
     <Compile Include="Editor\States\MapEditorTileEditState.cs" />
+    <Compile Include="Editor\ChoiceField.cs" />
     <Compile Include="Editor\TextField.cs" />
     <Compile Include="Map\Map.cs" />
     <Compile Include="Map\Tile.cs" />
