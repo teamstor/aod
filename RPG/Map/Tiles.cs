@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+﻿using Microsoft.Xna.Framework;
 
 namespace TeamStor.RPG
 {
@@ -7,24 +7,68 @@ namespace TeamStor.RPG
 	/// </summary>
 	public static class Tiles
 	{
-		public static class Terrain
+        #region Terrain
+        public static class Terrain
 		{
-			public static Tile Water = new Tile(0, Tile.MapLayer.Terrain, "Water", new Point(0, 0));
-		}
-		
-		public static class Decoration
+			public static Tile Water = new AnimatedTile(0, Tile.MapLayer.Terrain, "Water", new Point(0, 0), 4, 2);
+
+            public static Tile Grass = new VariationsTile(10, Tile.MapLayer.Terrain, "Grass", 
+                new Point[] {
+                    // 5/11 chance
+                    new Point(4, 0),
+                    new Point(4, 0),
+                    new Point(4, 0),
+                    new Point(4, 0),
+                    new Point(4, 0),
+
+                    /// 5/11 chance
+                    new Point(5, 0),
+                    new Point(5, 0),
+                    new Point(5, 0),
+                    new Point(5, 0),
+                    new Point(5, 0),
+
+                    /// 1/11 chance
+                    new Point(6, 0)
+                });
+            public static Tile Dirt = new VariationsTile(11, Tile.MapLayer.Terrain, "Dirt",
+                new Point[] {
+                    // 4/5 chance
+                    new Point(7, 0),
+                    new Point(7, 0),
+                    new Point(7, 0),
+                    new Point(7, 0),
+
+                    // 1/5 chance
+                    new Point(8, 0)
+                });
+        }
+        #endregion
+
+        #region Decoration
+        public static class Decoration
 		{
 			public static Tile Empty = new Tile(0, Tile.MapLayer.Decoration, "Empty", new Point(0, 0));
 		}
-		
-		public static class NPC
+        #endregion
+
+        #region NPC
+        public static class NPC
 		{
 			public static Tile Empty = new Tile(0, Tile.MapLayer.NPC, "Empty", new Point(0, 0));
 		}
-		
-		public static class Control
+        #endregion
+
+        #region Control
+        public static class Control
 		{
 			public static Tile Empty = new Tile(0, Tile.MapLayer.Control, "Empty", new Point(0, 0));
-		}
-	}
+
+            public static Tile TextBoxTrigger = new Tile(10, Tile.MapLayer.Control, "Textbox Trigger", new Point(0, 0));
+            public static Tile TextBoxInteraction = new Tile(11, Tile.MapLayer.Control, "Textbox Interaction", new Point(1, 0));
+
+            public static Tile EnemyTrigger = new Tile(20, Tile.MapLayer.Control, "Enemy Trigger", new Point(2, 0));
+        }
+        #endregion
+    }
 }

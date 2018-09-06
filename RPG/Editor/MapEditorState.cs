@@ -344,18 +344,24 @@ namespace TeamStor.RPG.Editor
 		{
 			batch.Transform = Camera.Transform;
 			batch.SamplerState = SamplerState.PointWrap;
-			
-            /*MapData.Draw(false, Game, Assets, new Rectangle(
-                (int)-(Camera.Translation.X / Camera.Zoom.Value),
-                (int)-(Camera.Translation.Y / Camera.Zoom.Value), 
-                (int)(screenSize.X / Math.Floor(Camera.Zoom.Value)), 
-                (int)(screenSize.Y / Math.Floor(Camera.Zoom.Value))));
 
-            MapData.Draw(true, Game, Assets, new Rectangle(
-                (int)-(Camera.Translation.X / Camera.Zoom.Value),
-                (int)-(Camera.Translation.Y / Camera.Zoom.Value),
-                (int)(screenSize.X / Math.Floor(Camera.Zoom.Value)),
-                (int)(screenSize.Y / Math.Floor(Camera.Zoom.Value))));*/
+            foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
+            {
+                if(layer == Tile.MapLayer.Control && 
+                    (CurrentState.GetType() != typeof(MapEditorTileEditState) || (CurrentState as MapEditorTileEditState).Layer != Tile.MapLayer.Control))
+                    break;
+
+                Rectangle area = new Rectangle(
+                    (int)-(Camera.Translation.X / Camera.Zoom.Value),
+                    (int)-(Camera.Translation.Y / Camera.Zoom.Value),
+                    (int)(screenSize.X / Math.Floor(Camera.Zoom.Value)),
+                    (int)(screenSize.Y / Math.Floor(Camera.Zoom.Value)));
+
+                if(layer == Tile.MapLayer.Control)
+                    batch.Rectangle(area, Color.Black * 0.6f);
+
+                Map.Draw(layer, Game, area);
+            }
 
             batch.Outline(new Rectangle(0, 0, Map.Width * 16, Map.Height * 16),
 				Color.White, 1, false);

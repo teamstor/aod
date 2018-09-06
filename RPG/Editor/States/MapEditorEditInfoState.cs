@@ -81,6 +81,18 @@ namespace TeamStor.RPG.Editor.States
                 ChoiceChanged = (field, newIndex, newChoice) =>
                 {
                     Enum.TryParse(newChoice, out BaseState.Map.Info.Environment);
+
+                    for(int x = 0; x < BaseState.Map.Width; x++)
+                    {
+                        for(int y = 0; y < BaseState.Map.Height; y++)
+                        {
+                            foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
+                            {
+                                if(!Tile.Find(BaseState.Map[layer, x, y], layer).Filter(BaseState.Map.Info.Environment))
+                                    BaseState.Map[layer, x, y] = 0;
+                            }
+                        }
+                    }
                 },
                 Width = 300
             });

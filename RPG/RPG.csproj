@@ -67,6 +67,8 @@
     <Compile Include="Map\Map.cs" />
     <Compile Include="Map\Tile.cs" />
     <Compile Include="Map\Tiles.cs" />
+    <Compile Include="Map\Tiles\AnimatedTile.cs" />
+    <Compile Include="Map\Tiles\VariationsTile.cs" />
     <Compile Include="Menu\MenuButton.cs" />
     <Compile Include="Menu\MenuController.cs" />
     <Compile Include="Menu\MenuState.cs" />

@@ -20,6 +20,17 @@ namespace TeamStor.RPG.Editor.States
 	{
 		private EditTool _tool = EditTool.PaintOne;
 		private Tile.MapLayer _layer = Tile.MapLayer.Terrain;
+
+        /// <summary>
+        /// The current selected layer.
+        /// </summary>
+        public Tile.MapLayer Layer
+        {
+            get
+            {
+                return _layer;
+            }
+        }
 		
 		private float _radius = 4;
 
@@ -72,7 +83,14 @@ namespace TeamStor.RPG.Editor.States
 
             List<string> tiles = new List<string>();
             foreach(Tile tile in Tile.Values(_layer))
-                tiles.Add(tile.Name());
+            {
+                if(tile.Filter(BaseState.Map.Info.Environment))
+                {
+                    if(tiles.Count > 0 && tile.ID - Tile.FindByName(tiles[tiles.Count - 1], _layer).ID > 1)
+                        tiles.Add(SelectionMenu.SPACING);
+                    tiles.Add(tile.Name());
+                }
+            }
 
             BaseState.SelectionMenus.Add("select-tile-menu", new SelectionMenu
             {
@@ -196,8 +214,11 @@ namespace TeamStor.RPG.Editor.States
 
         public override void Update(double deltaTime, double totalTime, long count)
         {
-            // TODO BaseState.SelectionMenus["select-tile-menu"].Title = "Tiles (selected: " + BaseState.SelectionMenus["select-tile-menu"].SelectedValue + ")";
-	        
+            BaseState.SelectionMenus["select-tile-menu"].Title = "Tiles [" + BaseState.SelectionMenus["select-tile-menu"].SelectedValue + "]";
+        
+	        if(Game.Input.KeyPressed(Microsoft.Xna.Framework.Input.Keys.E))
+                BaseState.SelectionMenus["select-tile-menu"].Selected = 0;
+
 	        BaseState.Buttons["tool-paintone"].Active = _tool == EditTool.PaintOne;
 	        BaseState.Buttons["tool-rectangle"].Active = _tool == EditTool.PaintRectangle;
 	        
@@ -246,9 +267,8 @@ namespace TeamStor.RPG.Editor.States
 		        switch(_tool)
 		        {
 			        case EditTool.PaintOne:
-				        /*if(Input.Mouse(MouseButton.Left))
-							TODO !!!    BaseState.MapData.SetTileIdAt(_decorationLayer, SelectedTile.X, SelectedTile.Y,
-								TerrainTile.FindByName(BaseState.SelectionMenus["select-tile-menu"].SelectedValue).Id);*/
+				        if(Input.Mouse(MouseButton.Left))
+							BaseState.Map[_layer, SelectedTile.X, SelectedTile.Y] = Tile.FindByName(BaseState.SelectionMenus["select-tile-menu"].SelectedValue, _layer).ID;
 				        break;
 				        
 			        case EditTool.PaintRectangle:
@@ -256,14 +276,13 @@ namespace TeamStor.RPG.Editor.States
 					        _startingTile = SelectedTile;
 				        if(Input.MouseReleased(MouseButton.Left))
 				        {
-					        /*for(int x = _rectangleToolRect.X; x <= _rectangleToolRect.X + _rectangleToolRect.Width; x++)
+					        for(int x = _rectangleToolRect.X; x <= _rectangleToolRect.X + _rectangleToolRect.Width; x++)
 					        {
 						        for(int y = _rectangleToolRect.Y; y <= _rectangleToolRect.Y + _rectangleToolRect.Height; y++)
-							        BaseState.MapData.SetTileIdAt(_decorationLayer, x, y,
-								        TerrainTile.FindByName(BaseState.SelectionMenus["select-tile-menu"].SelectedValue).Id);
-					        } TODO */
+                                    BaseState.Map[_layer, x, y] = Tile.FindByName(BaseState.SelectionMenus["select-tile-menu"].SelectedValue, _layer).ID;
+                            }
 
-					        _startingTile = new Point(-1, -1);
+                            _startingTile = new Point(-1, -1);
 				        }
 
 				        break;
@@ -323,12 +342,21 @@ namespace TeamStor.RPG.Editor.States
 						batch.Outline(new Rectangle(SelectedTile.X * 16, SelectedTile.Y * 16, 16, 16),
 							Color.White * alpha, 1, false);
 
-					batch.Reset();
+                    if(BaseState.SelectionMenus["select-tile-menu"].Hovered(Game) != -1 &&
+                        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Contains(Game.Input.MousePosition))
+                    {
+                        // TODO
+                        batch.Transform = Matrix.CreateScale(2, 2, 1) * Matrix.CreateTranslation(BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Right + 10, BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Y, 0);
+                        Tile tile = Tile.FindByName(BaseState.SelectionMenus["select-tile-menu"].Entries[BaseState.SelectionMenus["select-tile-menu"].Hovered(Game)], _layer);
+                        tile.Draw(Game, new Point(0, 0), BaseState.Map, "");
+                    }
+
+                    batch.Reset();
 
 					if(!(_tool == EditTool.PaintRectangle && _startingTile.X != -1))
 					{
 						string str = "(" + SelectedTile.X + ", " + SelectedTile.Y + ") ";
-						str += "[" + Tile.Find(BaseState.Map[_layer, SelectedTile.X, SelectedTile.Y], _layer).Name() + "]";
+						str += "[" + Tile.Find(BaseState.Map[_layer, SelectedTile.X, SelectedTile.Y], _layer).Name(BaseState.Map.GetMetadata(_layer, SelectedTile.X, SelectedTile.Y)) + "]";
 						
 						batch.Text(
 							SpriteBatch.FontStyle.MonoBold,
@@ -364,8 +392,22 @@ namespace TeamStor.RPG.Editor.States
 							str,
 							pos,
 							Color.White * alpha);
-					}
-				}
+
+                        Vector2 measure = Game.DefaultFonts.MonoBold.Measure(7, (_rectangleToolRect.Width + 1) + "x" + (_rectangleToolRect.Height + 1));
+                        Vector2 sizePos = new Vector2((_rectangleToolRect.Width * 16 + 16) / 2 - measure.X / 2, (_rectangleToolRect.Height * 16 + 16) / 2 - measure.Y / 2);
+                        sizePos += _rectangleToolRect.Location.ToVector2() * 16;
+                        sizePos -= new Vector2(0, 1);
+                        sizePos *= BaseState.Camera.Zoom;
+                        sizePos += BaseState.Camera.Translation;
+
+                        batch.Text(
+                            SpriteBatch.FontStyle.MonoBold,
+                            (uint)(7 * BaseState.Camera.Zoom),
+                            (_rectangleToolRect.Width + 1) + "x" + (_rectangleToolRect.Height + 1),
+                            sizePos,
+                            Color.White * alpha * 0.6f);
+                    }
+                }
 			}
 		}
 	}

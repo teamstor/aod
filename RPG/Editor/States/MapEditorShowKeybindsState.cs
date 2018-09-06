@@ -9,6 +9,7 @@ namespace TeamStor.RPG.Editor.States
 		public const string KEY_BINDINGS = 
 			"Left-click: Select or edit\n" + 
 			"Right-click: Move camera\n\n" +
+            "E: Select the empty tile\n\n" +
 			"Arrow keys: Grow map (Hold SHIFT to shrink, Hold CTRL to grow by 5)";
 		
 		public override bool PauseEditor

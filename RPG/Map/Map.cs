@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 
+using Game = TeamStor.Engine.Game;
+
 namespace TeamStor.RPG
 {
     /// <summary>
@@ -20,6 +22,7 @@ namespace TeamStor.RPG
             Forest = 0,
             SnowMountain = 1,
             Swamp = 2,
+            Lava = 3,
 
             Inside = 10
         }
@@ -44,7 +47,7 @@ namespace TeamStor.RPG
                 Name = name;
                 Environment = environment;
             }
-            
+
             /// <summary>
             /// Name of the map that will be shown when you enter it.
             /// </summary>
@@ -54,7 +57,7 @@ namespace TeamStor.RPG
             /// Environment the map is in.
             /// </summary>
             public Environment Environment;
-            
+
             /// <summary>
             /// Weather of the map.
             /// </summary>
@@ -159,7 +162,7 @@ namespace TeamStor.RPG
                 LayerToTileArray(layer)[(y * Width) + x] = value;
             }
         }
-        
+
         /// <param name="layer">The layer the tile is on.</param>
         /// <param name="x">The X position of the tile.</param>
         /// <param name="y">The Y position of the tile.</param>
@@ -171,7 +174,8 @@ namespace TeamStor.RPG
 
         private byte GetMetadataSlot(Tile.MapLayer layer, int x, int y)
         {
-            return (byte)(LayerToTileArray(layer)[(y * Width) + x] & 0x00ff);
+            // TODO något är fortfarande fel
+            return (byte)((LayerToTileArray(layer)[(y * Width) + x] & 0xff00) >> 8);
         }
 
         /// <summary>
@@ -201,16 +205,19 @@ namespace TeamStor.RPG
             if(HasMetadata(layer, x, y))
             {
                 byte slot = GetMetadataSlot(layer, x, y);
-                LayerToMetadataArray(layer).RemoveAt((y * Width) + x);
+                LayerToMetadataArray(layer).RemoveAt(slot);
                 LayerToTileArray(layer)[(y * Width) + x] = (byte)(LayerToTileArray(layer)[(y * Width) + x] & 0xff);
 
                 for(int i = 0; i < Width * Height; i++)
                 {
-                    if((LayerToTileArray(layer)[i] & 0xff00) > slot)
+                    if((LayerToTileArray(layer)[i] & 0xff00) >> 8 > slot)
                     {
+                        byte lastMetadataAttr = (byte)((LayerToTileArray(layer)[i] & 0xff00) >> 8);
+                        lastMetadataAttr--;
+
                         LayerToTileArray(layer)[i] = (short)(
-                            (LayerToTileArray(layer)[i] & 0xff) | 
-                            (LayerToTileArray(layer)[i] & 0xff00) - 1);
+                            (LayerToTileArray(layer)[i] & 0xff) |
+                            (lastMetadataAttr << 8));
                     }
                 }
             }
@@ -223,14 +230,14 @@ namespace TeamStor.RPG
                     ((LayerToMetadataArray(layer).Count) << 8));
             }
         }
-        
+
         /// <summary>
-		/// Resizes this map.
-		/// </summary>
-		/// <param name="newWidth">The new width</param>
-		/// <param name="newHeight">The new height</param>
-		public void Resize(int newWidth, int newHeight, int xOffset = int.MinValue, int yOffset = int.MinValue)
-		{
+        /// Resizes this map.
+        /// </summary>
+        /// <param name="newWidth">The new width</param>
+        /// <param name="newHeight">The new height</param>
+        public void Resize(int newWidth, int newHeight, int xOffset = int.MinValue, int yOffset = int.MinValue)
+        {
             int oldWidth = Width;
             int oldHeight = Height;
 
@@ -238,44 +245,68 @@ namespace TeamStor.RPG
             int yOffset_ = yOffset != int.MinValue ? yOffset : (int)Math.Floor((newHeight - oldHeight) / 2.0);
 
             Width = newWidth;
-			Height = newHeight;
+            Height = newHeight;
 
-		    foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
-		    {
-		        short[] tiles = LayerToTileArray(layer);
-		        short[] oldTiles = new short[oldWidth * oldHeight];
-		        Array.Copy(tiles, oldTiles, oldWidth * oldHeight);
+            foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
+            {
+                short[] tiles = LayerToTileArray(layer);
+                short[] oldTiles = new short[oldWidth * oldHeight];
+                Array.Copy(tiles, oldTiles, oldWidth * oldHeight);
 
-		        Array.Resize(ref tiles, newWidth * newHeight);
+                Array.Resize(ref tiles, newWidth * newHeight);
 
-		        switch(layer)
-		        {
-		            case Tile.MapLayer.Terrain:
-		                _layerTerrain = tiles;
-		                break;
-		            case Tile.MapLayer.Decoration:
-		                _layerDecoration = tiles;
-		                break;
-		            case Tile.MapLayer.NPC:
-		                _layerNPC = tiles;
-		                break;
-		            case Tile.MapLayer.Control:
-		                _layerControl = tiles;
-		                break;
-		        }
+                switch(layer)
+                {
+                    case Tile.MapLayer.Terrain:
+                        _layerTerrain = tiles;
+                        break;
+                    case Tile.MapLayer.Decoration:
+                        _layerDecoration = tiles;
+                        break;
+                    case Tile.MapLayer.NPC:
+                        _layerNPC = tiles;
+                        break;
+                    case Tile.MapLayer.Control:
+                        _layerControl = tiles;
+                        break;
+                }
 
-		        for(int x = 0; x < Math.Min(oldWidth, Width); x++)
-		        {
-		            for(int y = 0; y < Math.Min(oldHeight, Height); y++)
-		            {
-		                int xPos = MathHelper.Clamp(x + xOffset_, 0, Width - 1);
-		                int yPos = MathHelper.Clamp(y + yOffset_, 0, Height - 1);
+                for(int x = 0; x < Math.Min(oldWidth, Width); x++)
+                {
+                    for(int y = 0; y < Math.Min(oldHeight, Height); y++)
+                    {
+                        int xPos = MathHelper.Clamp(x + xOffset_, 0, Width - 1);
+                        int yPos = MathHelper.Clamp(y + yOffset_, 0, Height - 1);
 
-                        // TODO ÄR FEL
-			            LayerToTileArray(layer)[yPos * Width + xPos] = oldTiles[y * oldWidth + x];
-		            }
-		        }
-		    }
-		}
+                        LayerToTileArray(layer)[yPos * Width + xPos] = oldTiles[y * oldWidth + x];
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Draws this map.
+        /// </summary>
+        /// <param name="layer">Layer to draw.</param>
+        /// <param name="game">Game class.</param>
+        /// <param name="rectangle">The cropped part of the map to draw. null - draw whole map</param>
+        public void Draw(Tile.MapLayer layer, Game game, Rectangle? rectangle = null)
+        {
+            int x = 0;
+            int y = 0;
+
+            for(x = 0; x < Width; x++)
+            {
+                for(y = 0; y < Height; y++)
+                {
+                    if(!rectangle.HasValue || rectangle.Value.Intersects(new Rectangle(x * 16, y * 16, 16, 16)))
+                    {
+                        byte tile = this[layer, x, y];
+                        if(layer == Tile.MapLayer.Terrain || tile != 0)
+                            Tile.Find(tile, layer).Draw(game, new Point(x, y), this, GetMetadata(layer, x, y));
+                    }
+                }
+            }
+        }
     }
 }

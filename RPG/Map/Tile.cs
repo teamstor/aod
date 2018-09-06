@@ -1,10 +1,15 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
+using TeamStor.Engine;
+using TeamStor.Engine.Graphics;
+
+using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 
 namespace TeamStor.RPG
 {
@@ -16,8 +21,8 @@ namespace TeamStor.RPG
         public const string TILE_TEXTURE_LAYER_CONTROL = "tiles/control.png";
 
         /// <param name="layer">The layer.</param>
-        /// <returns>The texture used by the specified layer.</returns>
-        public static string LayerToTexture(MapLayer layer)
+        /// <returns>The texture name used by the specified layer.</returns>
+        public static string LayerToTextureName(MapLayer layer)
         {
             switch(layer)
             {
@@ -35,6 +40,17 @@ namespace TeamStor.RPG
             }
 
             return "";
+        }
+
+        /// <param name="layer">The layer.</param>
+        /// <returns>The texture used by the specified layer.</returns>
+        public static Texture2D LayerToTexture(Engine.Game game, MapLayer layer)
+        {
+            Texture2D texture = null;
+            if(!_tileTextureCache.TryGetValue(layer, out texture))
+                _tileTextureCache.Add(layer, texture = game.Assets.Get<Texture2D>(LayerToTextureName(layer), true));
+
+            return texture;
         }
 
         /// <summary>
@@ -80,6 +96,8 @@ namespace TeamStor.RPG
         /// </returns>
         public virtual string Name(string metadata = "")
         {
+            if(metadata != "")
+                return _name + " (" + metadata + ")";
             return _name;
         }
         
@@ -119,11 +137,43 @@ namespace TeamStor.RPG
         {
             return other.ID < ID && Layer == MapLayer.Terrain;
         }
-        
+
+        /// <param name="environment">The environment to filter by.</param>
+        /// <returns>If this tile is allowed in a specified environment.</returns>
+        public virtual bool Filter(Map.Environment environment)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Draws this tile.
+        /// </summary>
+        /// <param name="batch">The batch to draw with.</param>
+        /// <param name="time"></param>
+        /// <param name="mapPos"></param>
+        /// <param name="map"></param>
+        /// <param name="metadata"></param>
+        public virtual void Draw(Engine.Game game, Point mapPos, Map map, string metadata)
+        {
+            game.Batch.Texture(
+                new Vector2(mapPos.X * 16, mapPos.Y * 16),
+                LayerToTexture(game, Layer),
+                Color.White,
+                Vector2.One,
+                new Rectangle(TextureSlot(metadata).X * 16, TextureSlot(metadata).Y * 16, 16, 16),
+                0,
+                null,
+                SpriteEffects.None);
+
+            // TODO: transitions
+        }
+
         private static SortedDictionary<byte, Tile> _tilesTerrain = new SortedDictionary<byte, Tile>();
         private static SortedDictionary<byte, Tile> _tilesDecoration = new SortedDictionary<byte, Tile>();
         private static SortedDictionary<byte, Tile> _tilesNPC = new SortedDictionary<byte, Tile>();
         private static SortedDictionary<byte, Tile> _tilesControl = new SortedDictionary<byte, Tile>();
+
+        private static Dictionary<MapLayer, Texture2D> _tileTextureCache = new Dictionary<MapLayer, Texture2D>();
 
         private static SortedDictionary<byte, Tile> LayerToDictionary(MapLayer layer)
         {
