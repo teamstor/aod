@@ -28,6 +28,7 @@ namespace TeamStor.RPG.Editor
         public int Hovered(Game game)
         {
             int y = Rectangle.Value.Y + 15 + 12;
+            
             for(int i = 0; i < Entries.Count; i++)
             {
                 string s = Entries[i];
@@ -41,6 +42,8 @@ namespace TeamStor.RPG.Editor
 
                     if(rectangle.Contains(game.Input.MousePosition))
                         return i;
+
+                    y += 15 + 4;
                 }
             }
 

@@ -219,11 +219,11 @@ namespace TeamStor.RPG.Editor.States
 
         public override void Update(double deltaTime, double totalTime, long count)
         {
-	        if(Game.Input.KeyPressed(Microsoft.Xna.Framework.Input.Keys.E) && _layer != Tile.MapLayer.Terrain)
+	        if(Game.Input.KeyPressed(Microsoft.Xna.Framework.Input.Keys.E))
 	        {
 		        _lastSelection = BaseState.SelectionMenus["select-tile-menu"].Selected;
 		        BaseState.SelectionMenus["select-tile-menu"].Selected = 0;
-		        BaseState.SelectionMenus["select-tile-menu"].Title = "Tiles [erase mode]";
+		        BaseState.SelectionMenus["select-tile-menu"].Title = _layer != Tile.MapLayer.Terrain ? "Tiles [erase mode]" : "Tiles [" + BaseState.SelectionMenus["select-tile-menu"].SelectedValue + "]";
 	        }
 
 	        if(Game.Input.KeyReleased(Microsoft.Xna.Framework.Input.Keys.E) && _layer != Tile.MapLayer.Terrain)
@@ -332,9 +332,28 @@ namespace TeamStor.RPG.Editor.States
 
 		public override void Draw(SpriteBatch batch, Vector2 screenSize)
 		{
+			batch.SamplerState = SamplerState.PointWrap;
+
+			if(BaseState.SelectionMenus["select-tile-menu"].Hovered(Game) != -1 &&
+			   BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Contains(Input.MousePosition) && 
+			   BaseState.SelectionMenus["select-tile-menu"].Hovered(Game) != BaseState.SelectionMenus["select-tile-menu"].Selected)
+			{
+				batch.Transform = Matrix.CreateScale(2, 2, 1) * 
+				                  Matrix.CreateTranslation(
+					                  BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Right + 10, 
+					                  Input.MousePosition.Y - 16, 
+					                  0);
+                        
+				batch.Outline(new Rectangle(0, 0, 16, 16), Color.White, 1, false);
+	                    
+				Tile tile = Tile.FindByName(BaseState.SelectionMenus["select-tile-menu"].Entries[BaseState.SelectionMenus["select-tile-menu"].Hovered(Game)], _layer);
+				tile.Draw(Game, new Point(0, 0), BaseState.Map, "");
+				
+				batch.Reset();
+			}
+			
 			if(!BaseState.IsPointObscured(Input.MousePosition))
 			{
-				batch.SamplerState = SamplerState.PointWrap;
 				batch.Transform = BaseState.Camera.Transform;
 
 				if(_tool == EditTool.PaintRadius)
@@ -355,15 +374,6 @@ namespace TeamStor.RPG.Editor.States
 					else
 						batch.Outline(new Rectangle(SelectedTile.X * 16, SelectedTile.Y * 16, 16, 16),
 							_layer == Tile.MapLayer.Terrain || BaseState.SelectionMenus["select-tile-menu"].Selected != 0 || !Input.Mouse(MouseButton.Left) ? Color.White * alpha : Color.DarkRed * alpha, 1, false);
-
-                    if(BaseState.SelectionMenus["select-tile-menu"].Hovered(Game) != -1 &&
-                        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Contains(Game.Input.MousePosition))
-                    {
-                        // TODO
-                        batch.Transform = Matrix.CreateScale(2, 2, 1) * Matrix.CreateTranslation(BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Right + 10, BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Y, 0);
-                        Tile tile = Tile.FindByName(BaseState.SelectionMenus["select-tile-menu"].Entries[BaseState.SelectionMenus["select-tile-menu"].Hovered(Game)], _layer);
-                        tile.Draw(Game, new Point(0, 0), BaseState.Map, "");
-                    }
 
                     batch.Reset();
 
