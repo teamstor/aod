@@ -20,6 +20,7 @@ namespace TeamStor.RPG.Editor.States
 	{
 		private EditTool _tool = EditTool.PaintOne;
 		private Tile.MapLayer _layer = Tile.MapLayer.Terrain;
+		private int _lastSelection = -1;
 
         /// <summary>
         /// The current selected layer.
@@ -96,11 +97,15 @@ namespace TeamStor.RPG.Editor.States
             {
                 Title = "Tiles",
                 Entries = tiles,
-                Rectangle = new TweenedRectangle(Game, new Rectangle(-250, 114, 210, 15 + 12))
+                Rectangle = new TweenedRectangle(Game, new Rectangle(-250, 114, 210, 15 + 12)),
+	            SelectionChanged = (menu, selected) =>
+	            {
+		            BaseState.SelectionMenus["select-tile-menu"].Title = "Tiles [" + BaseState.SelectionMenus["select-tile-menu"].SelectedValue + "]";
+	            }
             });
 
             BaseState.SelectionMenus["select-tile-menu"].Rectangle.TweenTo(new Rectangle(48, 114, 210, 15 + 12), TweenEaseType.EaseOutQuad, doTween ? 0.65f : 0f);
-
+	        BaseState.SelectionMenus["select-tile-menu"].Title = "Tiles [" + BaseState.SelectionMenus["select-tile-menu"].SelectedValue + "]";
         }
 
         public override void OnEnter(GameState previousState)
@@ -214,10 +219,19 @@ namespace TeamStor.RPG.Editor.States
 
         public override void Update(double deltaTime, double totalTime, long count)
         {
-            BaseState.SelectionMenus["select-tile-menu"].Title = "Tiles [" + BaseState.SelectionMenus["select-tile-menu"].SelectedValue + "]";
-        
-	        if(Game.Input.KeyPressed(Microsoft.Xna.Framework.Input.Keys.E))
-                BaseState.SelectionMenus["select-tile-menu"].Selected = 0;
+	        if(Game.Input.KeyPressed(Microsoft.Xna.Framework.Input.Keys.E) && _layer != Tile.MapLayer.Terrain)
+	        {
+		        _lastSelection = BaseState.SelectionMenus["select-tile-menu"].Selected;
+		        BaseState.SelectionMenus["select-tile-menu"].Selected = 0;
+		        BaseState.SelectionMenus["select-tile-menu"].Title = "Tiles [erase mode]";
+	        }
+
+	        if(Game.Input.KeyReleased(Microsoft.Xna.Framework.Input.Keys.E) && _layer != Tile.MapLayer.Terrain)
+	        {
+		        BaseState.SelectionMenus["select-tile-menu"].Selected = _lastSelection;
+		        _lastSelection = -1;
+		        BaseState.SelectionMenus["select-tile-menu"].Title = "Tiles [" + BaseState.SelectionMenus["select-tile-menu"].SelectedValue + "]";
+	        }
 
 	        BaseState.Buttons["tool-paintone"].Active = _tool == EditTool.PaintOne;
 	        BaseState.Buttons["tool-rectangle"].Active = _tool == EditTool.PaintRectangle;
@@ -337,10 +351,10 @@ namespace TeamStor.RPG.Editor.States
 
 					if(Input.Mouse(MouseButton.Left) && _tool == EditTool.PaintRectangle)
 						batch.Outline(new Rectangle(_rectangleToolRect.X * 16, _rectangleToolRect.Y * 16, _rectangleToolRect.Width * 16 + 16, _rectangleToolRect.Height * 16 + 16),
-							Color.White * alpha, 1, false);
+							_layer == Tile.MapLayer.Terrain || BaseState.SelectionMenus["select-tile-menu"].Selected != 0 ? Color.White * alpha : Color.DarkRed * alpha, 1, false);
 					else
 						batch.Outline(new Rectangle(SelectedTile.X * 16, SelectedTile.Y * 16, 16, 16),
-							Color.White * alpha, 1, false);
+							_layer == Tile.MapLayer.Terrain || BaseState.SelectionMenus["select-tile-menu"].Selected != 0 || !Input.Mouse(MouseButton.Left) ? Color.White * alpha : Color.DarkRed * alpha, 1, false);
 
                     if(BaseState.SelectionMenus["select-tile-menu"].Hovered(Game) != -1 &&
                         BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Contains(Game.Input.MousePosition))
