@@ -226,7 +226,7 @@ namespace TeamStor.RPG.Editor.States
 		        BaseState.SelectionMenus["select-tile-menu"].Title = _layer != Tile.MapLayer.Terrain ? "Tiles [erase mode]" : "Tiles [" + BaseState.SelectionMenus["select-tile-menu"].SelectedValue + "]";
 	        }
 
-	        if(Game.Input.KeyReleased(Microsoft.Xna.Framework.Input.Keys.E) && _layer != Tile.MapLayer.Terrain)
+	        if(Game.Input.KeyReleased(Microsoft.Xna.Framework.Input.Keys.E))
 	        {
 		        BaseState.SelectionMenus["select-tile-menu"].Selected = _lastSelection;
 		        _lastSelection = -1;
