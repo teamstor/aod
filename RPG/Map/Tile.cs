@@ -159,17 +159,14 @@ namespace TeamStor.RPG
         /// <param name="mapPos"></param>
         /// <param name="map"></param>
         /// <param name="metadata"></param>
-        public virtual void Draw(Engine.Game game, Point mapPos, Map map, string metadata, Map.Environment environment)
+        public virtual void Draw(Engine.Game game, Point mapPos, Map map, string metadata, Map.Environment environment, Color? color = null)
         {
             game.Batch.Texture(
                 new Vector2(mapPos.X * 16, mapPos.Y * 16),
                 LayerToTexture(game, Layer),
-                Color.White,
+                color.HasValue ? color.Value : Color.White,
                 Vector2.One,
-                new Rectangle(TextureSlot(metadata, environment).X * 16, TextureSlot(metadata, environment).Y * 16, 16, 16),
-                0,
-                null,
-                SpriteEffects.None);
+                new Rectangle(TextureSlot(metadata, environment).X * 16, TextureSlot(metadata, environment).Y * 16, 16, 16));
         }
 
         private static SortedDictionary<byte, Tile> _tilesTerrain = new SortedDictionary<byte, Tile>();
@@ -220,9 +217,9 @@ namespace TeamStor.RPG
         public long UniqueIdentity(string metadata, Map.Environment environment)
         {
             long id = metadata.GetHashCode();
-            id |= ID << 32;
-            id |= (byte)environment << 40;
-            id |= (byte)Layer << 48;
+            id |= (long)ID << 36;
+            id |= (long)environment << 44;
+            id |= (long)Layer << 52;
             
             // TODO: can have 16 more bits here
 

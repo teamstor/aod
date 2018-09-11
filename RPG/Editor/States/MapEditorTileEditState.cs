@@ -333,24 +333,6 @@ namespace TeamStor.RPG.Editor.States
 		public override void Draw(SpriteBatch batch, Vector2 screenSize)
 		{
 			batch.SamplerState = SamplerState.PointWrap;
-
-			if(BaseState.SelectionMenus["select-tile-menu"].Hovered(Game) != -1 &&
-			   BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Contains(Input.MousePosition) && 
-			   BaseState.SelectionMenus["select-tile-menu"].Hovered(Game) != BaseState.SelectionMenus["select-tile-menu"].Selected)
-			{
-				batch.Transform = Matrix.CreateScale(2, 2, 1) * 
-				                  Matrix.CreateTranslation(
-					                  BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Right + 10, 
-					                  Input.MousePosition.Y - 16, 
-					                  0);
-                        
-				batch.Outline(new Rectangle(0, 0, 16, 16), Color.White, 1, false);
-	                    
-				Tile tile = Tile.FindByName(BaseState.SelectionMenus["select-tile-menu"].Entries[BaseState.SelectionMenus["select-tile-menu"].Hovered(Game)], _layer);
-				tile.Draw(Game, new Point(0, 0), BaseState.Map, "", BaseState.Map.Info.Environment);
-				
-				batch.Reset();
-			}
 			
 			if(!BaseState.IsPointObscured(Input.MousePosition))
 			{

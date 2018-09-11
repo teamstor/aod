@@ -38,10 +38,10 @@ namespace TeamStor.RPG
             FPS = fps;
         }
 
-        public override void Draw(Engine.Game game, Point mapPos, Map map, string metadata, Map.Environment environment)
+        public override void Draw(Engine.Game game, Point mapPos, Map map, string metadata, Map.Environment environment, Color? color = null)
         {
             _slotOverride = TextureSlot(metadata, environment) + new Point((int)(game.Time * FPS) % SlotCount, 0);
-            base.Draw(game, mapPos, map, metadata, environment);
+            base.Draw(game, mapPos, map, metadata, environment, color);
             _slotOverride = new Point(-1, -1);
         }
 

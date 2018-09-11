@@ -30,7 +30,7 @@ namespace TeamStor.RPG
 
                     /// 1/11 chance
                     new Point(6, 0)
-                });
+			});
             public static Tile Dirt = new VariationsTile(11, Tile.MapLayer.Terrain, "Dirt",
                 new Point[] {
                     // 4/5 chance
@@ -41,7 +41,18 @@ namespace TeamStor.RPG
 
                     // 1/5 chance
                     new Point(8, 0)
-                });
+			});
+			public static Tile Stone = new Tile(12, Tile.MapLayer.Terrain, "Stone", new Point(9, 0), true);
+
+			private class WoodTile : Tile
+			{
+				public WoodTile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false) : base(id, layer, name, textureSlot, solid) { }
+				public override bool UseTransition(Tile other, string metadata = "", string otherMetadata = "") { return false; }
+			}
+			
+			public static Tile Wood = new WoodTile(20, Tile.MapLayer.Terrain, "Wood", new Point(1, 1), true);
+			
+			public static Tile RoadCity = new Tile(50, Tile.MapLayer.Terrain, "Road (City)", new Point(0, 1));
         }
         #endregion
 
@@ -49,6 +60,14 @@ namespace TeamStor.RPG
         public static class Decoration
 		{
 			public static Tile Empty = new Tile(0, Tile.MapLayer.Decoration, "Empty", new Point(0, 0));
+			
+			public static Tile Tree = new DoubleTile(10, Tile.MapLayer.Decoration, "Tree", new Point(0, 1), true);
+			
+			public static Tile Wood = new Tile(20, Tile.MapLayer.Decoration, "Wood", new Point(2, 0), true);
+			public static Tile Brick = new Tile(21, Tile.MapLayer.Decoration, "Brick", new Point(3, 0), true);
+			public static Tile BrickStone = new Tile(22, Tile.MapLayer.Decoration, "Brick (Stone)", new Point(4, 0), true);
+
+			public static Tile DoorWood = new DoubleTile(50, Tile.MapLayer.Decoration, "Door (Wooden)", new Point(1, 1), true);
 		}
         #endregion
 
