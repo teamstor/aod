@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using TeamStor.Engine;
 using TeamStor.Engine.Graphics;
@@ -144,8 +145,8 @@ namespace TeamStor.RPG.Editor
 					OpenFileDialog dialog = new OpenFileDialog();
 					
 					dialog.Filter = "Map files (*.map)|*.map|All files (*.*)|*.*";
-					//if(dialog.ShowDialog() == DialogResult.OK)
-						//MapData = MapData.Load(dialog.FileName); TODO
+					if(dialog.ShowDialog() == DialogResult.OK)
+						Map = Map.Load(new FileStream(dialog.FileName, FileMode.Open));
 					
 					dialog.Dispose();
 					Application.DoEvents();
@@ -165,8 +166,8 @@ namespace TeamStor.RPG.Editor
 					SaveFileDialog dialog = new SaveFileDialog();
 					
 					dialog.Filter = "Map files (*.map)|*.map|All files (*.*)|*.*";
-					//if(dialog.ShowDialog() == DialogResult.OK)
-						//MapData.Save(dialog.FileName); TODO
+					if(dialog.ShowDialog() == DialogResult.OK)
+						Map.Save(new FileStream(dialog.FileName, FileMode.Create));
 					 
 					dialog.Dispose();
 					Application.DoEvents();

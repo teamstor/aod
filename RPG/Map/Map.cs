@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -281,6 +282,99 @@ namespace TeamStor.RPG
                         LayerToTileArray(layer)[yPos * Width + xPos] = oldTiles[y * oldWidth + x];
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Loads a map from a stream.
+        /// </summary>
+        /// <param name="stream">The stream to load from.</param>
+        public static Map Load(Stream stream)
+        {
+            Information info = new Information("???", Environment.Forest, Weather.Sunny);
+            int width = 0, height = 0;
+
+            using(BinaryReader reader = new BinaryReader(stream, Encoding.UTF8))
+            {
+                if(reader.ReadString() != "a map")
+                    throw new Exception("Not a valid map stream");
+                
+                info.Name = reader.ReadString();
+                info.Environment = (Environment)reader.ReadByte();
+                info.Weather = (Weather)reader.ReadByte();
+
+                width = reader.ReadInt32();
+                height = reader.ReadInt32();
+				
+                Map map = new Map(width, height, info);
+                for(int i = 0; i < width * height; i++)
+                {
+                    map._layerTerrain[i] = reader.ReadInt16();
+                    map._layerDecoration[i] = reader.ReadInt16();
+                    map._layerNPC[i] = reader.ReadInt16();
+                    map._layerControl[i] = reader.ReadInt16();
+                }
+
+                int count = reader.ReadByte();
+                for(int i = 0; i < count; i++)
+                    map._metadataTerrain.Add(reader.ReadString());
+                
+                count = reader.ReadByte();
+                for(int i = 0; i < count; i++)
+                    map._metadataDecoration.Add(reader.ReadString());
+                
+                count = reader.ReadByte();
+                for(int i = 0; i < count; i++)
+                    map._metadataNPC.Add(reader.ReadString());
+                
+                count = reader.ReadByte();
+                for(int i = 0; i < count; i++)
+                    map._metadataControl.Add(reader.ReadString());
+
+                return map;
+            }
+        }
+        
+        /// <summary>
+        /// Saves a map to a stream.
+        /// </summary>
+        /// <param name="stream">The stream to save to.</param>
+        public void Save(Stream stream)
+        {
+            using(BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8))
+            {
+                writer.Write("a map");
+                
+                writer.Write(Info.Name);
+                writer.Write((byte)Info.Environment);
+                writer.Write((byte)Info.Weather);
+                
+                writer.Write(Width);
+                writer.Write(Height);
+
+                for(int i = 0; i < Width * Height; i++)
+                {
+                    writer.Write(_layerTerrain[i]);
+                    writer.Write(_layerDecoration[i]);
+                    writer.Write(_layerNPC[i]);
+                    writer.Write(_layerControl[i]);
+                }
+
+                writer.Write(_metadataTerrain.Count);
+                foreach(string s in _metadataTerrain)
+                    writer.Write(s);
+                
+                writer.Write(_metadataDecoration.Count);
+                foreach(string s in _metadataDecoration)
+                    writer.Write(s);
+                
+                writer.Write(_metadataNPC.Count);
+                foreach(string s in _metadataNPC)
+                    writer.Write(s);
+                
+                writer.Write(_metadataControl.Count);
+                foreach(string s in _metadataControl)
+                    writer.Write(s);
             }
         }
 

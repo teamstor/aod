@@ -170,8 +170,6 @@ namespace TeamStor.RPG
                 0,
                 null,
                 SpriteEffects.None);
-
-            // TODO: transitions
         }
 
         private static SortedDictionary<byte, Tile> _tilesTerrain = new SortedDictionary<byte, Tile>();
