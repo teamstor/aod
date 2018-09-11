@@ -19,6 +19,8 @@ namespace TeamStor.RPG
         public const string TILE_TEXTURE_LAYER_DECORATION = "tiles/decoration.png";
         public const string TILE_TEXTURE_LAYER_NPC = "tiles/npc.png";
         public const string TILE_TEXTURE_LAYER_CONTROL = "tiles/control.png";
+        
+        public const string TRANSTION_GENERIC = "tiles/transitions/generic.png";
 
         /// <param name="layer">The layer.</param>
         /// <returns>The texture name used by the specified layer.</returns>
@@ -46,18 +48,14 @@ namespace TeamStor.RPG
         /// <returns>The texture used by the specified layer.</returns>
         public static Texture2D LayerToTexture(Engine.Game game, MapLayer layer)
         {
-            Texture2D texture = null;
-            if(!_tileTextureCache.TryGetValue(layer, out texture))
-                _tileTextureCache.Add(layer, texture = game.Assets.Get<Texture2D>(LayerToTextureName(layer), true));
-
-            return texture;
+            return game.Assets.Get<Texture2D>(LayerToTextureName(layer), true);
         }
 
         /// <summary>
         /// Layer that a tile is on. 
         /// Layers are stacked on top of each other with "terrain" being the lowest and "control" being the highest.
         /// </summary>
-        public enum MapLayer
+        public enum MapLayer : byte
         {
             /// <summary>
             /// The actual ground layer of the map. Tiles on this layer can be walked upon and no tile can be empty on this layer.
@@ -107,7 +105,7 @@ namespace TeamStor.RPG
         /// <returns>
         /// The texture slot to use when drawing the tile.
         /// </returns>
-        public virtual Point TextureSlot(string metadata = "")
+        public virtual Point TextureSlot(string metadata = "", Map.Environment environment = Map.Environment.Forest)
         {
             return _textureSlot;
         }
@@ -144,6 +142,14 @@ namespace TeamStor.RPG
         {
             return true;
         }
+        
+        /// <param name="metadata">Metadata for the tile being accessed.</param>
+        /// <param name="environment">The environment the tile is in.</param>
+        /// <returns>The transition texture to use when making a transition with other tiles.</returns>
+        public virtual string TransitionTexture(string metadata = "", Map.Environment environment = Map.Environment.Forest)
+        {
+            return TRANSTION_GENERIC;
+        }
 
         /// <summary>
         /// Draws this tile.
@@ -153,14 +159,14 @@ namespace TeamStor.RPG
         /// <param name="mapPos"></param>
         /// <param name="map"></param>
         /// <param name="metadata"></param>
-        public virtual void Draw(Engine.Game game, Point mapPos, Map map, string metadata)
+        public virtual void Draw(Engine.Game game, Point mapPos, Map map, string metadata, Map.Environment environment)
         {
             game.Batch.Texture(
                 new Vector2(mapPos.X * 16, mapPos.Y * 16),
                 LayerToTexture(game, Layer),
                 Color.White,
                 Vector2.One,
-                new Rectangle(TextureSlot(metadata).X * 16, TextureSlot(metadata).Y * 16, 16, 16),
+                new Rectangle(TextureSlot(metadata, environment).X * 16, TextureSlot(metadata, environment).Y * 16, 16, 16),
                 0,
                 null,
                 SpriteEffects.None);
@@ -172,8 +178,6 @@ namespace TeamStor.RPG
         private static SortedDictionary<byte, Tile> _tilesDecoration = new SortedDictionary<byte, Tile>();
         private static SortedDictionary<byte, Tile> _tilesNPC = new SortedDictionary<byte, Tile>();
         private static SortedDictionary<byte, Tile> _tilesControl = new SortedDictionary<byte, Tile>();
-
-        private static Dictionary<MapLayer, Texture2D> _tileTextureCache = new Dictionary<MapLayer, Texture2D>();
 
         private static SortedDictionary<byte, Tile> LayerToDictionary(MapLayer layer)
         {
@@ -207,6 +211,24 @@ namespace TeamStor.RPG
                 throw new ArgumentException("ID (" + id + "," + layer + ") already in use by another tile.");
             
             LayerToDictionary(layer).Add(id, this);
+        }
+
+        /// <summary>
+        /// Generates a unique identifer for this tile based on the metadata and environment.
+        /// </summary>
+        /// <param name="metadata">Metadata for the tile being accessed.</param>
+        /// <param name="environment">The environment the tile is in.</param>
+        /// <returns>A unique identifier.</returns>
+        public long UniqueIdentity(string metadata, Map.Environment environment)
+        {
+            long id = metadata.GetHashCode();
+            id |= ID << 32;
+            id |= (byte)environment << 40;
+            id |= (byte)Layer << 48;
+            
+            // TODO: can have 16 more bits here
+
+            return id;
         }
 
         /// <summary>

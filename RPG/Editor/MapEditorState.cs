@@ -68,7 +68,10 @@ namespace TeamStor.RPG.Editor
 		{
             Game.IsMouseVisible = true;
 			Map = new Map(50, 50, new Map.Information("Untitled", Map.Environment.Forest, Map.Weather.Sunny));
-			
+
+			if(Map.TransitionCache != null)
+				Map.TransitionCache.Clear();
+
 			Camera = new Camera(this);
 
             Buttons.Add("edit-tiles-mode", new Button

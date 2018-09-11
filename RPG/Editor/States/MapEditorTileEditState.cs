@@ -347,7 +347,7 @@ namespace TeamStor.RPG.Editor.States
 				batch.Outline(new Rectangle(0, 0, 16, 16), Color.White, 1, false);
 	                    
 				Tile tile = Tile.FindByName(BaseState.SelectionMenus["select-tile-menu"].Entries[BaseState.SelectionMenus["select-tile-menu"].Hovered(Game)], _layer);
-				tile.Draw(Game, new Point(0, 0), BaseState.Map, "");
+				tile.Draw(Game, new Point(0, 0), BaseState.Map, "", BaseState.Map.Info.Environment);
 				
 				batch.Reset();
 			}
@@ -381,13 +381,24 @@ namespace TeamStor.RPG.Editor.States
 					{
 						string str = "(" + SelectedTile.X + ", " + SelectedTile.Y + ") ";
 						str += "[" + Tile.Find(BaseState.Map[_layer, SelectedTile.X, SelectedTile.Y], _layer).Name(BaseState.Map.GetMetadata(_layer, SelectedTile.X, SelectedTile.Y)) + "]";
+
+						Vector2 pos = new Vector2(SelectedTile.X * 16, SelectedTile.Y * 16) * BaseState.Camera.Zoom + BaseState.Camera.Translation -
+						              new Vector2(0, 12 * BaseState.Camera.Zoom);
+						
+						if(pos.X < 5 * BaseState.Camera.Zoom)
+							pos.X = 5 * BaseState.Camera.Zoom;
+
+						if(pos.Y < 5 * BaseState.Camera.Zoom)
+						{
+							pos.Y = 5 * BaseState.Camera.Zoom;
+							pos.X += 3 * BaseState.Camera.Zoom;
+						}
 						
 						batch.Text(
 							SpriteBatch.FontStyle.MonoBold,
 							(uint) (8 * BaseState.Camera.Zoom),
 							str,
-							new Vector2(SelectedTile.X * 16, SelectedTile.Y * 16) * BaseState.Camera.Zoom + BaseState.Camera.Translation -
-							new Vector2(0, 12 * BaseState.Camera.Zoom),
+							pos,
 							Color.White * alpha);
 					}
 					else

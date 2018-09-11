@@ -31,7 +31,7 @@ namespace TeamStor.RPG
             TextureSlots = textureSlots;
         }
 
-        public override void Draw(Engine.Game game, Point mapPos, Map map, string metadata)
+        public override void Draw(Engine.Game game, Point mapPos, Map map, string metadata, Map.Environment environment)
         {
             if(!_hasValues)
             {
@@ -45,15 +45,15 @@ namespace TeamStor.RPG
             int slot = _randomValues[((mapPos.Y * map.Width) + mapPos.X) % _randomValues.Length] % TextureSlots.Length;
 
             _slotOverride = TextureSlots[slot];
-            base.Draw(game, mapPos, map, metadata);
+            base.Draw(game, mapPos, map, metadata, environment);
             _slotOverride = new Point(-1, -1);
         }
 
-        public override Point TextureSlot(string metadata = "")
+        public override Point TextureSlot(string metadata = "", Map.Environment environment = Map.Environment.Forest)
         {
             if(_slotOverride != new Point(-1, -1))
                 return _slotOverride;
-            return base.TextureSlot(metadata);
+            return base.TextureSlot(metadata, environment);
         }
     }
 }

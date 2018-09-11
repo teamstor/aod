@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
-
+using Microsoft.Xna.Framework.Graphics;
 using Game = TeamStor.Engine.Game;
 
 namespace TeamStor.RPG
@@ -17,7 +17,7 @@ namespace TeamStor.RPG
         /// <summary>
         /// Map environment.
         /// </summary>
-        public enum Environment
+        public enum Environment : byte
         {
             Forest = 0,
             SnowMountain = 1,
@@ -30,7 +30,7 @@ namespace TeamStor.RPG
         /// <summary>
         /// Map weather.
         /// </summary>
-        public enum Weather
+        public enum Weather : byte
         {
             Sunny = 0,
             Rainy = 1,
@@ -285,6 +285,11 @@ namespace TeamStor.RPG
         }
 
         /// <summary>
+        /// The tile transition cache.
+        /// </summary>
+        public static TileTransitionCache TransitionCache { get; private set; }
+        
+        /// <summary>
         /// Draws this map.
         /// </summary>
         /// <param name="layer">Layer to draw.</param>
@@ -292,18 +297,109 @@ namespace TeamStor.RPG
         /// <param name="rectangle">The cropped part of the map to draw. null - draw whole map</param>
         public void Draw(Tile.MapLayer layer, Game game, Rectangle? rectangle = null)
         {
-            int x = 0;
-            int y = 0;
-
-            for(x = 0; x < Width; x++)
+            if(TransitionCache != null && TransitionCache.Game != game)
             {
-                for(y = 0; y < Height; y++)
+                TransitionCache.Dispose();
+                TransitionCache = null;
+            }
+
+            if(TransitionCache == null)
+                TransitionCache = new TileTransitionCache(game);
+            
+            int xMin = 0;
+            int yMin = 0;
+            int xMax = Width - 1;
+            int yMax = Height - 1;
+
+            if(rectangle.HasValue)
+            {
+                xMin = Math.Max(0, (int)Math.Floor(rectangle.Value.X / 16.0));
+                yMin = Math.Max(0, (int)Math.Floor(rectangle.Value.Y / 16.0));
+                xMax = Math.Min(Width - 1, (int)Math.Ceiling((rectangle.Value.X + rectangle.Value.Width - 1) / 16.0));
+                yMax = Math.Min(Height - 1, (int)Math.Ceiling((rectangle.Value.Y + rectangle.Value.Height - 1) / 16.0));
+            }
+
+            // Add one more to allow for transitions outside the rectangle.
+            if(xMin > 0)
+                xMin--;
+            if(yMin > 0)
+                yMin--;
+
+            if(xMax < Width - 1)
+                xMax++;
+            if(yMax < Height - 1)
+                yMax++;
+
+            int x, y;
+
+            for(x = xMin; x <= xMax; x++)
+            {
+                for(y = yMin; y <= yMax; y++)
                 {
-                    if(!rectangle.HasValue || rectangle.Value.Intersects(new Rectangle(x * 16, y * 16, 16, 16)))
+                    byte tile = this[layer, x, y];
+                    if(layer == Tile.MapLayer.Terrain || (tile & 0xff) != 0)
+                        Tile.Find(tile, layer).Draw(game, new Point(x, y), this, GetMetadata(layer, x, y), Info.Environment);
+                }
+            }
+            
+            for(x = xMin; x <= xMax; x++)
+            {
+                for(y = yMin; y <= yMax; y++)
+                {
+                    byte tile = this[layer, x, y];
+                    if(layer == Tile.MapLayer.Terrain || (tile & 0xff) != 0)
                     {
-                        byte tile = this[layer, x, y];
-                        if(layer == Tile.MapLayer.Terrain || tile != 0)
-                            Tile.Find(tile, layer).Draw(game, new Point(x, y), this, GetMetadata(layer, x, y));
+                        Point[] points = new Point[]
+                        {
+                            new Point(x - 1, y),
+                            new Point(x + 1, y),
+                            new Point(x, y - 1),
+                            new Point(x, y + 1)
+                        };
+
+                        for(int i = 0; i < points.Length; i++)
+                        {
+                            Point point = points[i];
+                            
+                            if(point.X >= 0 && point.Y >= 0 && point.X < Width && point.Y < Height &&
+                               Tile.Find(tile, layer).UseTransition(Tile.Find(this[layer, point.X, point.Y], layer), GetMetadata(layer, x, y), GetMetadata(layer, point.X, point.Y)))
+                            {
+                                Point transitionPoint;
+                                Texture2D transitionTexture = TransitionCache.TextureForTile(
+                                    Tile.Find(tile, layer), 
+                                    GetMetadata(layer, x, y), 
+                                    Info.Environment, 
+                                    out transitionPoint);
+                                
+                                float rotation = 0;
+                                SpriteEffects effects = SpriteEffects.None;
+
+                                if(point == new Point(x + 1, y))
+                                    effects = SpriteEffects.FlipHorizontally;
+                                if(point == new Point(x, y - 1))
+                                    rotation = MathHelper.PiOver2;
+                                if(point == new Point(x, y + 1))
+                                    rotation = MathHelper.Pi + MathHelper.PiOver2;
+
+                                Rectangle textureRectangle = new Rectangle(
+                                    transitionPoint.X * 16,
+                                    transitionPoint.Y * 16,
+                                    16,
+                                    16);
+                                
+                                game.Batch.Texture(
+                                    new Vector2(
+                                        point.X * 16 + (rotation == MathHelper.PiOver2 ? 16 : 0),
+                                        point.Y * 16 + (rotation == MathHelper.Pi + MathHelper.PiOver2 ? 16 : 0)),
+                                    transitionTexture,
+                                    Color.White,
+                                    Vector2.One,
+                                    textureRectangle,
+                                    rotation, 
+                                    null, 
+                                    effects);
+                            }
+                        }
                     }
                 }
             }
