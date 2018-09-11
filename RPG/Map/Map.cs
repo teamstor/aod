@@ -272,6 +272,9 @@ namespace TeamStor.RPG
                         break;
                 }
 
+                for(int i = 0; i < tiles.Length; i++)
+                    tiles[i] = 0;
+
                 for(int x = 0; x < Math.Min(oldWidth, Width); x++)
                 {
                     for(int y = 0; y < Math.Min(oldHeight, Height); y++)
