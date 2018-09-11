@@ -44,7 +44,19 @@ namespace TeamStor.RPG.Editor.States
 				Point startPos = new Point(Math.Min(_startingTile.X, SelectedTile.X), Math.Min(_startingTile.Y, SelectedTile.Y));
 				Point endPos = new Point(Math.Max(_startingTile.X, SelectedTile.X), Math.Max(_startingTile.Y, SelectedTile.Y));
 				
-				return new Rectangle(startPos.X, startPos.Y, endPos.X - startPos.X, endPos.Y - startPos.Y);
+				Rectangle rect = new Rectangle(startPos.X, startPos.Y, endPos.X - startPos.X, endPos.Y - startPos.Y);
+
+				if(rect.X < 0)
+					rect.X = 0;
+				if(rect.Y < 0)
+					rect.Y = 0;
+
+				while(rect.Right >= BaseState.Map.Width)
+					rect.Width--;
+				while(rect.Bottom >= BaseState.Map.Height)
+					rect.Height--;
+
+				return rect;
 			}
 		}
 		
