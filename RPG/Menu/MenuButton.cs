@@ -17,7 +17,6 @@ namespace TeamStor.RPG.Menu
         
         public string Text;
         public Font Font;
-        public Color Outline;
 
         public MenuController Controller;
 
@@ -35,11 +34,10 @@ namespace TeamStor.RPG.Menu
             get; protected set;
         }
 
-        public MenuButton(string text, Color? color = null, Font font = null)
+        public MenuButton(string text, Font font = null)
         {
             Text = text;
             Font = font;
-            Outline = color.HasValue ? color.Value : Color.RoyalBlue;
         }
 
         public virtual void OnSelected(MenuButton previous)
@@ -59,49 +57,22 @@ namespace TeamStor.RPG.Menu
 
         public virtual Vector2 Measure()
         {
-            return Font.Measure(16, Text);
+            return Controller.Game.Assets.Get<Texture2D>("ui/button/normal.png").Bounds.Size.ToVector2();
         }
+
+        // TODO: NÄR MAN KLICKAR PÅ KNAPPEN SKA DEN BLINKA TILL TVÅ GGR INNAN NÅGOT HÄNDER
 
         public virtual void Draw(SpriteBatch batch, Vector2 pos)
         {
-            Color darkColor = Color.RoyalBlue;
-            darkColor.R = (byte) (darkColor.R * 0.6);
-            darkColor.G = (byte) (darkColor.G * 0.6);
-            darkColor.B = (byte) (darkColor.B * 0.6);
-                        
-            for(int x = -1; x <= 1; x++)
-            {
-                for(int y = -1; y <= 1; y++)
-                    batch.Text(Font, 16, Text, 
-                        pos + new Vector2(x, y), 
-                        IsSelected ? Color.RoyalBlue : darkColor);
-            }
-            
-            batch.Text(Font, 16, Text, pos, Color.White);
-
+            Texture2D texture = Controller.Game.Assets.Get<Texture2D>("ui/button/normal.png");
             if(IsSelected)
-            {
-                Texture2D tex = Controller.Game.Assets.Get<Texture2D>("ui/arrow.png");
-                Vector2 tpos = new Vector2(pos.X - tex.Width - 6 - (Math.Sin((Controller.Game.Time - _selectTime) * 10) > 0 ? 1 : 0), pos.Y + 9);
-                
-                for(int x = -1; x <= 1; x++)
-                {
-                    for(int y = -1; y <= 1; y++)
-                        batch.Texture(tpos + new Vector2(x, y), tex, Color.RoyalBlue);
-                }
-                
-                batch.Texture(tpos, tex, Color.White);
+                texture = Controller.Game.Assets.Get<Texture2D>("ui/button/hover.png");
 
-                tpos = new Vector2(pos.X + Measure().X + 6 + (Math.Sin((Controller.Game.Time - _selectTime) * 10) > 0 ? 1 : 0), pos.Y + 9);
-                
-                for(int x = -1; x <= 1; x++)
-                {
-                    for(int y = -1; y <= 1; y++)
-                        batch.Texture(tpos + new Vector2(x, y), tex, Color.RoyalBlue, null, null, 0, null, SpriteEffects.FlipHorizontally);
-                }
-                
-                batch.Texture(tpos, tex, Color.White, null, null, 0, null, SpriteEffects.FlipHorizontally);
-            }
+            batch.Texture(pos, texture, Color.White);
+
+            Vector2 measure = Font.Measure(16, Text);
+            batch.Text(Font, 16, Text, pos + Measure() / 2 - measure / 2 - new Vector2(0, 2), 
+                IsSelected ? new Color(233, 188, 255) : new Color(59, 54, 54));
         }
     }
 }

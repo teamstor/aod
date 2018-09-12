@@ -14,7 +14,7 @@ namespace TeamStor.RPG
         [System.Runtime.InteropServices.DllImport("user32.dll")]
         private static extern bool SetProcessDPIAware();
 
-        public static RenderTarget2D RenderTarget { get; private set; }
+        public const string VERSION = "1.0 (beta)";
         
         private static void Main()
         {
