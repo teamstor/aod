@@ -7,6 +7,7 @@ using Game = TeamStor.Engine.Game;
 
 namespace TeamStor.RPG.Editor
 {
+    // TODO: make this scroll with MaxHeight
 	public class SelectionMenu
 	{
         public const string SPACING = "[space]";
