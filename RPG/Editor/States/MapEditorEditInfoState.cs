@@ -29,7 +29,7 @@ namespace TeamStor.RPG.Editor.States
 			if(!int.TryParse(text[1], out y))
 				return null;
 			
-			return new Vector2(MathHelper.Clamp(x, 1, 500), MathHelper.Clamp(y, 1, 500));
+			return new Vector2(MathHelper.Clamp(x, 1, 4096), MathHelper.Clamp(y, 1, 4096));
 		}
 
 		public override void OnEnter(GameState previousState)

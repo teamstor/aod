@@ -252,13 +252,13 @@ namespace TeamStor.RPG.Editor
                 while(Map.Width + xadd < 1)
                     xadd++;
 
-                while(Map.Width + xadd > 500)
+                while(Map.Width + xadd > 4096)
                     xadd--;
 
                 while(Map.Height + yadd < 1)
                     yadd++;
 
-                while(Map.Height + yadd > 500)
+                while(Map.Height + yadd > 4096)
                     yadd--;
 
                 if(Input.KeyPressed(Keys.Left))

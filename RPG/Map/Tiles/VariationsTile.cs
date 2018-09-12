@@ -13,7 +13,7 @@ namespace TeamStor.RPG
     public class VariationsTile : Tile
     {
         private static int[] _randomValues = new int[100 * 100];
-        private bool _hasValues = false;
+        private static bool _hasValues = false;
 
         private Point _slotOverride = new Point(-1, -1);
 
@@ -42,7 +42,7 @@ namespace TeamStor.RPG
                 _hasValues = true;
             }
 
-            int slot = _randomValues[(Math.Abs(mapPos.Y) * map.Width) + Math.Abs(mapPos.X) % _randomValues.Length] % TextureSlots.Length;
+            int slot = _randomValues[((Math.Abs(mapPos.Y) * map.Width) + Math.Abs(mapPos.X)) % _randomValues.Length] % TextureSlots.Length;
 
             _slotOverride = TextureSlots[slot];
             base.Draw(game, mapPos, map, metadata, environment, color);
