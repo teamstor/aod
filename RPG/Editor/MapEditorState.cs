@@ -349,6 +349,9 @@ namespace TeamStor.RPG.Editor
 			batch.Transform = Camera.Transform;
 			batch.SamplerState = SamplerState.PointWrap;
 
+			Vector2 scissorPos = Vector2.Transform(Vector2.Zero, Camera.Transform);
+			batch.Scissor = new Rectangle((int)scissorPos.X, (int)scissorPos.Y, (int)(Map.Width * 16 * Camera.Zoom.Value), (int)(Map.Height * 16 * Camera.Zoom.Value));
+
             foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
             {
                 if(layer == Tile.MapLayer.Control && 
@@ -366,6 +369,8 @@ namespace TeamStor.RPG.Editor
 
                 Map.Draw(layer, Game, area);
             }
+
+			batch.Scissor = null;
 
             batch.Outline(new Rectangle(0, 0, Map.Width * 16, Map.Height * 16),
 				Color.White, 1, false);
