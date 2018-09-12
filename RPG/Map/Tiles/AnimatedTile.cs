@@ -31,8 +31,8 @@ namespace TeamStor.RPG
             get; private set;
         }
 
-        public AnimatedTile(byte id, MapLayer layer, string name, Point firstSlot, int slotCount, int fps, bool solid = false) : 
-            base(id, layer, name, firstSlot, solid)
+        public AnimatedTile(byte id, MapLayer layer, string name, Point firstSlot, int slotCount, int fps, bool solid = false, int transitionPriority = 1000) : 
+            base(id, layer, name, firstSlot, solid, transitionPriority)
         {
             SlotCount = slotCount;
             FPS = fps;

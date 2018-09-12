@@ -8,8 +8,8 @@ namespace TeamStor.RPG
 	/// </summary>
 	public class DoubleTile : Tile
 	{
-		public DoubleTile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false) : 
-			base(id, layer, name, textureSlot, solid)
+		public DoubleTile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : 
+			base(id, layer, name, textureSlot, solid, transitionPriority)
 		{
 		}
 		

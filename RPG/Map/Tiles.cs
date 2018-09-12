@@ -43,16 +43,10 @@ namespace TeamStor.RPG
                     new Point(8, 0)
 			});
 			public static Tile Stone = new Tile(12, Tile.MapLayer.Terrain, "Stone", new Point(9, 0), true);
-
-			private class WoodTile : Tile
-			{
-				public WoodTile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false) : base(id, layer, name, textureSlot, solid) { }
-				public override bool UseTransition(Tile other, string metadata = "", string otherMetadata = "") { return false; }
-			}
 			
-			public static Tile Wood = new WoodTile(20, Tile.MapLayer.Terrain, "Wood", new Point(1, 1), true);
+			public static Tile Wood = new Tile(20, Tile.MapLayer.Terrain, "Wood", new Point(1, 1), true, -1);
 			
-			public static Tile RoadCity = new Tile(50, Tile.MapLayer.Terrain, "Road (City)", new Point(0, 1));
+			public static Tile RoadCity = new Tile(50, Tile.MapLayer.Terrain, "Road (City)", new Point(0, 1), false, 500);
         }
         #endregion
 

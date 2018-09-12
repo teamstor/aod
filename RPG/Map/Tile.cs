@@ -120,7 +120,20 @@ namespace TeamStor.RPG
         {
             return _solid;
         }
-        
+
+        private int _transitionPriority;
+
+        /// <param name="metadata">Metadata for the tile being accessed.</param>
+        /// <returns>
+        /// The transition priority for the tile. Higher = will get transition.
+        /// -1 = never use transition with this tile.
+        /// </returns>
+        public virtual int TransitionPriority(string metadata = "")
+        {
+            return _transitionPriority;
+        }
+
+
         /// <param name="other">The tile to transition with.</param>
         /// <param name="metadata">Metadata for the tile being accessed.</param>
         /// <param name="otherMetadata">Metadata for the other tile being accessed.</param>
@@ -133,7 +146,20 @@ namespace TeamStor.RPG
         /// </returns>
         public virtual bool UseTransition(Tile other, string metadata = "", string otherMetadata = "")
         {
-            return other.ID < ID && Layer == MapLayer.Terrain;
+            if(TransitionPriority() == -1)
+                return false;
+            if(other.TransitionPriority(otherMetadata) == -1)
+                return false;
+
+            if(Layer == MapLayer.Terrain)
+            {
+                if(other.TransitionPriority(otherMetadata) < TransitionPriority(metadata))
+                    return true;
+                else if(other.TransitionPriority(otherMetadata) == TransitionPriority(metadata))
+                    return other.ID < ID;
+            }
+
+            return false;
         }
 
         /// <param name="environment">The environment to filter by.</param>
@@ -194,13 +220,14 @@ namespace TeamStor.RPG
             return null;
         }
 
-        public Tile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false)
+        public Tile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000)
         {            
             ID = id;
             Layer = layer;
             _name = name;
             _textureSlot = textureSlot;
             _solid = solid;
+            _transitionPriority = transitionPriority;
             
             if(LayerToDictionary(layer).ContainsKey(id))
                 throw new ArgumentException("ID (" + id + "," + layer + ") already in use by another tile.");
