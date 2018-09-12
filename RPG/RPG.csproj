@@ -68,6 +68,7 @@
     <Compile Include="Map\Tiles.cs" />
     <Compile Include="Map\Tiles\AnimatedTile.cs" />
     <Compile Include="Map\Tiles\DoubleTile.cs" />
+    <Compile Include="Map\Tiles\TransitionIntoTerrainTile.cs" />
     <Compile Include="Map\Tiles\VariationsTile.cs" />
     <Compile Include="Map\TileTransitionCache.cs" />
     <Compile Include="Menu\MenuButton.cs" />

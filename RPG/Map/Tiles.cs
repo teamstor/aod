@@ -57,7 +57,7 @@ namespace TeamStor.RPG
 			
 			public static Tile Tree = new DoubleTile(10, Tile.MapLayer.Decoration, "Tree", new Point(0, 1), true);
 			
-			public static Tile Wood = new Tile(20, Tile.MapLayer.Decoration, "Wood", new Point(2, 0), true);
+			public static Tile Wood = new TransitionIntoTerrainTile(20, Tile.MapLayer.Decoration, "Wood", new Point(2, 0), true);
 			public static Tile Brick = new Tile(21, Tile.MapLayer.Decoration, "Brick", new Point(3, 0), true);
 			public static Tile BrickStone = new Tile(22, Tile.MapLayer.Decoration, "Brick (Stone)", new Point(4, 0), true);
 

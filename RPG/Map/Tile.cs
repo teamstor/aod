@@ -134,6 +134,9 @@ namespace TeamStor.RPG
         }
 
 
+        /// <param name="from">The point the transition is coming from.</param>
+        /// <param name="to">The point the transition is going to.</param>
+        /// <param name="map">The map.</param>
         /// <param name="other">The tile to transition with.</param>
         /// <param name="metadata">Metadata for the tile being accessed.</param>
         /// <param name="otherMetadata">Metadata for the other tile being accessed.</param>
@@ -143,8 +146,10 @@ namespace TeamStor.RPG
         /// * The tile is on the terrain layer
         /// * The tile has a higher ID than the other tile
         /// * The tile doesn't have the same ID as the other tile
+        /// OR
+        /// * The tile is on the terrain layer and has a higher transition priority (and the other tile doesn't have -1).
         /// </returns>
-        public virtual bool UseTransition(Tile other, string metadata = "", string otherMetadata = "")
+        public virtual bool UseTransition(Point from, Point to, Map map, Tile other, string metadata = "", string otherMetadata = "")
         {
             if(TransitionPriority() == -1)
                 return false;

@@ -459,7 +459,13 @@ namespace TeamStor.RPG
                             Point point = points[i];
                             
                             if(point.X >= 0 && point.Y >= 0 && point.X < Width && point.Y < Height &&
-                               Tile.Find(tile, layer).UseTransition(Tile.Find(this[layer, point.X, point.Y], layer), GetMetadata(layer, x, y), GetMetadata(layer, point.X, point.Y)))
+                               Tile.Find(tile, layer).UseTransition(
+                                   new Point(x, y),
+                                   point,
+                                   this, 
+                                   Tile.Find(this[layer, point.X, point.Y], layer), 
+                                   GetMetadata(layer, x, y), 
+                                   GetMetadata(layer, point.X, point.Y)))
                             {
                                 Point transitionPoint;
                                 Texture2D transitionTexture = TransitionCache.TextureForTile(
