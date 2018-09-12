@@ -16,6 +16,11 @@ namespace TeamStor.RPG
     public class Map
     {
         /// <summary>
+        /// Map save version.
+        /// </summary>
+        public const int MAP_FORMAT_VERSION = 1;
+        
+        /// <summary>
         /// Map environment.
         /// </summary>
         public enum Environment : byte
@@ -67,10 +72,10 @@ namespace TeamStor.RPG
 
         // The lower 8 bits of the layer arrays are the ID of the tile. The higher 8 bits are the position into the metadata array.
         // If the higher 8 bits are all 0 the tile doesn't have any metadata.
-        private short[] _layerTerrain, _layerDecoration, _layerNPC, _layerControl;
+        private int[] _layerTerrain, _layerDecoration, _layerNPC, _layerControl;
         private List<string> _metadataTerrain, _metadataDecoration, _metadataNPC, _metadataControl;
 
-        private short[] LayerToTileArray(Tile.MapLayer layer)
+        private int[] LayerToTileArray(Tile.MapLayer layer)
         {
             switch(layer)
             {
@@ -140,10 +145,10 @@ namespace TeamStor.RPG
 
             Info = info;
 
-            _layerTerrain = new short[w * h];
-            _layerDecoration = new short[w * h];
-            _layerNPC = new short[w * h];
-            _layerControl = new short[w * h];
+            _layerTerrain = new int[w * h];
+            _layerDecoration = new int[w * h];
+            _layerNPC = new int[w * h];
+            _layerControl = new int[w * h];
 
             _metadataTerrain = new List<string>();
             _metadataDecoration = new List<string>();
@@ -216,7 +221,7 @@ namespace TeamStor.RPG
                         byte lastMetadataAttr = (byte)((LayerToTileArray(layer)[i] & 0xff00) >> 8);
                         lastMetadataAttr--;
 
-                        LayerToTileArray(layer)[i] = (short)(
+                        LayerToTileArray(layer)[i] = (int)(
                             (LayerToTileArray(layer)[i] & 0xff) |
                             (lastMetadataAttr << 8));
                     }
@@ -226,7 +231,7 @@ namespace TeamStor.RPG
             if(!String.IsNullOrEmpty(metadata))
             {
                 LayerToMetadataArray(layer).Add(metadata);
-                LayerToTileArray(layer)[(y * Width) + x] = (short)(
+                LayerToTileArray(layer)[(y * Width) + x] = (int)(
                     (LayerToTileArray(layer)[(y * Width) + x] & 0xff) |
                     ((LayerToMetadataArray(layer).Count) << 8));
             }
@@ -250,8 +255,8 @@ namespace TeamStor.RPG
 
             foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
             {
-                short[] tiles = LayerToTileArray(layer);
-                short[] oldTiles = new short[oldWidth * oldHeight];
+                int[] tiles = LayerToTileArray(layer);
+                int[] oldTiles = new int[oldWidth * oldHeight];
                 Array.Copy(tiles, oldTiles, oldWidth * oldHeight);
 
                 Array.Resize(ref tiles, newWidth * newHeight);
@@ -299,8 +304,14 @@ namespace TeamStor.RPG
 
             using(BinaryReader reader = new BinaryReader(stream, Encoding.UTF8))
             {
-                if(reader.ReadString() != "a map")
+                if(reader.ReadString() != "rpg:map")
                     throw new Exception("Not a valid map stream");
+
+                int readVersion;
+                if((readVersion = reader.ReadInt32()) != MAP_FORMAT_VERSION)
+                    throw new Exception("Map loaded from " + 
+                                        (readVersion > MAP_FORMAT_VERSION ? "a newer" : "an older") + 
+                                        " version (" + MAP_FORMAT_VERSION + " != " + readVersion + ")");
                 
                 info.Name = reader.ReadString();
                 info.Environment = (Environment)reader.ReadByte();
@@ -312,10 +323,10 @@ namespace TeamStor.RPG
                 Map map = new Map(width, height, info);
                 for(int i = 0; i < width * height; i++)
                 {
-                    map._layerTerrain[i] = reader.ReadInt16();
-                    map._layerDecoration[i] = reader.ReadInt16();
-                    map._layerNPC[i] = reader.ReadInt16();
-                    map._layerControl[i] = reader.ReadInt16();
+                    map._layerTerrain[i] = reader.ReadInt32();
+                    map._layerDecoration[i] = reader.ReadInt32();
+                    map._layerNPC[i] = reader.ReadInt32();
+                    map._layerControl[i] = reader.ReadInt32();
                 }
 
                 int count = reader.ReadByte();
@@ -346,7 +357,8 @@ namespace TeamStor.RPG
         {
             using(BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8))
             {
-                writer.Write("a map");
+                writer.Write("rpg:map");
+                writer.Write(MAP_FORMAT_VERSION);
                 
                 writer.Write(Info.Name);
                 writer.Write((byte)Info.Environment);
