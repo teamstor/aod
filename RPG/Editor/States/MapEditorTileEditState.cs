@@ -6,6 +6,7 @@ using TeamStor.Engine.Tween;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Xna.Framework.Input;
 
 namespace TeamStor.RPG.Editor.States
 {
@@ -231,19 +232,40 @@ namespace TeamStor.RPG.Editor.States
 
         public override void Update(double deltaTime, double totalTime, long count)
         {
-	        if(Game.Input.KeyPressed(Microsoft.Xna.Framework.Input.Keys.E))
+	        if(Game.Input.KeyPressed(Keys.E))
 	        {
 		        _lastSelection = BaseState.SelectionMenus["select-tile-menu"].Selected;
 		        BaseState.SelectionMenus["select-tile-menu"].Selected = 0;
 		        BaseState.SelectionMenus["select-tile-menu"].Title = _layer != Tile.MapLayer.Terrain ? "Tiles [erase mode]" : "Tiles [" + BaseState.SelectionMenus["select-tile-menu"].SelectedValue + "]";
 	        }
 
-	        if(Game.Input.KeyReleased(Microsoft.Xna.Framework.Input.Keys.E))
+	        if(Game.Input.KeyReleased(Keys.E))
 	        {
 		        BaseState.SelectionMenus["select-tile-menu"].Selected = _lastSelection;
 		        _lastSelection = -1;
 		        BaseState.SelectionMenus["select-tile-menu"].Title = "Tiles [" + BaseState.SelectionMenus["select-tile-menu"].SelectedValue + "]";
 	        }
+
+            if(!Game.Input.Key(Keys.LeftShift) && !Game.Input.Key(Keys.RightShift))
+            {
+                int last = BaseState.SelectionMenus["select-tile-menu"].Selected;
+                if(Game.Input.KeyPressed(Keys.Up))
+                    BaseState.SelectionMenus["select-tile-menu"].Selected--;
+                if(Game.Input.KeyPressed(Keys.Down))
+                    BaseState.SelectionMenus["select-tile-menu"].Selected++;
+                int dir = BaseState.SelectionMenus["select-tile-menu"].Selected - last;
+
+                // TODO fixa
+                while(BaseState.SelectionMenus["select-tile-menu"].SelectedValue == SelectionMenu.SPACING)
+                    BaseState.SelectionMenus["select-tile-menu"].Selected += dir;
+
+                if(BaseState.SelectionMenus["select-tile-menu"].Selected < 0)
+                    BaseState.SelectionMenus["select-tile-menu"].Selected = BaseState.SelectionMenus["select-tile-menu"].Entries.Count - 1;
+                if(BaseState.SelectionMenus["select-tile-menu"].Selected >= BaseState.SelectionMenus["select-tile-menu"].Entries.Count)
+                    BaseState.SelectionMenus["select-tile-menu"].Selected = 0;
+
+                BaseState.SelectionMenus["select-tile-menu"].Title = "Tiles [" + BaseState.SelectionMenus["select-tile-menu"].SelectedValue + "]";
+            }
 
 	        BaseState.Buttons["tool-paintone"].Active = _tool == EditTool.PaintOne;
 	        BaseState.Buttons["tool-rectangle"].Active = _tool == EditTool.PaintRectangle;

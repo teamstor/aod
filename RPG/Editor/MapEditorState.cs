@@ -243,7 +243,7 @@ namespace TeamStor.RPG.Editor
 		{
 			if(!CurrentState.PauseEditor)
 			{
-                int xadd = Input.Key(Keys.LeftShift) || Input.Key(Keys.RightShift) ? -1 : 1;
+                int xadd = Input.Key(Keys.LeftAlt) || Input.Key(Keys.RightAlt) ? -1 : 1;
                 if(Input.Key(Keys.LeftControl) || Input.Key(Keys.RightControl))
                     xadd *= 5;
 
@@ -261,17 +261,20 @@ namespace TeamStor.RPG.Editor
                 while(Map.Height + yadd > 4096)
                     yadd--;
 
-                if(Input.KeyPressed(Keys.Left))
-                    Map.Resize(Map.Width + xadd, Map.Height, xadd, 0);
+                if(Input.Key(Keys.LeftShift) || Input.Key(Keys.RightShift))
+                {
+                    if(Input.KeyPressed(Keys.Left))
+                        Map.Resize(Map.Width + xadd, Map.Height, xadd, 0);
 
-                if(Input.KeyPressed(Keys.Right))
-                    Map.Resize(Map.Width + xadd, Map.Height, 0, 0);
+                    if(Input.KeyPressed(Keys.Right))
+                        Map.Resize(Map.Width + xadd, Map.Height, 0, 0);
 
-                if(Input.KeyPressed(Keys.Up))
-                    Map.Resize(Map.Width, Map.Height + yadd, 0, yadd);
+                    if(Input.KeyPressed(Keys.Up))
+                        Map.Resize(Map.Width, Map.Height + yadd, 0, yadd);
 
-                if(Input.KeyPressed(Keys.Down))
-                    Map.Resize(Map.Width, Map.Height + yadd, 0, 0);
+                    if(Input.KeyPressed(Keys.Down))
+                        Map.Resize(Map.Width, Map.Height + yadd, 0, 0);
+                }
             }
 
             Camera.Update(deltaTime, totalTime);
