@@ -12,11 +12,21 @@ using Game = TeamStor.Engine.Game;
 
 namespace TeamStor.RPG.Menu
 {
+    /// <summary>
+    /// Menu controller.
+    /// </summary>
     public class MenuController
     {
         private List<MenuButton> _buttons = new List<MenuButton>();
 
+        /// <summary>
+        /// Selected button index.
+        /// </summary>
         public int SelectedIndex = 0;
+
+        /// <summary>
+        /// Selected button object or null.
+        /// </summary>
         public MenuButton SelectedButton
         {
             get
@@ -35,6 +45,11 @@ namespace TeamStor.RPG.Menu
             Game = game;
         }
 
+        /// <summary>
+        /// Adds a new button to the menu list.
+        /// </summary>
+        /// <param name="btn">The button to add. btn.Controller will = this</param>
+        /// <param name="at">Position to add the button at.</param>
         public void Add(MenuButton btn, int at = -1)
         {
             if(at < 0)
@@ -51,6 +66,10 @@ namespace TeamStor.RPG.Menu
                 _buttons[SelectedIndex].OnSelected(null);
         }
 
+        /// <summary>
+        /// Removes a menu button from this menu if it's in this menu.
+        /// </summary>
+        /// <param name="btn">The button to remove.</param>
         public void Remove(MenuButton btn)
         {
             if(_buttons.Contains(btn))
@@ -67,16 +86,24 @@ namespace TeamStor.RPG.Menu
             }
         }
 
+        /// <summary>
+        /// Removes the button at the specified index.
+        /// </summary>
+        /// <param name="at">The position to remove the button from.</param>
         public void Remove(int at)
         {
             _buttons.RemoveAt(at);
         }
 
+        /// <param name="btn">Button to check for.</param>
+        /// <returns>true if this menu has the specified button in it.</returns>
         public bool HasButton(MenuButton btn)
         {
             return _buttons.Contains(btn);
         }
 
+        /// <param name="btn">Button to find.</param>
+        /// <returns>Position of the button in this menu, or -1</returns>
         public int IndexOf(MenuButton btn)
         {
             return _buttons.IndexOf(btn);
@@ -89,8 +116,9 @@ namespace TeamStor.RPG.Menu
 
             MenuButton currentBtn = _buttons.Count > 0 ? _buttons[SelectedIndex] : null;
 
-            if(currentBtn != null)
+            if(currentBtn != null && !currentBtn.IsInClickAnimation)
             {
+                // TODO: byt ut med något keybind system som fungerar med controllers också.
                 if(Game.Input.KeyPressed(Keys.Up))
                 {
                     SelectedIndex--;
@@ -112,36 +140,45 @@ namespace TeamStor.RPG.Menu
                     currentBtn.OnDeselected(_buttons[SelectedIndex]);
                     _buttons[SelectedIndex].OnSelected(currentBtn);
                 }
+
+                if(Game.Input.KeyPressed(Keys.Z))
+                    currentBtn.OnClicked();
             }
         }
 
-        public Vector2 Measure()
+        /// <summary>
+        /// Complete area of this menu.
+        /// </summary>
+        public Vector2 Size
         {
-            Vector2 measure = Vector2.Zero;
-
-            foreach(MenuButton button in _buttons)
+            get
             {
-                Vector2 measureBtn = button.Measure();
+                Vector2 measure = Vector2.Zero;
 
-                if(measureBtn.X > measure.X)
-                    measure.X = measureBtn.X;
+                foreach(MenuButton button in _buttons)
+                {
+                    Vector2 measureBtn = button.Size;
 
-                if(measure.Y != 0)
-                    measure.Y += 2;
-                measure.Y += measureBtn.Y;
+                    if(measureBtn.X > measure.X)
+                        measure.X = measureBtn.X;
+
+                    if(measure.Y != 0)
+                        measure.Y += 2;
+                    measure.Y += measureBtn.Y;
+                }
+
+                return measure;
             }
-
-            return measure;
         }
 
         public void Draw(SpriteBatch batch, Vector2 pos, bool centerBtns)
         {
-            Vector2 sizeOfMe = Measure();
+            Vector2 sizeOfMe = Size;
             int y = (int)pos.Y;
 
             foreach(MenuButton button in _buttons)
             {
-                Vector2 sizeOfBtn = button.Measure();
+                Vector2 sizeOfBtn = button.Size;
                 int x = (int)pos.X;
 
                 if(centerBtns)

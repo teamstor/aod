@@ -41,12 +41,10 @@ namespace TeamStor.RPG.Menu
         public override void Draw(SpriteBatch batch, Vector2 screenSize)
         {
             screenSize = Program.ScaleBatch(batch);
-
-            batch.Text(Game.Assets.Get<Font>("fonts/Alkhemikal.ttf"), 16, "Version " + Program.VERSION, new Vector2(10, screenSize.Y - 16 - 10), Color.White * 0.6f);
             
             _menuController.Draw(batch, new Vector2(
-                screenSize.X / 2 - _menuController.Measure().X / 2, 
-                screenSize.Y / 2 - _menuController.Measure().Y / 2 + 20), true);
+                screenSize.X / 2 - _menuController.Size.X / 2, 
+                screenSize.Y / 2 - _menuController.Size.Y / 2 + 20), true);
             
             Program.BlackBorders(batch);
         }
