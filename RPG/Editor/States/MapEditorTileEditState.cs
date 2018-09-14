@@ -255,7 +255,11 @@ namespace TeamStor.RPG.Editor.States
                     BaseState.SelectionMenus["select-tile-menu"].Selected++;
                 int dir = BaseState.SelectionMenus["select-tile-menu"].Selected - last;
 
-                // TODO fixa
+                if(BaseState.SelectionMenus["select-tile-menu"].Selected < 0)
+                    BaseState.SelectionMenus["select-tile-menu"].Selected = BaseState.SelectionMenus["select-tile-menu"].Entries.Count - 1;
+                if(BaseState.SelectionMenus["select-tile-menu"].Selected >= BaseState.SelectionMenus["select-tile-menu"].Entries.Count)
+                    BaseState.SelectionMenus["select-tile-menu"].Selected = 0;
+
                 while(BaseState.SelectionMenus["select-tile-menu"].SelectedValue == SelectionMenu.SPACING)
                     BaseState.SelectionMenus["select-tile-menu"].Selected += dir;
 

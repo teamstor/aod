@@ -15,7 +15,8 @@ namespace TeamStor.RPG
         private static extern bool SetProcessDPIAware();
 
         public const string VERSION = "1.0 (beta)";
-        
+
+        [STAThreadAttribute]
         private static void Main()
         {
             // http://crsouza.com/2015/04/13/how-to-fix-blurry-windows-forms-windows-in-high-dpi-settings/
