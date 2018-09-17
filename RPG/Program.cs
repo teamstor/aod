@@ -23,15 +23,28 @@ namespace TeamStor.RPG
             if(Environment.OSVersion.Version.Major >= 6)
                 SetProcessDPIAware();
 
-            using(Game game = Game.Run(new Menu.MenuState(), "data", false))
-            {
-                System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(Tiles.Terrain).TypeHandle);
-                System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(Tiles.Decoration).TypeHandle);
-                System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(Tiles.NPC).TypeHandle);
-                System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(Tiles.Control).TypeHandle);
+            Game game = Game.Run(new Menu.MenuState(), "data", false);
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(Tiles.Terrain).TypeHandle);
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(Tiles.Decoration).TypeHandle);
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(Tiles.NPC).TypeHandle);
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(Tiles.Control).TypeHandle);
                 
-                game.OnUpdateAfterState += OnUpdate;
+            game.OnUpdateAfterState += OnUpdate;
+
+            try
+            {
                 game.Run();
+                game.OnUpdateAfterState -= OnUpdate;
+                game.Dispose();
+            }
+            catch(Exception e)
+            {
+                game.OnUpdateAfterState -= OnUpdate;
+                game.Dispose();
+
+                Game recoveryGame = Game.Run(new CrashRecoveryState(game, e), "data", false);
+                recoveryGame.Run();
+                recoveryGame.Dispose();
             }
         }
 

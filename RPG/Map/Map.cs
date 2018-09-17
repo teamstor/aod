@@ -194,7 +194,11 @@ namespace TeamStor.RPG
         public string GetMetadata(Tile.MapLayer layer, int x, int y)
         {
             if(HasMetadata(layer, x, y))
+            {
+                if(LayerToMetadataArray(layer).Count <= GetMetadataSlot(layer, x, y) - 1)
+                    return "";
                 return LayerToMetadataArray(layer)[GetMetadataSlot(layer, x, y) - 1];
+            }
 
             return "";
         }
@@ -291,6 +295,8 @@ namespace TeamStor.RPG
                     }
                 }
             }
+
+            GC.Collect();
         }
 
         /// <summary>
@@ -344,6 +350,8 @@ namespace TeamStor.RPG
                 count = reader.ReadByte();
                 for(int i = 0; i < count; i++)
                     map._metadataControl.Add(reader.ReadString());
+
+                GC.Collect();
 
                 return map;
             }

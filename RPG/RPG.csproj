@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CrashRecoveryState.cs" />
     <Compile Include="Editor\Button.cs" />
     <Compile Include="Editor\Camera.cs" />
     <Compile Include="Editor\MapEditorState.cs" />

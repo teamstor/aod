@@ -11,6 +11,9 @@ using TeamStor.RPG.Editor.States;
 using Keys = Microsoft.Xna.Framework.Input.Keys;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 using System.Windows.Forms;
+using System.Threading;
+using System.Threading.Tasks;
+using static TeamStor.Engine.Graphics.SpriteBatch;
 
 namespace TeamStor.RPG.Editor
 {
@@ -31,6 +34,15 @@ namespace TeamStor.RPG.Editor
         private EditMode _editMode = EditMode.Tiles;
 
 		private MapEditorModeState _state;
+
+        private enum DataOperation
+        {
+            None,
+            Saving,
+            Loading
+        }
+
+        private DataOperation _dataOperation = DataOperation.None;
 		
 		public Map Map;
 		public Dictionary<string, Button> Buttons = new Dictionary<string, Button>();
@@ -145,8 +157,15 @@ namespace TeamStor.RPG.Editor
 					OpenFileDialog dialog = new OpenFileDialog();
 					
 					dialog.Filter = "Map files (*.map)|*.map|All files (*.*)|*.*";
-					if(dialog.ShowDialog() == DialogResult.OK)
-						Map = Map.Load(new FileStream(dialog.FileName, FileMode.Open));
+                    if(dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        _dataOperation = DataOperation.Loading;
+                        Task.Run(() =>
+                        {
+                            Map = Map.Load(new FileStream(dialog.FileName, FileMode.Open));
+                            _dataOperation = DataOperation.None;
+                        });
+                    }
 					
 					dialog.Dispose();
 					Application.DoEvents();
@@ -166,8 +185,14 @@ namespace TeamStor.RPG.Editor
 					SaveFileDialog dialog = new SaveFileDialog();
 					
 					dialog.Filter = "Map files (*.map)|*.map|All files (*.*)|*.*";
-					if(dialog.ShowDialog() == DialogResult.OK)
-						Map.Save(new FileStream(dialog.FileName, FileMode.Create));
+                    if(dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        _dataOperation = DataOperation.Saving;
+                        Task.Run(() => {
+                            Map.Save(new FileStream(dialog.FileName, FileMode.Create));
+                            _dataOperation = DataOperation.None;
+                        });
+                    }
 					 
 					dialog.Dispose();
 					Application.DoEvents();
@@ -182,7 +207,7 @@ namespace TeamStor.RPG.Editor
 				Icon = Assets.Get<Texture2D>("editor/exit.png"),
 				Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 6)),
 				Font = Game.DefaultFonts.Normal,
-				Clicked = (btn) => { },
+				Clicked = (btn) => { throw new Exception("aaa"); },
 
 				Active = false
 			});
@@ -241,7 +266,7 @@ namespace TeamStor.RPG.Editor
 
 		public override void Update(double deltaTime, double totalTime, long count)
 		{
-			if(!CurrentState.PauseEditor)
+			if(!CurrentState.PauseEditor && _dataOperation == DataOperation.None)
 			{
                 int xadd = Input.Key(Keys.LeftAlt) || Input.Key(Keys.RightAlt) ? -1 : 1;
                 if(Input.Key(Keys.LeftControl) || Input.Key(Keys.RightControl))
@@ -284,17 +309,20 @@ namespace TeamStor.RPG.Editor
             Buttons["edit-info-mode"].Active = _editMode == EditMode.Info;
 			Buttons["keybinds-help-mode"].Active = _editMode == EditMode.Keybinds;
 
-            foreach(Button button in Buttons.Values.ToArray())
-                button.Update(Game);
+            if(_dataOperation == DataOperation.None)
+            {
+                foreach(Button button in Buttons.Values.ToArray())
+                    button.Update(Game);
 
-            foreach(SelectionMenu menu in SelectionMenus.Values.ToArray())
-                menu.Update(Game);
-			
-			foreach(TextField field in TextFields.Values.ToArray())
-				field.Update(Game);
+                foreach(SelectionMenu menu in SelectionMenus.Values.ToArray())
+                    menu.Update(Game);
 
-            foreach(ChoiceField field in ChoiceFields.Values.ToArray())
-                field.Update(Game);
+                foreach(TextField field in TextFields.Values.ToArray())
+                    field.Update(Game);
+
+                foreach(ChoiceField field in ChoiceFields.Values.ToArray())
+                    field.Update(Game);
+            }
 
             string str =
                "Map Editor\n" +
@@ -309,8 +337,9 @@ namespace TeamStor.RPG.Editor
                 _topTextFade.TweenTo(0.6, TweenEaseType.EaseOutQuad, 0.4f);
             else if(!topTextRectangle.Contains(Input.MousePosition) && topTextRectangle.Contains(Input.PreviousMousePosition))
                 _topTextFade.TweenTo(2.0, TweenEaseType.EaseOutQuad, 0.4f);
-			
-			CurrentState.Update(deltaTime, totalTime, count);
+
+            if(_dataOperation == DataOperation.None)
+                CurrentState.Update(deltaTime, totalTime, count);
         }
 
 		public bool IsPointObscured(Vector2 point)
@@ -344,7 +373,8 @@ namespace TeamStor.RPG.Editor
 
         public override void FixedUpdate(long count)
 		{
-			CurrentState.FixedUpdate(count);
+            if(_dataOperation == DataOperation.None)
+                CurrentState.FixedUpdate(count);
 		}
 
 		public override void Draw(SpriteBatch batch, Vector2 screenSize)
@@ -381,40 +411,58 @@ namespace TeamStor.RPG.Editor
 			//batch.Texture(new Vector2(64, 64), Assets.Get<Texture2D>("textures/buildings/mine_soviet.png"), Color.White);
 			
 			batch.Reset();
-			
-			CurrentState.Draw(batch, screenSize);
-			
-			string str = 
-				"Map Editor\n" +
-				"Name: \"" + Map.Info.Name + "\"\n" +
-				"Size: " + Map.Width + "x" + Map.Height + "\n" +
-				"[PLACEHOLDER PLACEHOLDER PLACEHOLDER]";
 
-			Vector2 measure = Game.DefaultFonts.Bold.Measure(15, str);
-			batch.Rectangle(new Rectangle(10, (int)_topTextY, (int)(measure.X + 20), (int)(measure.Y + 20)),
-				Color.Black * (MathHelper.Clamp(_topTextFade, 0, 1) * 0.85f));
+            if(_dataOperation == DataOperation.None)
+            {
+                CurrentState.Draw(batch, screenSize);
 
-			str = str.Replace("[PLACEHOLDER PLACEHOLDER PLACEHOLDER]", CurrentHelpText)
-				.Replace("Map Editor\n", "");
+                string str =
+                    "Map Editor\n" +
+                    "Name: \"" + Map.Info.Name + "\"\n" +
+                    "Size: " + Map.Width + "x" + Map.Height + "\n" +
+                    "[PLACEHOLDER PLACEHOLDER PLACEHOLDER]";
 
-			batch.Text(SpriteBatch.FontStyle.Bold, 15, "Map Editor", new Vector2(20, (int)_topTextY + 10),
-				Color.White * MathHelper.Clamp(_topTextFade, 0, 1));
-			batch.Text(SpriteBatch.FontStyle.Bold, 15, str, new Vector2(20, (int)_topTextY + 10 + (15 * 1.25f)),
-				Color.White * (MathHelper.Clamp(_topTextFade, 0, 1) * 0.8f));
-			
-			foreach(Button button in Buttons.Values)
-                button.Draw(Game);
+                Vector2 measure = Game.DefaultFonts.Bold.Measure(15, str);
+                batch.Rectangle(new Rectangle(10, (int)_topTextY, (int)(measure.X + 20), (int)(measure.Y + 20)),
+                    Color.Black * (MathHelper.Clamp(_topTextFade, 0, 1) * 0.85f));
 
-            foreach(SelectionMenu menu in SelectionMenus.Values)
-                menu.Draw(Game);
-			
-			foreach(TextField field in TextFields.Values)
-				field.Draw(Game);
+                str = str.Replace("[PLACEHOLDER PLACEHOLDER PLACEHOLDER]", CurrentHelpText)
+                    .Replace("Map Editor\n", "");
 
-            foreach(ChoiceField field in ChoiceFields.Values)
-                field.Draw(Game);
+                batch.Text(SpriteBatch.FontStyle.Bold, 15, "Map Editor", new Vector2(20, (int)_topTextY + 10),
+                    Color.White * MathHelper.Clamp(_topTextFade, 0, 1));
+                batch.Text(SpriteBatch.FontStyle.Bold, 15, str, new Vector2(20, (int)_topTextY + 10 + (15 * 1.25f)),
+                    Color.White * (MathHelper.Clamp(_topTextFade, 0, 1) * 0.8f));
+
+                foreach(Button button in Buttons.Values)
+                    button.Draw(Game);
+
+                foreach(SelectionMenu menu in SelectionMenus.Values)
+                    menu.Draw(Game);
+
+                foreach(TextField field in TextFields.Values)
+                    field.Draw(Game);
+
+                foreach(ChoiceField field in ChoiceFields.Values)
+                    field.Draw(Game);
+            }
 
             batch.Rectangle(new Rectangle(0, 0, (int)screenSize.X, (int)screenSize.Y), Color.Black * _fade);
-		}
+
+            if(_dataOperation != DataOperation.None)
+            {
+                string text = "Saving map...";
+                if(_dataOperation == DataOperation.Loading)
+                    text = "Loading map...";
+
+                Vector2 measure = Game.DefaultFonts.Bold.Measure(32, text);
+
+                float alpha = 0.6f;
+                alpha = MathHelper.Clamp(alpha + (float)Math.Sin(Game.Time * 10f) * 0.05f, 0, 1);
+
+                batch.Rectangle(new Rectangle(0, 0, (int)screenSize.X, (int)screenSize.Y), Color.Black * alpha);
+                batch.Text(FontStyle.Bold, 32, text, screenSize / 2 - measure / 2, Color.White);
+            }
+        }
 	}
 }
