@@ -109,8 +109,8 @@ namespace TeamStor.RPG
         {
             batch.Texture(new Vector2(screenSize.X / 2 - 160 / 2, screenSize.Y / 4 - 80), Assets.Get<Texture2D>("crash_recovery/angrymonkey" + MonkeyAnimationFrame + ".png"), Color.White);
 
-            Vector2 measure = Game.DefaultFonts.Bold.Measure(20, Exception.GetType().Name + " occured in " + Game.CurrentState.GetType().Name);
-            batch.Text(FontStyle.Bold, 20, Exception.GetType().Name + " occured in " + Game.CurrentState.GetType().Name, new Vector2(screenSize.X / 2 - measure.X / 2, screenSize.Y / 4 + 120), Color.White);
+            Vector2 measure = Game.DefaultFonts.Bold.Measure(20, Exception.GetType().Name + " occured in " + RecoveryGame.CurrentState.GetType().Name);
+            batch.Text(FontStyle.Bold, 20, Exception.GetType().Name + " occured in " + RecoveryGame.CurrentState.GetType().Name, new Vector2(screenSize.X / 2 - measure.X / 2, screenSize.Y / 4 + 120), Color.White);
 
             measure = Game.DefaultFonts.Normal.Measure(16, "\"" + Exception.Message + "\"");
             batch.Text(FontStyle.Normal, 16, "\"" + Exception.Message + "\"", new Vector2(screenSize.X / 2 - measure.X / 2, screenSize.Y / 4 + 150), Color.LightGray);
