@@ -81,6 +81,11 @@ namespace TeamStor.RPG
             public static Tile TextBoxInteraction = new Tile(11, Tile.MapLayer.Control, "Textbox Interaction", new Point(1, 0));
 
             public static Tile EnemyTrigger = new Tile(20, Tile.MapLayer.Control, "Enemy Trigger", new Point(2, 0));
+
+            public static Tile SpawnPoint = new Tile(30, Tile.MapLayer.Control, "Spawn Point", new Point(3, 0));
+
+            public static Tile Barrier = new Tile(40, Tile.MapLayer.Control, "Barrier", new Point(4, 0), true);
+            public static Tile InvertedBarrier = new Tile(41, Tile.MapLayer.Control, "Inverted Barrier", new Point(5, 0));
         }
         #endregion
     }
