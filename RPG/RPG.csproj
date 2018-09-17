@@ -63,6 +63,7 @@
     <Compile Include="Editor\States\MapEditorTileEditState.cs" />
     <Compile Include="Editor\ChoiceField.cs" />
     <Compile Include="Editor\TextField.cs" />
+    <Compile Include="Gameplay\WorldState.cs" />
     <Compile Include="Map\Map.cs" />
     <Compile Include="Map\Tile.cs" />
     <Compile Include="Map\Tiles.cs" />
@@ -103,6 +104,7 @@
       <Name>TeamStor.Engine</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent Condition="'$(OS)' == 'Windows_NT' ">

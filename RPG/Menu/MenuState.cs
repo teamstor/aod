@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using TeamStor.Engine;
 using TeamStor.Engine.Graphics;
+using System.IO;
+using TeamStor.RPG.Gameplay;
 
 namespace TeamStor.RPG.Menu
 {
@@ -16,8 +18,14 @@ namespace TeamStor.RPG.Menu
         public override void OnEnter(GameState previousState)
         {
             _menuController = new MenuController(Game);
-            
-            _menuController.Add(new MenuButton("New Game"));
+
+            MenuButton newGame = new MenuButton("New Game");
+            newGame.Clicked = (btn) =>
+            {
+                Game.CurrentState = new WorldState(Map.Load(File.OpenRead("data/maps/gameplay_test.map")));
+            };
+
+            _menuController.Add(newGame);
             _menuController.Add(new MenuButton("Load Game"));
             _menuController.Add(new MenuButton("Options"));
             _menuController.Add(new MenuButton("Exit"));
