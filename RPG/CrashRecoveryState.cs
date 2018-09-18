@@ -63,7 +63,7 @@ namespace TeamStor.RPG
 
         public CrashRecoveryState(Game game, Exception e)
         {
-            Game = game;
+            RecoveryGame = game;
             Exception = e;
 
             if(game.CurrentState != null && game.CurrentState.GetType() == typeof(MapEditorState))
@@ -77,7 +77,7 @@ namespace TeamStor.RPG
                         ((MapEditorState)game.CurrentState).Map.Save(File.OpenWrite(_mapTempSaveName));
                         _recoveryState = RecoveryState.RecoveredMapData;
                     }
-                    catch(Exception exception)
+                    catch
                     {
                         _recoveryState = RecoveryState.Nothing;
                     }

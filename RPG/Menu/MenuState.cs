@@ -8,6 +8,7 @@ using TeamStor.Engine;
 using TeamStor.Engine.Graphics;
 using System.IO;
 using TeamStor.RPG.Gameplay;
+using TeamStor.RPG.Gameplay.World;
 
 namespace TeamStor.RPG.Menu
 {

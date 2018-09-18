@@ -64,7 +64,9 @@
     <Compile Include="Editor\States\MapEditorTileEditState.cs" />
     <Compile Include="Editor\ChoiceField.cs" />
     <Compile Include="Editor\TextField.cs" />
-    <Compile Include="Gameplay\WorldState.cs" />
+    <Compile Include="Gameplay\Player.cs" />
+    <Compile Include="Gameplay\World\PositionedEntity.cs" />
+    <Compile Include="Gameplay\World\WorldState.cs" />
     <Compile Include="Map\Map.cs" />
     <Compile Include="Map\Tile.cs" />
     <Compile Include="Map\Tiles.cs" />

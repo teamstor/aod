@@ -11,13 +11,21 @@ using Microsoft.Xna.Framework.Graphics;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 using Microsoft.Xna.Framework.Input;
 
-namespace TeamStor.RPG.Gameplay
+namespace TeamStor.RPG.Gameplay.World
 {
     /// <summary>
     /// Gameplay state the game is in while the player is walking around in the world.
     /// </summary>
     public class WorldState : GameState
     {
+        /// <summary>
+        /// The player.
+        /// </summary>
+        public Player Player
+        {
+            get; private set;
+        }
+
         // TODO: byt ut med en kamera som smooth följer efter spelaren men om det går för snabbt så hoppar den direkt
         public Vector2 Camera
         {
@@ -37,10 +45,14 @@ namespace TeamStor.RPG.Gameplay
         public WorldState(Map map)
         {
             Map = map;
+
+            if(Map.TransitionCache != null)
+                Map.TransitionCache.Clear();
         }
 
         public override void OnEnter(GameState previousState)
         {
+            Player = new Player(this);
         }
 
         public override void OnLeave(GameState nextState)
@@ -73,6 +85,9 @@ namespace TeamStor.RPG.Gameplay
             batch.Texture(drawRectangle, Assets.Get<Texture2D>("tiles/water/" + (int)((Game.Time * 2) % 4) + ".png"), Color.White, drawRectangle);
 
             Map.Draw(Tile.MapLayer.Terrain, Game, new Rectangle((int)-SmoothCamera.X, (int)-SmoothCamera.Y, (int)screenSize.X, (int)screenSize.Y));
+
+            Player.Draw(batch);
+
             Map.Draw(Tile.MapLayer.Decoration, Game, new Rectangle((int)-Camera.X, (int)-Camera.Y, (int)screenSize.X, (int)screenSize.Y));
 
             Program.BlackBorders(batch);

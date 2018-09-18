@@ -207,7 +207,7 @@ namespace TeamStor.RPG.Editor
 				Icon = Assets.Get<Texture2D>("editor/exit.png"),
 				Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 6)),
 				Font = Game.DefaultFonts.Normal,
-				Clicked = (btn) => { throw new Exception("aaa"); },
+				Clicked = (btn) => { },
 
 				Active = false
 			});

@@ -31,20 +31,29 @@ namespace TeamStor.RPG
                 
             game.OnUpdateAfterState += OnUpdate;
 
-            try
+            if(System.Diagnostics.Debugger.IsAttached)
             {
                 game.Run();
                 game.OnUpdateAfterState -= OnUpdate;
                 game.Dispose();
             }
-            catch(Exception e)
+            else
             {
-                game.OnUpdateAfterState -= OnUpdate;
-                game.Dispose();
+                try
+                {
+                    game.Run();
+                    game.OnUpdateAfterState -= OnUpdate;
+                    game.Dispose();
+                }
+                catch(Exception e)
+                {
+                    game.OnUpdateAfterState -= OnUpdate;
+                    game.Dispose();
 
-                Game recoveryGame = Game.Run(new CrashRecoveryState(game, e), "data", false);
-                recoveryGame.Run();
-                recoveryGame.Dispose();
+                    Game recoveryGame = Game.Run(new CrashRecoveryState(game, e), "data", false);
+                    recoveryGame.Run();
+                    recoveryGame.Dispose();
+                }
             }
         }
 
