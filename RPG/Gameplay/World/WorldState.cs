@@ -54,6 +54,8 @@ namespace TeamStor.RPG.Gameplay.World
         {
             Player = new Player(this);
             Camera = new Camera(this);
+
+            Game.IsMouseVisible = false;
         }
 
         public override void OnLeave(GameState nextState)

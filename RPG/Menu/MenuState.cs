@@ -30,6 +30,8 @@ namespace TeamStor.RPG.Menu
             _menuController.Add(new MenuButton("Load Game"));
             _menuController.Add(new MenuButton("Options"));
             _menuController.Add(new MenuButton("Exit"));
+
+            Game.IsMouseVisible = false;
         }
 
         public override void OnLeave(GameState nextState)
