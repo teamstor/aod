@@ -111,7 +111,6 @@ namespace TeamStor.RPG.Gameplay
                 frame = ((int)World.Game.TotalFixedUpdates / 10) % (Heading == Direction.Up || Heading == Direction.Down ? 3 : 2);
 
             batch.Texture(WorldPosition + new Vector2(0, _landWhen > World.Game.Time ? -1 : 0), World.Game.Assets.Get<Texture2D>("npc/pig/" + texture + frame + ".png"), Color.White);
-            batch.Text(FontStyle.Normal, 8, "walk completion " + WalkCompletion.ToString() + "\nkey held " + _keyHeld, new Vector2(0, 0), Color.White);
         }
     }
 }

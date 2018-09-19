@@ -26,13 +26,13 @@ namespace TeamStor.RPG.Gameplay.World
             get; private set;
         }
 
-        // TODO: byt ut med en kamera som smooth följer efter spelaren men om det går för snabbt så hoppar den direkt
-        public Vector2 Camera
+        /// <summary>
+        /// The camera following the player.
+        /// </summary>
+        public Camera Camera
         {
             get; private set;
         }
-
-        public Vector2 SmoothCamera;
 
         /// <summary>
         /// Map of the world.
@@ -53,6 +53,7 @@ namespace TeamStor.RPG.Gameplay.World
         public override void OnEnter(GameState previousState)
         {
             Player = new Player(this);
+            Camera = new Camera(this);
         }
 
         public override void OnLeave(GameState nextState)
@@ -73,17 +74,17 @@ namespace TeamStor.RPG.Gameplay.World
             screenSize = Program.ScaleBatch(batch);
 
             batch.SamplerState = SamplerState.PointWrap;
-            batch.Transform = Matrix.CreateTranslation(SmoothCamera.X, SmoothCamera.Y, 0) * batch.Transform;
+            batch.Transform = Matrix.CreateTranslation(Camera.Offset.X, Camera.Offset.Y, 0) * batch.Transform;
             
             // TODO: följ kameran
             Rectangle drawRectangle = new Rectangle(-1000, -1000, Map.Width * 16 + 2000, Map.Height * 16 + 2000);
             batch.Texture(drawRectangle, Assets.Get<Texture2D>("tiles/water/" + (int)((Game.Time * 2) % 4) + ".png"), Color.White, drawRectangle);
 
-            Map.Draw(Tile.MapLayer.Terrain, Game, new Rectangle((int)-SmoothCamera.X, (int)-SmoothCamera.Y, (int)screenSize.X, (int)screenSize.Y));
+            Map.Draw(Tile.MapLayer.Terrain, Game, new Rectangle((int)-Camera.Offset.X, (int)-Camera.Offset.Y, (int)screenSize.X, (int)screenSize.Y));
 
             Player.Draw(batch);
 
-            Map.Draw(Tile.MapLayer.Decoration, Game, new Rectangle((int)-SmoothCamera.X, (int)-SmoothCamera.Y, (int)screenSize.X, (int)screenSize.Y));
+            Map.Draw(Tile.MapLayer.Decoration, Game, new Rectangle((int)-Camera.Offset.X, (int)-Camera.Offset.Y, (int)screenSize.X, (int)screenSize.Y));
 
             Program.BlackBorders(batch);
         }

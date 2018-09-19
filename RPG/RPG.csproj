@@ -65,6 +65,7 @@
     <Compile Include="Editor\ChoiceField.cs" />
     <Compile Include="Editor\TextField.cs" />
     <Compile Include="Gameplay\Player.cs" />
+    <Compile Include="Gameplay\World\Camera.cs" />
     <Compile Include="Gameplay\World\PositionedEntity.cs" />
     <Compile Include="Gameplay\World\WorldState.cs" />
     <Compile Include="Map\Map.cs" />
