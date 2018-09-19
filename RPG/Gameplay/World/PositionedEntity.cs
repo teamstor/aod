@@ -9,12 +9,47 @@ using TeamStor.Engine.Graphics;
 namespace TeamStor.RPG.Gameplay.World
 {
     /// <summary>
+    /// Heading direction.
+    /// </summary>
+    public enum Direction
+    {
+        Left,
+        Right,
+        Up,
+        Down
+    };
+
+    public static class DirectionHelper
+    {
+        public static Point ToPoint(this Direction dir)
+        {
+            switch(dir)
+            {
+                case Direction.Left:
+                    return new Point(-1, 0);
+
+                case Direction.Right:
+                    return new Point(1, 0);
+
+                case Direction.Up:
+                    return new Point(0, -1);
+
+                case Direction.Down:
+                    return new Point(0, 1);
+            }
+
+            return Point.Zero;
+        }
+    }
+
+    /// <summary>
     /// An entity in the world with a position and hitbox.
     /// </summary>
     public abstract class PositionedEntity
     {
         protected Point _position;
         protected double _walkCompletionTime = 0;
+        protected double _multiplyBy = 1;
 
         /// <summary>
         /// The world the entity is in.
@@ -31,7 +66,10 @@ namespace TeamStor.RPG.Gameplay.World
         {
             get
             {
-                Vector2 vec = Vector2.Lerp((Position * new Point(16, 16)).ToVector2(), (NextPosition * new Point(16, 16)).ToVector2(), (float)WalkCompletion);
+                Vector2 vec = Vector2.Lerp(
+                    (Position * new Point(16, 16)).ToVector2(), 
+                    (NextPosition * new Point(16, 16)).ToVector2(), 
+                    (float)WalkCompletion);
                 vec.X = (int)vec.X;
                 vec.Y = (int)vec.Y;
 
@@ -57,7 +95,7 @@ namespace TeamStor.RPG.Gameplay.World
         {
             get
             {
-                return MathHelper.Clamp((float)(World.Game.Time - _walkCompletionTime), 0.0f, 1.0f);
+                return 1.0f - MathHelper.Clamp((float)(_walkCompletionTime - World.Game.Time) * (float)_multiplyBy, 0.0f, 1.0f);
             }
         }
 
@@ -82,11 +120,33 @@ namespace TeamStor.RPG.Gameplay.World
         }
 
         /// <summary>
+        /// Direction the entity is heading.
+        /// </summary>
+        public Direction Heading = Direction.Down;
+
+        /// <summary>
         /// Speed in tiles/second the player walks.
         /// </summary>
         public virtual double Speed
         {
             get; protected set;
+        } = 1;
+
+        private void UpdateDirection()
+        {
+            Point distance = NextPosition - Position;
+
+            if(distance.X <= -1)
+                Heading = Direction.Left;
+
+            if(distance.X >= 1)
+                Heading = Direction.Right;
+
+            if(distance.Y <= -1)
+                Heading = Direction.Up;
+
+            if(distance.Y >= 1)
+                Heading = Direction.Down;
         }
 
         /// <summary>
@@ -100,9 +160,13 @@ namespace TeamStor.RPG.Gameplay.World
             if(IsWalking || position == NextPosition)
                 return _walkCompletionTime;
 
+            _multiplyBy = Speed;
             _position = Position;
             NextPosition = position;
             _walkCompletionTime = World.Game.Time + (1.0 / Speed);
+
+            UpdateDirection();
+
             return _walkCompletionTime;
         }
 
@@ -118,9 +182,13 @@ namespace TeamStor.RPG.Gameplay.World
             if(IsWalking || position == NextPosition)
                 return _walkCompletionTime;
 
+            _multiplyBy = speed;
             _position = Position;
             NextPosition = position;
             _walkCompletionTime = World.Game.Time + (1.0 / speed);
+
+            UpdateDirection();
+
             return _walkCompletionTime;
         }
 
@@ -136,9 +204,13 @@ namespace TeamStor.RPG.Gameplay.World
             if(IsWalking || position == NextPosition)
                 return _walkCompletionTime;
 
+            _multiplyBy = time - World.Game.Time;
             _position = Position;
             NextPosition = position;
             _walkCompletionTime = time;
+
+            UpdateDirection();
+
             return _walkCompletionTime;
         }
 
@@ -150,7 +222,11 @@ namespace TeamStor.RPG.Gameplay.World
         public virtual void MoveInstantly(Point position)
         {
             NextPosition = position;
+
+            UpdateDirection();
+
             _position = position;
+            _walkCompletionTime = World.Game.Time;
         }
 
         public PositionedEntity(WorldState world)

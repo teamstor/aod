@@ -61,12 +61,7 @@ namespace TeamStor.RPG.Gameplay.World
 
         public override void Update(double deltaTime, double totalTime, long count)
         {
-            Vector2 camera = Camera;
-            camera.X -= Input.Key(Keys.Left) ? -520 * (float)deltaTime : Input.Key(Keys.Right) ? 520 * (float)deltaTime : 0;
-            camera.Y -= Input.Key(Keys.Up) ? -520 * (float)deltaTime : Input.Key(Keys.Down) ? 520 * (float)deltaTime : 0;
-            Camera = camera;
-
-            SmoothCamera = Vector2.LerpPrecise(SmoothCamera, Camera, (float)deltaTime * 20f);
+            Player.Update(deltaTime, totalTime, count);
         }
 
         public override void FixedUpdate(long count)
@@ -88,7 +83,7 @@ namespace TeamStor.RPG.Gameplay.World
 
             Player.Draw(batch);
 
-            Map.Draw(Tile.MapLayer.Decoration, Game, new Rectangle((int)-Camera.X, (int)-Camera.Y, (int)screenSize.X, (int)screenSize.Y));
+            Map.Draw(Tile.MapLayer.Decoration, Game, new Rectangle((int)-SmoothCamera.X, (int)-SmoothCamera.Y, (int)screenSize.X, (int)screenSize.Y));
 
             Program.BlackBorders(batch);
         }
