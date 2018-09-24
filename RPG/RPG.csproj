@@ -64,8 +64,12 @@
     <Compile Include="Editor\States\MapEditorTileEditState.cs" />
     <Compile Include="Editor\ChoiceField.cs" />
     <Compile Include="Editor\TextField.cs" />
+    <Compile Include="Gameplay\Direction.cs" />
+    <Compile Include="Gameplay\NPCs.cs" />
+    <Compile Include="Gameplay\NPCTemplate.cs" />
     <Compile Include="Gameplay\Player.cs" />
     <Compile Include="Gameplay\World\Camera.cs" />
+    <Compile Include="Gameplay\World\NPC.cs" />
     <Compile Include="Gameplay\World\PositionedEntity.cs" />
     <Compile Include="Gameplay\World\WorldState.cs" />
     <Compile Include="Map\Map.cs" />

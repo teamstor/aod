@@ -35,6 +35,15 @@ namespace TeamStor.RPG.Gameplay.World
         }
 
         /// <summary>
+        /// NPCs in the world.
+        /// </summary>
+        public List<NPC> NPCs
+        {
+            get;
+            private set;
+        } = new List<NPC>();
+
+        /// <summary>
         /// Map of the world.
         /// </summary>
         public Map Map

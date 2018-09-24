@@ -17,7 +17,7 @@ namespace TeamStor.RPG
     {
         public const string TILE_TEXTURE_LAYER_TERRAIN = "tiles/terrain.png";
         public const string TILE_TEXTURE_LAYER_DECORATION = "tiles/decoration.png";
-        public const string TILE_TEXTURE_LAYER_NPC = "tiles/npc.png";
+        public const string TILE_TEXTURE_LAYER_NPC = "tiles/template.png"; // NPCs draw their own textures.
         public const string TILE_TEXTURE_LAYER_CONTROL = "tiles/control.png";
         
         public const string TRANSTION_GENERIC = "tiles/transitions/generic.png";

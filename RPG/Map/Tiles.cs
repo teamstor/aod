@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using TeamStor.RPG.Gameplay;
 
 namespace TeamStor.RPG
 {
@@ -76,6 +77,8 @@ namespace TeamStor.RPG
         public static class NPC
 		{
 			public static Tile Empty = new Tile(0, Tile.MapLayer.NPC, "Empty", new Point(0, 0));
+
+            public static Tile GreenPig = NPCs.GreenPig.AsTile(10);
 		}
         #endregion
 
