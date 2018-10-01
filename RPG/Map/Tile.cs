@@ -92,7 +92,7 @@ namespace TeamStor.RPG
         /// <returns>
         /// The name of the tile used in the map editor.
         /// </returns>
-        public virtual string Name(string metadata = "")
+        public virtual string Name(string metadata = "", Map.Environment environment = Map.Environment.Forest)
         {
             if(metadata != "")
                 return _name + " (" + metadata + ")";
@@ -171,7 +171,10 @@ namespace TeamStor.RPG
         /// <returns>If this tile is allowed in a specified environment.</returns>
         public virtual bool Filter(Map.Environment environment)
         {
-            return true;
+            // A tile with ID 0 always exists
+            if(ID == 0 || Layer == MapLayer.Control)
+                return true;
+            return environment != Map.Environment.Inside;
         }
         
         /// <param name="metadata">Metadata for the tile being accessed.</param>
@@ -275,11 +278,11 @@ namespace TeamStor.RPG
         /// <param name="name">The name of the tile without metadata.</param>
         /// <param name="layer">The layer the tile belongs to.</param>
         /// <returns>The tile, or an exception.</returns>
-        public static Tile FindByName(string name, MapLayer layer)
+        public static Tile FindByName(string name, MapLayer layer, Map.Environment environment = Map.Environment.Forest)
         {
             foreach(Tile tile in LayerToDictionary(layer).Values)
             {
-                if(tile.Name() == name)
+                if(tile.Name("", environment) == name)
                     return tile;
             }
 

@@ -36,6 +36,11 @@ namespace TeamStor.RPG.Gameplay
                     color.HasValue ? color.Value : Color.White);
             }
 
+            public override bool Filter(Map.Environment environment)
+            {
+                return true;
+            }
+
             /// <summary>
             /// Template this tile originates from.
             /// </summary>

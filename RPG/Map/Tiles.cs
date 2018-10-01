@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using TeamStor.Engine;
 using TeamStor.RPG.Gameplay;
 
 namespace TeamStor.RPG
@@ -11,7 +12,29 @@ namespace TeamStor.RPG
         #region Terrain
         public static class Terrain
 		{
-			public static Tile Water = new AnimatedTile(0, Tile.MapLayer.Terrain, "Water", new Point(0, 0), 4, 2, true);
+            public class WaterTile : AnimatedTile
+            {
+                public WaterTile(byte id, MapLayer layer, string name, Point firstSlot, int slotCount, int fps, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, firstSlot, slotCount, fps, solid, transitionPriority)
+                {
+                }
+
+                public override string Name(string metadata = "", Map.Environment environment = Map.Environment.Forest)
+                {
+                    if(environment == Map.Environment.Inside)
+                        return "The Void";
+                    return base.Name(metadata, environment);
+                }
+
+                public override void Draw(Engine.Game game, Point mapPos, Map map, string metadata, Map.Environment environment, Color? color = null)
+                {
+                    if(environment == Map.Environment.Inside)
+                        game.Batch.Rectangle(new Rectangle(mapPos.X * 16, mapPos.Y * 16, 16, 16), Color.Black);
+                    else
+                        base.Draw(game, mapPos, map, metadata, environment, color);
+                }
+            }
+
+            public static Tile Water = new WaterTile(0, Tile.MapLayer.Terrain, "Water", new Point(0, 0), 4, 2, true);
 
             public static Tile Grass = new VariationsTile(10, Tile.MapLayer.Terrain, "Grass", 
                 new Point[] {
@@ -45,9 +68,11 @@ namespace TeamStor.RPG
 			});
 			public static Tile Stone = new Tile(12, Tile.MapLayer.Terrain, "Stone", new Point(9, 0), true);
 			
-			public static Tile Wood = new Tile(20, Tile.MapLayer.Terrain, "Wood", new Point(1, 1), true, -1);
-			
-			public static Tile RoadCity = new Tile(50, Tile.MapLayer.Terrain, "Road (City)", new Point(0, 1), false, 500);
+			public static Tile Wood = new InsideTile(20, Tile.MapLayer.Terrain, "Wood", new Point(1, 1), true, -1);
+            public static Tile WoodenPanel = new InsideTile(21, Tile.MapLayer.Terrain, "Wooden Panel", new Point(1, 2), true, -1);
+            public static Tile HouseWall = new InsideTile(22, Tile.MapLayer.Terrain, "Wall", new Point(0, 2), true, -1);
+
+            public static Tile RoadCity = new Tile(50, Tile.MapLayer.Terrain, "Road (City)", new Point(0, 1), false, 500);
         }
         #endregion
 
@@ -56,7 +81,21 @@ namespace TeamStor.RPG
 		{
 			public static Tile Empty = new Tile(0, Tile.MapLayer.Decoration, "Empty", new Point(0, 0));
 			
-			public static Tile Tree = new DoubleTile(10, Tile.MapLayer.Decoration, "Tree", new Point(0, 1), true);
+            public class TreeTile : DoubleTile
+            {
+                public TreeTile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlot, solid, transitionPriority)
+                {
+                }
+
+                public override Point TextureSlot(string metadata = "", Map.Environment environment = Map.Environment.Forest)
+                {
+                    if(environment == Map.Environment.SnowMountain)
+                        return base.TextureSlot(metadata, environment) + new Point(0, 2);
+                    return base.TextureSlot(metadata, environment);
+                }
+            }
+
+			public static Tile Tree = new TreeTile(10, Tile.MapLayer.Decoration, "Tree", new Point(0, 1), true);
 			
 			public static Tile Wood = new TransitionIntoTerrainTile(20, Tile.MapLayer.Decoration, "Wood", new Point(2, 0), true);
             public static Tile Brick = new Tile(21, Tile.MapLayer.Decoration, "Brick", new Point(3, 0), true);

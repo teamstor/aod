@@ -90,6 +90,22 @@ namespace TeamStor.RPG.Editor.States
 			get { return false; }
 		}
 
+        private bool LayerContainsValidTiles(Tile.MapLayer layer)
+        {
+            List<string> tiles = new List<string>();
+            foreach(Tile tile in Tile.Values(layer))
+            {
+                if(tile.Filter(BaseState.Map.Info.Environment))
+                {
+                    if(tiles.Count > 0 && tile.ID - Tile.FindByName(tiles[tiles.Count - 1], layer, BaseState.Map.Info.Environment).ID > 1)
+                        tiles.Add(SelectionMenu.SPACING);
+                    tiles.Add(tile.Name("", BaseState.Map.Info.Environment));
+                }
+            }
+
+            return tiles.Count > 0;
+        }
+
         private void UpdateSelectTileMenu(bool doTween = false)
         {
             if(BaseState.SelectionMenus.ContainsKey("select-tile-menu"))
@@ -100,9 +116,9 @@ namespace TeamStor.RPG.Editor.States
             {
                 if(tile.Filter(BaseState.Map.Info.Environment))
                 {
-                    if(tiles.Count > 0 && tile.ID - Tile.FindByName(tiles[tiles.Count - 1], _layer).ID > 1)
+                    if(tiles.Count > 0 && tile.ID - Tile.FindByName(tiles[tiles.Count - 1], _layer, BaseState.Map.Info.Environment).ID > 1)
                         tiles.Add(SelectionMenu.SPACING);
-                    tiles.Add(tile.Name());
+                    tiles.Add(tile.Name("", BaseState.Map.Info.Environment));
                 }
             }
 
@@ -174,9 +190,10 @@ namespace TeamStor.RPG.Editor.States
 				Position = new TweenedVector2(Game, new Vector2(-250, 119 + 31 + 32 * 3)),
 				
 				Active = false,
-				Clicked = (btn) => { 					
-					_layer = Tile.MapLayer.Decoration;
-					UpdateSelectTileMenu();
+                Disabled = !LayerContainsValidTiles(Tile.MapLayer.Decoration),
+                Clicked = (btn) => {
+                    _layer = Tile.MapLayer.Decoration;
+                    UpdateSelectTileMenu();
 				},
 				Font = Game.DefaultFonts.Normal
 			});
@@ -190,7 +207,8 @@ namespace TeamStor.RPG.Editor.States
 				Position = new TweenedVector2(Game, new Vector2(-250, 119 + 31 + 32 * 4)),
 				
 				Active = false,
-				Clicked = (btn) => { 					
+                Disabled = !LayerContainsValidTiles(Tile.MapLayer.NPC),
+                Clicked = (btn) => { 					
 					_layer = Tile.MapLayer.NPC;
 					UpdateSelectTileMenu();
 				},
@@ -206,7 +224,8 @@ namespace TeamStor.RPG.Editor.States
 				Position = new TweenedVector2(Game, new Vector2(-250, 119 + 31 + 32 * 5)),
 				
 				Active = false,
-				Clicked = (btn) => { 					
+                Disabled = !LayerContainsValidTiles(Tile.MapLayer.Control),
+                Clicked = (btn) => { 					
 					_layer = Tile.MapLayer.Control;
 					UpdateSelectTileMenu();
 				},
@@ -320,7 +339,7 @@ namespace TeamStor.RPG.Editor.States
 		        {
 			        case EditTool.PaintOne:
 				        if(Input.Mouse(MouseButton.Left))
-							BaseState.Map[_layer, SelectedTile.X, SelectedTile.Y] = Tile.FindByName(BaseState.SelectionMenus["select-tile-menu"].SelectedValue, _layer).ID;
+							BaseState.Map[_layer, SelectedTile.X, SelectedTile.Y] = Tile.FindByName(BaseState.SelectionMenus["select-tile-menu"].SelectedValue, _layer, BaseState.Map.Info.Environment).ID;
 				        break;
 				        
 			        case EditTool.PaintRectangle:
@@ -331,7 +350,7 @@ namespace TeamStor.RPG.Editor.States
 					        for(int x = _rectangleToolRect.X; x <= _rectangleToolRect.X + _rectangleToolRect.Width; x++)
 					        {
 						        for(int y = _rectangleToolRect.Y; y <= _rectangleToolRect.Y + _rectangleToolRect.Height; y++)
-                                    BaseState.Map[_layer, x, y] = Tile.FindByName(BaseState.SelectionMenus["select-tile-menu"].SelectedValue, _layer).ID;
+                                    BaseState.Map[_layer, x, y] = Tile.FindByName(BaseState.SelectionMenus["select-tile-menu"].SelectedValue, _layer, BaseState.Map.Info.Environment).ID;
                             }
 
                             _startingTile = new Point(-1, -1);
@@ -400,7 +419,7 @@ namespace TeamStor.RPG.Editor.States
 					if(!(_tool == EditTool.PaintRectangle && _startingTile.X != -1))
 					{
 						string str = "(" + SelectedTile.X + ", " + SelectedTile.Y + ") ";
-						str += "[" + Tile.Find(BaseState.Map[_layer, SelectedTile.X, SelectedTile.Y], _layer).Name(BaseState.Map.GetMetadata(_layer, SelectedTile.X, SelectedTile.Y)) + "]";
+						str += "[" + Tile.Find(BaseState.Map[_layer, SelectedTile.X, SelectedTile.Y], _layer).Name(BaseState.Map.GetMetadata(_layer, SelectedTile.X, SelectedTile.Y), BaseState.Map.Info.Environment) + "]";
 
 						Vector2 pos = new Vector2(SelectedTile.X * 16, SelectedTile.Y * 16) * BaseState.Camera.Zoom + BaseState.Camera.Translation -
 						              new Vector2(0, 12 * BaseState.Camera.Zoom);

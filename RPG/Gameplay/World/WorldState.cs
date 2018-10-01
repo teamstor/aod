@@ -34,14 +34,31 @@ namespace TeamStor.RPG.Gameplay.World
             get; private set;
         }
 
+        private List<NPC> _npcs = new List<NPC>();
+
         /// <summary>
         /// NPCs in the world.
         /// </summary>
-        public List<NPC> NPCs
+        public IReadOnlyList<NPC> NPCs
         {
-            get;
-            private set;
-        } = new List<NPC>();
+            get
+            {
+                return _npcs;
+            }
+        }
+
+        /// <summary>
+        /// Spawns a new NPC in the world.
+        /// </summary>
+        /// <param name="template">The template to create the NPC from.</param>
+        /// <param name="position">The position to spawn the NPC at.</param>
+        /// <returns>The newly spawned NPC.</returns>
+        public NPC SpawnNPC(NPCTemplate template, Point position)
+        {
+            NPC npc = new NPC(this, template);
+            npc.MoveInstantly(position);
+            return npc;
+        }
 
         /// <summary>
         /// Map of the world.
@@ -93,6 +110,8 @@ namespace TeamStor.RPG.Gameplay.World
 
             Map.Draw(Tile.MapLayer.Terrain, Game, new Rectangle((int)-Camera.Offset.X, (int)-Camera.Offset.Y, (int)screenSize.X, (int)screenSize.Y));
 
+            foreach(NPC npc in NPCs)
+                npc.Draw(batch);
             Player.Draw(batch);
 
             Map.Draw(Tile.MapLayer.Decoration, Game, new Rectangle((int)-Camera.Offset.X, (int)-Camera.Offset.Y, (int)screenSize.X, (int)screenSize.Y));

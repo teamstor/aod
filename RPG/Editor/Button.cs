@@ -41,10 +41,11 @@ namespace TeamStor.RPG.Editor
         }
 
         public bool Active;
+        public bool Disabled = false;
 
         public void Update(Game game)
         {
-            bool hovered = !Active && Rectangle.Contains(game.Input.MousePosition);
+            bool hovered = !Active && Rectangle.Contains(game.Input.MousePosition) && !Disabled;
 
             if(hovered && game.Input.MousePressed(MouseButton.Left) && Clicked != null)
                 Clicked(this);
@@ -53,15 +54,15 @@ namespace TeamStor.RPG.Editor
         public void Draw(Game game)
         {
             SpriteBatch batch = game.Batch;
-            bool hovered = Active || Rectangle.Contains(game.Input.MousePosition);
+            bool hovered = (Active || Rectangle.Contains(game.Input.MousePosition)) && !Disabled;
 
             batch.Rectangle(Rectangle, Color.Black * 0.8f * Alpha);
 
             if(Icon != null)
-                batch.Texture(new Vector2(Position.Value.X + 4, Position.Value.Y + 4), Icon, Color.White * (hovered ? 1f : 0.6f) * Alpha);
+                batch.Texture(new Vector2(Position.Value.X + 4, Position.Value.Y + 4), Icon, Color.White * (hovered ? 1f : 0.6f) * Alpha * (Disabled ? 0.6f : 1.0f));
 
             if(Text != "")
-                batch.Text(Font, 15, Text, new Vector2(Position.Value.X + (Icon != null ? Icon.Width + 8 : 4), Position.Value.Y + 6), Color.White * (hovered ? 1f : 0.6f) * Alpha);
+                batch.Text(Font, 15, Text, new Vector2(Position.Value.X + (Icon != null ? Icon.Width + 8 : 4), Position.Value.Y + 6), Color.White * (hovered ? 1f : 0.6f) * Alpha * (Disabled ? 0.6f : 1.0f));
         }
     }
 }

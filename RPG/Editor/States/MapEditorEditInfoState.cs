@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using TeamStor.Engine;
 using TeamStor.Engine.Tween;
+using System.Linq;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 
 namespace TeamStor.RPG.Editor.States
@@ -74,7 +75,7 @@ namespace TeamStor.RPG.Editor.States
 	            Game = Game,
                 Label = "Environment",
                 Choices = Enum.GetNames(typeof(Map.Environment)),
-                Choice = (int)BaseState.Map.Info.Environment,
+                Choice = Enum.GetValues(typeof(Map.Environment)).Cast<Map.Environment>().ToList().IndexOf(BaseState.Map.Info.Environment),
                 Font = Game.DefaultFonts.Bold,
                 Icon = Assets.Get<Texture2D>("editor/info/environment.png"),
                 Position = new TweenedVector2(Game, new Vector2(Game.GraphicsDevice.Viewport.Width / 2 - 150, Game.GraphicsDevice.Viewport.Height / 2 - 72 + 36 * 2)),
