@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TeamStor.Engine;
 using TeamStor.Engine.Graphics;
-
+using TeamStor.RPG.Editor;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 
 namespace TeamStor.RPG
@@ -199,6 +199,22 @@ namespace TeamStor.RPG
                 color.HasValue ? color.Value : Color.White,
                 Vector2.One,
                 new Rectangle(TextureSlot(metadata, environment).X * 16, TextureSlot(metadata, environment).Y * 16, 16, 16));
+        }
+
+        /// <summary>
+        /// If this tile has any editable attributes.
+        /// </summary>
+        public virtual bool HasEditableAttributes
+        {
+            get { return false;  }
+        }
+
+        /// <param name="state">The map editor state to create the editors in.</param>
+        /// <param name="currentY">The current Y position the editor is placing elements in.</param>
+        /// <returns>Tile attribute editors for this tile.</returns>
+        public virtual TileAttributeEditor[] AttributeEditors(MapEditorState state, ref int currentY)
+        {
+            return null;
         }
 
         private static SortedDictionary<byte, Tile> _tilesTerrain = new SortedDictionary<byte, Tile>();

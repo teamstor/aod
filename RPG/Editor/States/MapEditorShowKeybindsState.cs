@@ -10,7 +10,9 @@ namespace TeamStor.RPG.Editor.States
 			"Left-click: Select or edit\n" + 
 			"Right-click: Move camera\n\n" +
             "E: Select the empty tile\n" +
-            "Up/down: Switch tiles\n\n" +
+			"T: Switch between editing tiles and tile attributes\n\n" +
+            "Up/down: Switch tiles\n" +
+			"CTRL + Up/down: Switch layers\n" +
             "SHIFT + Arrow keys: Grow map (Hold CTRL to grow by 5, Hold ALT to shrink)";
 		
 		public override bool PauseEditor

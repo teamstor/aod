@@ -127,8 +127,8 @@ namespace TeamStor.RPG
 		{
 			public static Tile Empty = new Tile(0, Tile.MapLayer.Control, "Empty", new Point(0, 0));
 
-            public static Tile TextBoxTrigger = new Tile(10, Tile.MapLayer.Control, "Textbox Trigger", new Point(0, 0));
-            public static Tile TextBoxInteraction = new Tile(11, Tile.MapLayer.Control, "Textbox Interaction", new Point(1, 0));
+            public static Tile TextBoxTrigger = new TextBoxTile(10, "Textbox Trigger", new Point(0, 0), true);
+            public static Tile TextBoxInteraction = new TextBoxTile(11, "Textbox Interaction", new Point(1, 0), false);
 
             public static Tile EnemyTrigger = new Tile(20, Tile.MapLayer.Control, "Enemy Trigger", new Point(2, 0));
 

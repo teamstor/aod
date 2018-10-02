@@ -31,8 +31,6 @@ namespace TeamStor.RPG.Editor
         private TweenedDouble _fade;
         private TweenedDouble _topTextFade;
 
-        private EditMode _editMode = EditMode.Tiles;
-
 		private MapEditorModeState _state;
 
         private enum DataOperation
@@ -94,9 +92,12 @@ namespace TeamStor.RPG.Editor
                 Position = new TweenedVector2(Game, new Vector2(-200, 114)),
                 Font = Game.DefaultFonts.Normal,
                 Clicked = (btn) =>
-                {
-	                _editMode = EditMode.Tiles;
-	                CurrentState = new MapEditorTileEditState();
+                {	                
+	                MapEditorTileEditState state = new MapEditorTileEditState();
+	                if(CurrentState is MapEditorEditAttributesState)
+		                state.Layer = (CurrentState as MapEditorEditAttributesState).Layer;
+	                
+	                CurrentState = state;
                 },
 
                 Active = false
@@ -109,9 +110,12 @@ namespace TeamStor.RPG.Editor
 	            Position = new TweenedVector2(Game, new Vector2(-200, 114 + 32)),
                 Font = Game.DefaultFonts.Normal,
                 Clicked = (btn) =>
-                {
-	                _editMode = EditMode.Attributes;
-                    CurrentState = new MapEditorEditAttributesState();
+                {	                
+	                MapEditorEditAttributesState state = new MapEditorEditAttributesState();
+	                if(CurrentState is MapEditorTileEditState)
+		                state.Layer = (CurrentState as MapEditorTileEditState).Layer;
+	                
+                    CurrentState = state;
                 },
 
                 Active = false
@@ -125,7 +129,6 @@ namespace TeamStor.RPG.Editor
                 Font = Game.DefaultFonts.Normal,
                 Clicked = (btn) =>
                 {
-	                _editMode = EditMode.Info; 
 	                CurrentState = new MapEditorEditInfoState();
                 },
 
@@ -140,7 +143,6 @@ namespace TeamStor.RPG.Editor
 				Font = Game.DefaultFonts.Normal,
 				Clicked = (btn) =>
 				{
-					_editMode = EditMode.Keybinds; 
 					CurrentState = new MapEditorShowKeybindsState();
 				},
 
@@ -305,10 +307,10 @@ namespace TeamStor.RPG.Editor
 
             Camera.Update(deltaTime, totalTime);
 			
-            Buttons["edit-tiles-mode"].Active = _editMode == EditMode.Tiles;
-            Buttons["edit-attributes-mode"].Active = _editMode == EditMode.Attributes;
-            Buttons["edit-info-mode"].Active = _editMode == EditMode.Info;
-			Buttons["keybinds-help-mode"].Active = _editMode == EditMode.Keybinds;
+            Buttons["edit-tiles-mode"].Active = CurrentState is MapEditorTileEditState;
+            Buttons["edit-attributes-mode"].Active = CurrentState is MapEditorEditAttributesState;
+            Buttons["edit-info-mode"].Active = CurrentState is MapEditorEditInfoState;
+			Buttons["keybinds-help-mode"].Active = CurrentState is MapEditorShowKeybindsState;
 
             if(_dataOperation == DataOperation.None)
             {
@@ -388,9 +390,18 @@ namespace TeamStor.RPG.Editor
 
             foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
             {
-                if(layer == Tile.MapLayer.Control && 
-                    (CurrentState.GetType() != typeof(MapEditorTileEditState) || (CurrentState as MapEditorTileEditState).Layer != Tile.MapLayer.Control))
-                    break;
+	            if(layer == Tile.MapLayer.Control)
+	            {
+		            bool shouldDraw = false;
+
+		            if(CurrentState.GetType() == typeof(MapEditorTileEditState) && (CurrentState as MapEditorTileEditState).Layer == Tile.MapLayer.Control)
+			            shouldDraw = true;
+		            if(CurrentState.GetType() == typeof(MapEditorEditAttributesState) && (CurrentState as MapEditorEditAttributesState).Layer == Tile.MapLayer.Control)
+			            shouldDraw = true;
+
+		            if(!shouldDraw)
+			            break;
+	            }
 
                 Rectangle area = new Rectangle(
                     (int)-(Camera.Translation.X / Camera.Zoom.Value),
@@ -464,6 +475,14 @@ namespace TeamStor.RPG.Editor
                 batch.Rectangle(new Rectangle(0, 0, (int)screenSize.X, (int)screenSize.Y), Color.Black * alpha);
                 batch.Text(FontStyle.Bold, 32, text, screenSize / 2 - measure / 2, Color.White);
             }
+			
+			batch.Text(FontStyle.Bold, 32, "BYGG INTE MAPS MED DEN HÄR TACK\nMapEditorState.cs LINJE 479", new Vector2(20, 20), Color.Red);
+			// TODO: crash i Map.SetMetadata som har med RemoveAt att göra
+			// gör så att textfield är multiline
+			// skapa fler tile attribute editors
+			// rita titel och ett sätt att gå ut i editattributesstate
+			// kasper fick något konstigt när den hamnade en massa roof uppe i hörnet
+			// kanske har med threading att göra
         }
 	}
 }
