@@ -14,7 +14,7 @@ namespace TeamStor.RPG
 		{
 		}
 		
-		public override void Draw(Game game, Point mapPos, Map map, Dictionary<string, string> metadata, Map.Environment environment, Color? color = null)
+		public override void Draw(Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
 		{
 			game.Batch.Texture(
 				new Vector2(mapPos.X * 16, mapPos.Y * 16 - 16),

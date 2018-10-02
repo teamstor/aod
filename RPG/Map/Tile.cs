@@ -92,7 +92,7 @@ namespace TeamStor.RPG
         /// <returns>
         /// The name of the tile used in the map editor.
         /// </returns>
-        public virtual string Name(Dictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
+        public virtual string Name(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
         {
             return _name;
         }
@@ -103,7 +103,7 @@ namespace TeamStor.RPG
         /// <returns>
         /// The texture slot to use when drawing the tile.
         /// </returns>
-        public virtual Point TextureSlot(Dictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
+        public virtual Point TextureSlot(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
         {
             return _textureSlot;
         }
@@ -114,7 +114,7 @@ namespace TeamStor.RPG
         /// <returns>
         /// If this tile is solid or not (if the player can walk through it).
         /// </returns>
-        public virtual bool Solid(Dictionary<string, string> metadata = null)
+        public virtual bool Solid(SortedDictionary<string, string> metadata = null)
         {
             return _solid;
         }
@@ -126,7 +126,7 @@ namespace TeamStor.RPG
         /// The transition priority for the tile. Higher = will get transition.
         /// -1 = never use transition with this tile.
         /// </returns>
-        public virtual int TransitionPriority(Dictionary<string, string> metadata = null)
+        public virtual int TransitionPriority(SortedDictionary<string, string> metadata = null)
         {
             return _transitionPriority;
         }
@@ -147,7 +147,7 @@ namespace TeamStor.RPG
         /// OR
         /// * The tile is on the terrain layer and has a higher transition priority (and the other tile doesn't have -1).
         /// </returns>
-        public virtual bool UseTransition(Point from, Point to, Map map, Tile other, Dictionary<string, string> metadata = null, Dictionary<string, string> otherMetadata = null)
+        public virtual bool UseTransition(Point from, Point to, Map map, Tile other, SortedDictionary<string, string> metadata = null, SortedDictionary<string, string> otherMetadata = null)
         {
             if(TransitionPriority() == -1)
                 return false;
@@ -178,7 +178,7 @@ namespace TeamStor.RPG
         /// <param name="metadata">Metadata for the tile being accessed.</param>
         /// <param name="environment">The environment the tile is in.</param>
         /// <returns>The transition texture to use when making a transition with other tiles.</returns>
-        public virtual string TransitionTexture(Dictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
+        public virtual string TransitionTexture(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
         {
             return TRANSTION_GENERIC;
         }
@@ -191,7 +191,7 @@ namespace TeamStor.RPG
         /// <param name="mapPos"></param>
         /// <param name="map"></param>
         /// <param name="metadata"></param>
-        public virtual void Draw(Engine.Game game, Point mapPos, Map map, Dictionary<string, string> metadata, Map.Environment environment, Color? color = null)
+        public virtual void Draw(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
         {
             game.Batch.Texture(
                 new Vector2(mapPos.X * 16, mapPos.Y * 16),
@@ -247,10 +247,18 @@ namespace TeamStor.RPG
         /// <param name="metadata">Metadata for the tile being accessed.</param>
         /// <param name="environment">The environment the tile is in.</param>
         /// <returns>A unique identifier.</returns>
-        public long UniqueIdentity(Dictionary<string, string> metadata, Map.Environment environment)
+        public long UniqueIdentity(SortedDictionary<string, string> metadata, Map.Environment environment)
         {
-            // TODO HASH CODE FÖR EN DICTIONARY????
-            long id = metadata.GetHashCoaaaaaaaaaaaaaaaae();
+            int dhash = 0;
+            if(metadata == null)
+                dhash = "".GetHashCode();
+            else
+            {
+                foreach(KeyValuePair<string, string> pair in metadata)
+                    dhash ^= pair.Key.GetHashCode() ^ pair.Value.GetHashCode();
+            }
+
+            long id = dhash;
             id |= (long)ID << 36;
             id |= (long)environment << 44;
             id |= (long)Layer << 52;

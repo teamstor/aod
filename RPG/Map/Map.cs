@@ -73,7 +73,7 @@ namespace TeamStor.RPG
         // The lower 8 bits of the layer arrays are the ID of the tile. The higher 8 bits are the position into the metadata array.
         // If the higher 8 bits are all 0 the tile doesn't have any metadata.
         private int[] _layerTerrain, _layerDecoration, _layerNPC, _layerControl;
-        private List<Dictionary<string, string>> _metadataTerrain, _metadataDecoration, _metadataNPC, _metadataControl;
+        private List<SortedDictionary<string, string>> _metadataTerrain, _metadataDecoration, _metadataNPC, _metadataControl;
 
         private int[] LayerToTileArray(Tile.MapLayer layer)
         {
@@ -95,7 +95,7 @@ namespace TeamStor.RPG
             return null;
         }
 
-        private List<Dictionary<string, string>> LayerToMetadataArray(Tile.MapLayer layer)
+        private List<SortedDictionary<string, string>> LayerToMetadataArray(Tile.MapLayer layer)
         {
             switch(layer)
             {
@@ -150,10 +150,10 @@ namespace TeamStor.RPG
             _layerNPC = new int[w * h];
             _layerControl = new int[w * h];
 
-            _metadataTerrain = new List<Dictionary<string, string>>();
-            _metadataDecoration = new List<Dictionary<string, string>>();
-            _metadataNPC = new List<Dictionary<string, string>>();
-            _metadataControl = new List<Dictionary<string, string>>();
+            _metadataTerrain = new List<SortedDictionary<string, string>>();
+            _metadataDecoration = new List<SortedDictionary<string, string>>();
+            _metadataNPC = new List<SortedDictionary<string, string>>();
+            _metadataControl = new List<SortedDictionary<string, string>>();
         }
 
         public byte this[Tile.MapLayer layer, int x, int y]
@@ -191,7 +191,7 @@ namespace TeamStor.RPG
         /// <param name="x">The X position of the tile.</param>
         /// <param name="y">The Y position of the tile.</param>
         /// <returns>The metadata or null.</returns>
-        public Dictionary<string, string> GetMetadata(Tile.MapLayer layer, int x, int y)
+        public SortedDictionary<string, string> GetMetadata(Tile.MapLayer layer, int x, int y)
         {
             if(HasMetadata(layer, x, y))
             {
@@ -210,7 +210,7 @@ namespace TeamStor.RPG
         /// <param name="x">The X position of the tile.</param>
         /// <param name="y">The Y position of the tile.</param>
         /// <param name="metadata">The metadata string, or null.</param>
-        public void SetMetadata(Tile.MapLayer layer, int x, int y, Dictionary<string, string> metadata)
+        public void SetMetadata(Tile.MapLayer layer, int x, int y, SortedDictionary<string, string> metadata)
         {
             if(HasMetadata(layer, x, y))
             {
@@ -338,7 +338,7 @@ namespace TeamStor.RPG
                 int count = reader.ReadInt32();
                 for(int i = 0; i < count; i++)
                 {
-                    map._metadataTerrain.Add(new Dictionary<string, string>());
+                    map._metadataTerrain.Add(new SortedDictionary<string, string>());
                     int pairs = reader.ReadInt32();
 
                     for(int i2 = 0; i2 < pairs; i2++)
@@ -348,7 +348,7 @@ namespace TeamStor.RPG
                 count = reader.ReadInt32();
                 for(int i = 0; i < count; i++)
                 {
-                    map._metadataDecoration.Add(new Dictionary<string, string>());
+                    map._metadataDecoration.Add(new SortedDictionary<string, string>());
                     int pairs = reader.ReadInt32();
 
                     for(int i2 = 0; i2 < pairs; i2++)
@@ -358,7 +358,7 @@ namespace TeamStor.RPG
                 count = reader.ReadInt32();
                 for(int i = 0; i < count; i++)
                 {
-                    map._metadataNPC.Add(new Dictionary<string, string>());
+                    map._metadataNPC.Add(new SortedDictionary<string, string>());
                     int pairs = reader.ReadInt32();
 
                     for(int i2 = 0; i2 < pairs; i2++)
@@ -368,7 +368,7 @@ namespace TeamStor.RPG
                 count = reader.ReadInt32();
                 for(int i = 0; i < count; i++)
                 {
-                    map._metadataControl.Add(new Dictionary<string, string>());
+                    map._metadataControl.Add(new SortedDictionary<string, string>());
                     int pairs = reader.ReadInt32();
 
                     for(int i2 = 0; i2 < pairs; i2++)
@@ -407,7 +407,7 @@ namespace TeamStor.RPG
                 }
 
                 writer.Write(_metadataTerrain.Count);
-                foreach(Dictionary<string, string> s in _metadataTerrain)
+                foreach(SortedDictionary<string, string> s in _metadataTerrain)
                 {
                     writer.Write(s.Count);
                     foreach(KeyValuePair<string, string> pair in s)
@@ -418,7 +418,7 @@ namespace TeamStor.RPG
                 }
                 
                 writer.Write(_metadataDecoration.Count);
-                foreach(Dictionary<string, string> s in _metadataDecoration)
+                foreach(SortedDictionary<string, string> s in _metadataDecoration)
                 {
                     writer.Write(s.Count);
                     foreach(KeyValuePair<string, string> pair in s)
@@ -429,7 +429,7 @@ namespace TeamStor.RPG
                 }
                 
                 writer.Write(_metadataNPC.Count);
-                foreach(Dictionary<string, string> s in _metadataNPC)
+                foreach(SortedDictionary<string, string> s in _metadataNPC)
                 {
                     writer.Write(s.Count);
                     foreach(KeyValuePair<string, string> pair in s)
@@ -440,7 +440,7 @@ namespace TeamStor.RPG
                 }
                 
                 writer.Write(_metadataControl.Count);
-                foreach(Dictionary<string, string> s in _metadataControl)
+                foreach(SortedDictionary<string, string> s in _metadataControl)
                 {
                     writer.Write(s.Count);
                     foreach(KeyValuePair<string, string> pair in s)

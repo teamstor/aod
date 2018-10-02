@@ -31,7 +31,7 @@ namespace TeamStor.RPG
             TextureSlots = textureSlots;
         }
 
-        public override void Draw(Engine.Game game, Point mapPos, Map map, Dictionary<string, string> metadata, Map.Environment environment, Color? color = null)
+        public override void Draw(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
         {
             if(!_hasValues)
             {
@@ -49,7 +49,7 @@ namespace TeamStor.RPG
             _slotOverride = new Point(-1, -1);
         }
 
-        public override Point TextureSlot(Dictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
+        public override Point TextureSlot(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
         {
             if(_slotOverride != new Point(-1, -1))
                 return _slotOverride;
