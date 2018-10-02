@@ -19,7 +19,7 @@ namespace TeamStor.RPG
                 throw new InvalidOperationException("TransitionIntoTerrainTile only works on the decoration layer");
         }
 
-        public override bool UseTransition(Point from, Point to, Map map, Tile other, string metadata = "", string otherMetadata = "")
+        public override bool UseTransition(Point from, Point to, Map map, Tile other, Dictionary<string, string> metadata = null, Dictionary<string, string> otherMetadata = null)
         {
             if((to - from).Y == 1)
             {

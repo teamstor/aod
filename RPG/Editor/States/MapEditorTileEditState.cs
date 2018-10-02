@@ -99,7 +99,7 @@ namespace TeamStor.RPG.Editor.States
                 {
                     if(tiles.Count > 0 && tile.ID - Tile.FindByName(tiles[tiles.Count - 1], layer, BaseState.Map.Info.Environment).ID > 1)
                         tiles.Add(SelectionMenu.SPACING);
-                    tiles.Add(tile.Name("", BaseState.Map.Info.Environment));
+                    tiles.Add(tile.Name(null, BaseState.Map.Info.Environment));
                 }
             }
 
@@ -118,7 +118,7 @@ namespace TeamStor.RPG.Editor.States
                 {
                     if(tiles.Count > 0 && tile.ID - Tile.FindByName(tiles[tiles.Count - 1], _layer, BaseState.Map.Info.Environment).ID > 1)
                         tiles.Add(SelectionMenu.SPACING);
-                    tiles.Add(tile.Name("", BaseState.Map.Info.Environment));
+                    tiles.Add(tile.Name(null, BaseState.Map.Info.Environment));
                 }
             }
 

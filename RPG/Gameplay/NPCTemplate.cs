@@ -28,7 +28,7 @@ namespace TeamStor.RPG.Gameplay
                 Template = npcTemplate;
             }
 
-            public override void Draw(Engine.Game game, Point mapPos, Map map, string metadata, Map.Environment environment, Color? color = null)
+            public override void Draw(Engine.Game game, Point mapPos, Map map, Dictionary<string, string> metadata, Map.Environment environment, Color? color = null)
             {
                 game.Batch.Texture(
                     new Vector2(mapPos.X * 16, mapPos.Y * 16),

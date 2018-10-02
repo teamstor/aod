@@ -73,7 +73,7 @@ namespace TeamStor.RPG
         // The lower 8 bits of the layer arrays are the ID of the tile. The higher 8 bits are the position into the metadata array.
         // If the higher 8 bits are all 0 the tile doesn't have any metadata.
         private int[] _layerTerrain, _layerDecoration, _layerNPC, _layerControl;
-        private List<string> _metadataTerrain, _metadataDecoration, _metadataNPC, _metadataControl;
+        private List<Dictionary<string, string>> _metadataTerrain, _metadataDecoration, _metadataNPC, _metadataControl;
 
         private int[] LayerToTileArray(Tile.MapLayer layer)
         {
@@ -95,7 +95,7 @@ namespace TeamStor.RPG
             return null;
         }
 
-        private List<string> LayerToMetadataArray(Tile.MapLayer layer)
+        private List<Dictionary<string, string>> LayerToMetadataArray(Tile.MapLayer layer)
         {
             switch(layer)
             {
@@ -150,10 +150,10 @@ namespace TeamStor.RPG
             _layerNPC = new int[w * h];
             _layerControl = new int[w * h];
 
-            _metadataTerrain = new List<string>();
-            _metadataDecoration = new List<string>();
-            _metadataNPC = new List<string>();
-            _metadataControl = new List<string>();
+            _metadataTerrain = new List<Dictionary<string, string>>();
+            _metadataDecoration = new List<Dictionary<string, string>>();
+            _metadataNPC = new List<Dictionary<string, string>>();
+            _metadataControl = new List<Dictionary<string, string>>();
         }
 
         public byte this[Tile.MapLayer layer, int x, int y]
@@ -190,17 +190,17 @@ namespace TeamStor.RPG
         /// <param name="layer">The layer the tile is on.</param>
         /// <param name="x">The X position of the tile.</param>
         /// <param name="y">The Y position of the tile.</param>
-        /// <returns>The metadata or an empty string.</returns>
-        public string GetMetadata(Tile.MapLayer layer, int x, int y)
+        /// <returns>The metadata or null.</returns>
+        public Dictionary<string, string> GetMetadata(Tile.MapLayer layer, int x, int y)
         {
             if(HasMetadata(layer, x, y))
             {
                 if(LayerToMetadataArray(layer).Count <= GetMetadataSlot(layer, x, y) - 1)
-                    return "";
+                    return null;
                 return LayerToMetadataArray(layer)[GetMetadataSlot(layer, x, y) - 1];
             }
 
-            return "";
+            return null;
         }
 
         /// <summary>
@@ -210,7 +210,7 @@ namespace TeamStor.RPG
         /// <param name="x">The X position of the tile.</param>
         /// <param name="y">The Y position of the tile.</param>
         /// <param name="metadata">The metadata string, or null.</param>
-        public void SetMetadata(Tile.MapLayer layer, int x, int y, string metadata)
+        public void SetMetadata(Tile.MapLayer layer, int x, int y, Dictionary<string, string> metadata)
         {
             if(HasMetadata(layer, x, y))
             {
@@ -232,7 +232,7 @@ namespace TeamStor.RPG
                 }
             }
 
-            if(!String.IsNullOrEmpty(metadata))
+            if(metadata != null)
             {
                 LayerToMetadataArray(layer).Add(metadata);
                 LayerToTileArray(layer)[(y * Width) + x] = (int)(
@@ -335,22 +335,45 @@ namespace TeamStor.RPG
                     map._layerControl[i] = reader.ReadInt32();
                 }
 
-                int count = reader.ReadByte();
+                int count = reader.ReadInt32();
                 for(int i = 0; i < count; i++)
-                    map._metadataTerrain.Add(reader.ReadString());
-                
-                count = reader.ReadByte();
-                for(int i = 0; i < count; i++)
-                    map._metadataDecoration.Add(reader.ReadString());
-                
-                count = reader.ReadByte();
-                for(int i = 0; i < count; i++)
-                    map._metadataNPC.Add(reader.ReadString());
-                
-                count = reader.ReadByte();
-                for(int i = 0; i < count; i++)
-                    map._metadataControl.Add(reader.ReadString());
+                {
+                    map._metadataTerrain.Add(new Dictionary<string, string>());
+                    int pairs = reader.ReadInt32();
 
+                    for(int i2 = 0; i2 < pairs; i2++)
+                        map._metadataTerrain[map._metadataTerrain.Count - 1].Add(reader.ReadString(), reader.ReadString());
+                }
+
+                count = reader.ReadInt32();
+                for(int i = 0; i < count; i++)
+                {
+                    map._metadataDecoration.Add(new Dictionary<string, string>());
+                    int pairs = reader.ReadInt32();
+
+                    for(int i2 = 0; i2 < pairs; i2++)
+                        map._metadataDecoration[map._metadataDecoration.Count - 1].Add(reader.ReadString(), reader.ReadString());
+                }
+                
+                count = reader.ReadInt32();
+                for(int i = 0; i < count; i++)
+                {
+                    map._metadataNPC.Add(new Dictionary<string, string>());
+                    int pairs = reader.ReadInt32();
+
+                    for(int i2 = 0; i2 < pairs; i2++)
+                        map._metadataNPC[map._metadataNPC.Count - 1].Add(reader.ReadString(), reader.ReadString());
+                }
+                
+                count = reader.ReadInt32();
+                for(int i = 0; i < count; i++)
+                {
+                    map._metadataControl.Add(new Dictionary<string, string>());
+                    int pairs = reader.ReadInt32();
+
+                    for(int i2 = 0; i2 < pairs; i2++)
+                        map._metadataControl[map._metadataControl.Count - 1].Add(reader.ReadString(), reader.ReadString());
+                }
                 GC.Collect();
 
                 return map;
@@ -384,20 +407,48 @@ namespace TeamStor.RPG
                 }
 
                 writer.Write(_metadataTerrain.Count);
-                foreach(string s in _metadataTerrain)
-                    writer.Write(s);
+                foreach(Dictionary<string, string> s in _metadataTerrain)
+                {
+                    writer.Write(s.Count);
+                    foreach(KeyValuePair<string, string> pair in s)
+                    {
+                        writer.Write(pair.Key);
+                        writer.Write(pair.Value);
+                    }
+                }
                 
                 writer.Write(_metadataDecoration.Count);
-                foreach(string s in _metadataDecoration)
-                    writer.Write(s);
+                foreach(Dictionary<string, string> s in _metadataDecoration)
+                {
+                    writer.Write(s.Count);
+                    foreach(KeyValuePair<string, string> pair in s)
+                    {
+                        writer.Write(pair.Key);
+                        writer.Write(pair.Value);
+                    }
+                }
                 
                 writer.Write(_metadataNPC.Count);
-                foreach(string s in _metadataNPC)
-                    writer.Write(s);
+                foreach(Dictionary<string, string> s in _metadataNPC)
+                {
+                    writer.Write(s.Count);
+                    foreach(KeyValuePair<string, string> pair in s)
+                    {
+                        writer.Write(pair.Key);
+                        writer.Write(pair.Value);
+                    }
+                }
                 
                 writer.Write(_metadataControl.Count);
-                foreach(string s in _metadataControl)
-                    writer.Write(s);
+                foreach(Dictionary<string, string> s in _metadataControl)
+                {
+                    writer.Write(s.Count);
+                    foreach(KeyValuePair<string, string> pair in s)
+                    {
+                        writer.Write(pair.Key);
+                        writer.Write(pair.Value);
+                    }
+                }
             }
         }
 

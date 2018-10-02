@@ -26,7 +26,7 @@ namespace TeamStor.RPG
 		
 		private Dictionary<long, TileTransition> _cachedTransitions = new Dictionary<long, TileTransition>();
 
-		private void GenerateTileTransition(Tile tile, string metadata, Map.Environment environment)
+		private void GenerateTileTransition(Tile tile, Dictionary<string, string> metadata, Map.Environment environment)
 		{
 			string transitionBase = tile.TransitionTexture(metadata, environment);
 			
@@ -95,7 +95,7 @@ namespace TeamStor.RPG
 		/// <param name="environment">The environment the tile is in.</param>
 		/// <param name="pointOnTexture">The point on the texture the tile is on.</param>
 		/// <returns>The texture for the specified tile.</returns>
-		public Texture2D TextureForTile(Tile tile, string metadata, Map.Environment environment, out Point pointOnTexture)
+		public Texture2D TextureForTile(Tile tile, Dictionary<string, string> metadata, Map.Environment environment, out Point pointOnTexture)
 		{
 			if(!HasTransition(tile, metadata, environment))
 				GenerateTileTransition(tile, metadata, environment);
@@ -109,7 +109,7 @@ namespace TeamStor.RPG
 		/// <param name="metadata">The metadata for the tile.</param>
 		/// <param name="environment">The environment the tile is in.</param>
 		/// <returns>true if the cache has a transition for the specified tile</returns>
-		public bool HasTransition(Tile tile, string metadata, Map.Environment environment)
+		public bool HasTransition(Tile tile, Dictionary<string, string> metadata, Map.Environment environment)
 		{
 			return _cachedTransitions.ContainsKey(tile.UniqueIdentity(metadata, environment));
 		}

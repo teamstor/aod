@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using TeamStor.Engine;
 using TeamStor.RPG.Gameplay;
 
@@ -18,14 +19,14 @@ namespace TeamStor.RPG
                 {
                 }
 
-                public override string Name(string metadata = "", Map.Environment environment = Map.Environment.Forest)
+                public override string Name(Dictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
                 {
                     if(environment == Map.Environment.Inside)
-                        return "The Void";
+                        return "Void";
                     return base.Name(metadata, environment);
                 }
 
-                public override void Draw(Engine.Game game, Point mapPos, Map map, string metadata, Map.Environment environment, Color? color = null)
+                public override void Draw(Engine.Game game, Point mapPos, Map map, Dictionary<string, string> metadata, Map.Environment environment, Color? color = null)
                 {
                     if(environment == Map.Environment.Inside)
                         game.Batch.Rectangle(new Rectangle(mapPos.X * 16, mapPos.Y * 16, 16, 16), Color.Black);
@@ -87,7 +88,7 @@ namespace TeamStor.RPG
                 {
                 }
 
-                public override Point TextureSlot(string metadata = "", Map.Environment environment = Map.Environment.Forest)
+                public override Point TextureSlot(Dictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
                 {
                     if(environment == Map.Environment.SnowMountain)
                         return base.TextureSlot(metadata, environment) + new Point(0, 2);
