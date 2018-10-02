@@ -110,7 +110,8 @@ namespace TeamStor.RPG.Editor
                 Font = Game.DefaultFonts.Normal,
                 Clicked = (btn) =>
                 {
-	                _editMode = EditMode.Attributes; 
+	                _editMode = EditMode.Attributes;
+                    CurrentState = new MapEditorEditAttributesState();
                 },
 
                 Active = false
