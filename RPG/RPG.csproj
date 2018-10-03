@@ -86,8 +86,10 @@
     <Compile Include="Map\Tiles\InsideTile.cs" />
     <Compile Include="Map\Tiles\NPCPathTile.cs" />
     <Compile Include="Map\Tiles\RoadCityTile.cs" />
+    <Compile Include="Map\Tiles\BeamTile.cs" />
+    <Compile Include="Map\Tiles\RoofBeamTile.cs" />
+    <Compile Include="Map\Tiles\RoofTile.cs" />
     <Compile Include="Map\Tiles\TextBoxTile.cs" />
-    <Compile Include="Map\Tiles\TransitionIntoTerrainTile.cs" />
     <Compile Include="Map\Tiles\VariationsTile.cs" />
     <Compile Include="Map\TileTransitionCache.cs" />
     <Compile Include="Menu\MenuButton.cs" />
