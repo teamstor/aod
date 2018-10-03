@@ -29,19 +29,22 @@ namespace TeamStor.RPG
 		private void GenerateTileTransition(Tile tile, SortedDictionary<string, string> metadata, Map.Environment environment)
 		{
 			string transitionBase = tile.TransitionTexture(metadata, environment);
-			
-			if(!_masks.ContainsKey(transitionBase))
-			{
-				_masks.Add(transitionBase, new BitArray(16 * 16));
-				
-				Color[] data = new Color[16 * 16];
-				Game.Assets.Get<Texture2D>(transitionBase).GetData(data);
 
-				for(int i = 0; i < data.Length; i++)
-					_masks[transitionBase][i] = data[i] == Color.Black;
+            if(!transitionBase.Contains("_color"))
+            {
+                if(!_masks.ContainsKey(transitionBase))
+                {
+                    _masks.Add(transitionBase, new BitArray(16 * 16));
 
-				Game.Assets.UnloadAsset(transitionBase);
-			}
+                    Color[] data = new Color[16 * 16];
+                    Game.Assets.Get<Texture2D>(transitionBase).GetData(data);
+
+                    for(int i = 0; i < data.Length; i++)
+                        _masks[transitionBase][i] = data[i] == Color.Black;
+
+                    Game.Assets.UnloadAsset(transitionBase);
+                }
+            }
 			
 			if(_textures.Count == 0 || _currentPointOnTexture.Y >= 16)
 			{
@@ -63,8 +66,16 @@ namespace TeamStor.RPG
 			Tile.LayerToTexture(Game, tile.Layer).GetData(0, textureRectangle, tileData, 0, 16 * 16);
 			
 			Color[] tileTransition = new Color[16 * 16];
-			for(int i = 0; i < tileTransition.Length; i++)
-				tileTransition[i] = _masks[transitionBase][i] ? tileData[i] : Color.Transparent;
+            if(transitionBase.Contains("_color"))
+            {
+                Game.Assets.Get<Texture2D>(transitionBase).GetData(tileTransition);
+                Game.Assets.UnloadAsset(transitionBase);
+            }
+            else
+            {
+                for(int i = 0; i < tileTransition.Length; i++)
+                    tileTransition[i] = _masks[transitionBase][i] ? tileData[i] : Color.Transparent;
+            }
 			_textures.Last().SetData(0, new Rectangle(_currentPointOnTexture.X * 16, _currentPointOnTexture.Y * 16, 16, 16), tileTransition, 0, 16 * 16);
 
 			_currentPointOnTexture.X++;
