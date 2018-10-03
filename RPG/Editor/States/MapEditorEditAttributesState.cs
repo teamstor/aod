@@ -10,6 +10,7 @@ using TeamStor.Engine.Tween;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
+using static TeamStor.Engine.Graphics.SpriteBatch;
 
 namespace TeamStor.RPG.Editor.States
 {
@@ -181,7 +182,7 @@ namespace TeamStor.RPG.Editor.States
             BaseState.Buttons["layer-npc"].Disabled = SelectedTile != new Point(-1, -1);
             BaseState.Buttons["layer-control"].Disabled = SelectedTile != new Point(-1, -1);
 
-            if(Game.Input.KeyPressed(Keys.T))
+            if(Game.Input.KeyPressed(Keys.T) && SelectedTile == new Point(-1, -1))
             {
                 MapEditorTileEditState state = new MapEditorTileEditState();
                 state.Layer = Layer;
@@ -199,7 +200,7 @@ namespace TeamStor.RPG.Editor.States
                     SelectedTile = HoveredTile;
                     SortedDictionary<string, string> attribs = BaseState.Map.GetMetadata(Layer, SelectedTile.X, SelectedTile.Y);
 
-                    int currentY = Game.GraphicsDevice.Viewport.Bounds.Height / 2 - 200 / 2 + 30;
+                    int currentY = Game.GraphicsDevice.Viewport.Bounds.Height / 2 - 300 / 2 + 30;
                     _editors = Tile.Find(BaseState.Map[Layer, SelectedTile.X, SelectedTile.Y], Layer).AttributeEditors(BaseState, ref currentY);
 
                     if(attribs != null)
@@ -259,6 +260,11 @@ namespace TeamStor.RPG.Editor.States
             if(SelectedTile != new Point(-1, -1))
             {
                 batch.Rectangle(new Rectangle(Point.Zero, screenSize.ToPoint()), Color.Black * 0.6f);
+
+                string tileName = Tile.Find(BaseState.Map[Layer, SelectedTile.X, SelectedTile.Y], Layer).Name(BaseState.Map.GetMetadata(Layer, SelectedTile.X, SelectedTile.Y), BaseState.Map.Info.Environment);
+                string str = "\"" + tileName + "\" (" + SelectedTile.X + ", " + SelectedTile.Y + ")";
+                Vector2 measure = Game.DefaultFonts.Bold.Measure(16, str);
+                batch.Text(FontStyle.Bold, 16, str, new Vector2(screenSize.X / 2 - measure.X / 2, screenSize.Y / 2 - 300 / 2), Color.White);
             }
 
             if(!BaseState.IsPointObscured(Input.MousePosition) && SelectedTile == new Point(-1, -1))
