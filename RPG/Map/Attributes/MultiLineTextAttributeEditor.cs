@@ -32,7 +32,7 @@ namespace TeamStor.RPG.Attributes
 		{
 			MaxLines = maxLines;
 			
-			State.TextFields.Add(GetType().Name + "-" + Name, TextField = new TextField()
+			State.TextFields.Add("editor-" + GetType().Name + "-" + Name, TextField = new TextField()
 			{
 				Label = name + ": ",
 				Text = "",
@@ -52,7 +52,7 @@ namespace TeamStor.RPG.Attributes
 
 		public override void Dispose()
 		{
-			State.TextFields.Remove(GetType().Name + "-" + Name);
+			State.TextFields.Remove("editor-" + GetType().Name + "-" + Name);
 		}
 	}
 }

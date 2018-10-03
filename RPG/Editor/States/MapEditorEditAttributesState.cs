@@ -15,6 +15,8 @@ namespace TeamStor.RPG.Editor.States
 {
     public class MapEditorEditAttributesState : MapEditorModeState
     {
+        private Rectangle _lastBounds;
+
         public override bool PauseEditor
         {
             get
@@ -61,6 +63,8 @@ namespace TeamStor.RPG.Editor.States
 
         public override void OnEnter(GameState previousState)
         {
+            _lastBounds = Game.GraphicsDevice.Viewport.Bounds;
+
             BaseState.Buttons.Add("layer-terrain", new Button
             {
                 Text = "",
@@ -208,6 +212,39 @@ namespace TeamStor.RPG.Editor.States
                     }
                 }
             }
+
+            Vector2 offset = new Vector2(
+                Game.GraphicsDevice.Viewport.Bounds.Width - _lastBounds.Width,
+                Game.GraphicsDevice.Viewport.Bounds.Height - _lastBounds.Height) / 2;
+
+            foreach(KeyValuePair<string, Button> pair in BaseState.Buttons)
+            {
+                if(pair.Key.StartsWith("editor-"))
+                    pair.Value.Position.TweenTo(pair.Value.Position + offset, TweenEaseType.Linear, 0);
+            }
+
+            foreach(KeyValuePair<string, SelectionMenu> pair in BaseState.SelectionMenus)
+            {
+                if(pair.Key.StartsWith("editor-"))
+                    pair.Value.Rectangle.TweenTo(new Rectangle(
+                    pair.Value.Rectangle.Value.X + (int)offset.X,
+                    pair.Value.Rectangle.Value.Y + (int)offset.Y, 
+                    0, 0), TweenEaseType.Linear, 0);
+            }
+
+            foreach(KeyValuePair<string, TextField> pair in BaseState.TextFields)
+            {
+                if(pair.Key.StartsWith("editor-"))
+                    pair.Value.Position.TweenTo(pair.Value.Position + offset, TweenEaseType.Linear, 0);
+            }
+
+            foreach(KeyValuePair<string, ChoiceField> pair in BaseState.ChoiceFields)
+            {
+                if(pair.Key.StartsWith("editor-"))
+                    pair.Value.Position.TweenTo(pair.Value.Position + offset, TweenEaseType.Linear, 0);
+            }
+
+            _lastBounds = Game.GraphicsDevice.Viewport.Bounds;
         }
 
         public override void FixedUpdate(long count)
