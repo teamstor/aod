@@ -69,7 +69,7 @@ namespace TeamStor.RPG
                     new Point(6, 0)
 			}, false, 1001);
 
-            public static Tile Dirt = new NatureTransitionTile(11, Tile.MapLayer.Terrain, "Dirt",
+            public static Tile Dirt = new VariationsTile(11, Tile.MapLayer.Terrain, "Dirt",
                 new Point[] {
                     // 4/5 chance
                     new Point(7, 0),
