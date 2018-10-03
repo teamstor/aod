@@ -187,10 +187,10 @@ namespace TeamStor.RPG
         /// Draws this tile.
         /// </summary>
         /// <param name="batch">The batch to draw with.</param>
-        /// <param name="time"></param>
-        /// <param name="mapPos"></param>
-        /// <param name="map"></param>
-        /// <param name="metadata"></param>
+        /// <param name="mapPos">The position this tile is on.</param>
+        /// <param name="map">The map the tile is in.</param>
+        /// <param name="metadata">Metadata associated with this position.</param>
+        /// <param name="environment">The environment the map is in.</param>
         public virtual void Draw(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
         {
             game.Batch.Texture(
@@ -199,6 +199,18 @@ namespace TeamStor.RPG
                 color.HasValue ? color.Value : Color.White,
                 Vector2.One,
                 new Rectangle(TextureSlot(metadata, environment).X * 16, TextureSlot(metadata, environment).Y * 16, 16, 16));
+        }
+
+        /// <summary>
+        /// A second draw pass. Called after transitions have been drawn.
+        /// </summary>
+        /// <param name="batch">The batch to draw with.</param>
+        /// <param name="mapPos">The position this tile is on.</param>
+        /// <param name="map">The map the tile is in.</param>
+        /// <param name="metadata">Metadata associated with this position.</param>
+        /// <param name="environment">The environment the map is in.</param>
+        public virtual void DrawAfterTransition(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
+        {
         }
 
         /// <summary>

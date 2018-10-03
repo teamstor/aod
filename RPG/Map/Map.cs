@@ -581,6 +581,16 @@ namespace TeamStor.RPG
                     }
                 }
             }
+
+            for(x = xMin; x <= xMax; x++)
+            {
+                for(y = yMin; y <= yMax; y++)
+                {
+                    byte tile = this[layer, x, y];
+                    if(layer == Tile.MapLayer.Terrain || (tile & 0xff) != 0)
+                        Tile.Find(tile, layer).DrawAfterTransition(game, new Point(x, y), this, GetMetadata(layer, x, y), Info.Environment);
+                }
+            }
         }
     }
 }

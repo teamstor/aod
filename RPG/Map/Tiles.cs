@@ -87,7 +87,7 @@ namespace TeamStor.RPG
             public static Tile WoodenPanel = new InsideTile(21, Tile.MapLayer.Terrain, "Wooden Panel", new Point(1, 2), true, -1);
             public static Tile HouseWall = new InsideTile(22, Tile.MapLayer.Terrain, "Wall", new Point(0, 2), true, -1);
 
-            public static Tile RoadCity = new Tile(50, Tile.MapLayer.Terrain, "Road (City)", new Point(0, 1), false, 500);
+            public static Tile RoadCity = new RoadCityTile(50, Tile.MapLayer.Terrain, "City Road", new Point(0, 1), false, 1002);
         }
         #endregion
 
@@ -113,17 +113,17 @@ namespace TeamStor.RPG
 			public static Tile Tree = new TreeTile(10, Tile.MapLayer.Decoration, "Tree", new Point(0, 1), true);
 			
 			public static Tile Wood = new TransitionIntoTerrainTile(20, Tile.MapLayer.Decoration, "Wood", new Point(2, 0), true);
-            public static Tile Brick = new Tile(21, Tile.MapLayer.Decoration, "Brick", new Point(3, 0), true);
-			public static Tile BrickStone = new Tile(22, Tile.MapLayer.Decoration, "Brick (Stone)", new Point(4, 0), true);
+            public static Tile Brick = new Tile(21, Tile.MapLayer.Decoration, "Bricks", new Point(3, 0), true);
+			public static Tile BrickStone = new Tile(22, Tile.MapLayer.Decoration, "Stone Bricks", new Point(4, 0), true);
 
-            public static Tile RoofOrange = new Tile(30, Tile.MapLayer.Decoration, "Roof (Orange)", new Point(3, 1), true);
-            public static Tile RoofBlue = new Tile(31, Tile.MapLayer.Decoration, "Roof (Blue)", new Point(4, 1), true);
-            public static Tile RoofPurple = new Tile(32, Tile.MapLayer.Decoration, "Roof (Purple)", new Point(5, 1), true);
-            public static Tile RoofRed = new Tile(33, Tile.MapLayer.Decoration, "Roof (Red)", new Point(6, 1), true);
+            public static Tile RoofOrange = new Tile(30, Tile.MapLayer.Decoration, "Orange Roof", new Point(3, 1), true);
+            public static Tile RoofBlue = new Tile(31, Tile.MapLayer.Decoration, "Blue Roof", new Point(4, 1), true);
+            public static Tile RoofPurple = new Tile(32, Tile.MapLayer.Decoration, "Purple Roof", new Point(5, 1), true);
+            public static Tile RoofRed = new Tile(33, Tile.MapLayer.Decoration, "Red Roof", new Point(6, 1), true);
 
-            public static Tile StairsWood = new TransitionIntoTerrainTile(40, Tile.MapLayer.Decoration, "Stairs (Wood)", new Point(2, 1));
+            public static Tile StairsWood = new TransitionIntoTerrainTile(40, Tile.MapLayer.Decoration, "Wood Stairs", new Point(2, 1));
 
-            public static Tile DoorWood = new DoubleTile(50, Tile.MapLayer.Decoration, "Door (Wooden)", new Point(1, 1), true);
+            public static Tile DoorWood = new DoubleTile(50, Tile.MapLayer.Decoration, "Wooden Door", new Point(1, 1), true);
 		}
         #endregion
 

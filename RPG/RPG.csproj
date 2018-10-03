@@ -85,6 +85,7 @@
     <Compile Include="Map\Tiles\DoubleTile.cs" />
     <Compile Include="Map\Tiles\InsideTile.cs" />
     <Compile Include="Map\Tiles\NPCPathTile.cs" />
+    <Compile Include="Map\Tiles\RoadCityTile.cs" />
     <Compile Include="Map\Tiles\TextBoxTile.cs" />
     <Compile Include="Map\Tiles\TransitionIntoTerrainTile.cs" />
     <Compile Include="Map\Tiles\VariationsTile.cs" />
