@@ -136,6 +136,9 @@ namespace TeamStor.RPG
 
             public static Tile Barrier = new Tile(40, Tile.MapLayer.Control, "Barrier", new Point(4, 0), true);
             public static Tile InvertedBarrier = new Tile(41, Tile.MapLayer.Control, "Inverted Barrier", new Point(5, 0));
+
+            public static Tile NPCPathStart = new NPCPathTile(50, Tile.MapLayer.Control, "NPC Path Start", new Point(6, 0), false);
+            public static Tile NPCPath = new Tile(51, Tile.MapLayer.Control, "NPC Path", new Point(7, 0), false);
         }
         #endregion
     }

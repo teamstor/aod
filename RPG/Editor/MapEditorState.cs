@@ -475,11 +475,6 @@ namespace TeamStor.RPG.Editor
                 batch.Rectangle(new Rectangle(0, 0, (int)screenSize.X, (int)screenSize.Y), Color.Black * alpha);
                 batch.Text(FontStyle.Bold, 32, text, screenSize / 2 - measure / 2, Color.White);
             }
-			
-			// TODO: 
-			// skapa fler tile attribute editors
-			// kasper fick något konstigt när den hamnade en massa roof uppe i hörnet
-			// kanske har med threading att göra
         }
 	}
 }

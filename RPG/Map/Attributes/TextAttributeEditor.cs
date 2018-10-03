@@ -5,9 +5,9 @@ using TeamStor.RPG.Editor;
 namespace TeamStor.RPG.Attributes
 {
 	/// <summary>
-	/// A text attribute that can have multiple lines.
+	/// An attribute with an editable string.
 	/// </summary>
-	public class MultiLineTextAttributeEditor : TileAttributeEditor
+	public class TextAttributeEditor : TileAttributeEditor
 	{
 		public TextField TextField { get; private set; }
 
@@ -27,7 +27,7 @@ namespace TeamStor.RPG.Attributes
 			}
 		}
 
-		public MultiLineTextAttributeEditor(string name, MapEditorState state, int maxLines, bool monospace, ref int currentY) : base(name, state, ref currentY)
+		public TextAttributeEditor(string name, MapEditorState state, int maxLines, bool monospace, ref int currentY) : base(name, state, ref currentY)
 		{			
 			State.TextFields.Add("editor-" + GetType().Name + "-" + Name, TextField = new TextField()
 			{

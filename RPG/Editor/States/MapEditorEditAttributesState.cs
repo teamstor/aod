@@ -309,11 +309,10 @@ namespace TeamStor.RPG.Editor.States
                     else
                     {
                         int size = 0;
-                        unsafe
+                        foreach(KeyValuePair<string, string> pair in attribs)
                         {
-                            // https://stackoverflow.com/questions/1128315/find-size-of-object-instance-in-bytes-in-c-sharp
-                            RuntimeTypeHandle th = attribs.GetType().TypeHandle;
-                            size = *(*(int**)&th + 1);
+                            size += pair.Key.Length * 2;
+                            size += pair.Value.Length * 2;
                         }
 
                         str = "Edit \"" + tileName + "\" (" + HoveredTile.X + ", " + HoveredTile.Y + ") [" + (size / (double) 1024).ToString("0.00") + " KB @ slot " + BaseState.Map.GetMetadataSlot(Layer, HoveredTile.X, HoveredTile.Y) + "]";

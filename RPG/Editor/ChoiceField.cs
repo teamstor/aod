@@ -23,6 +23,9 @@ namespace TeamStor.RPG.Editor
 		public Font Font;
 		public Color TextColor = Color.White;
 
+        public int MinValue = 0;
+        public int MaxValue = int.MaxValue;
+
 		public delegate void OnChoiceChanged(ChoiceField field, int newIndex, string newChoice);
 		public OnChoiceChanged ChoiceChanged;
 		
@@ -62,19 +65,21 @@ namespace TeamStor.RPG.Editor
 				if(LeftButtonRectangle.Contains(Game.Input.MousePosition))
 				{
 					Choice--;
-					if(Choice < 0)
-						Choice = Choices.Length - 1;
+					if(Choice < (Choices == null ? MinValue : 0))
+						Choice = Choices == null ? MaxValue : Choices.Length - 1;
 
-					ChoiceChanged(this, Choice, Choices[Choice]);
+                    if(ChoiceChanged != null)
+					    ChoiceChanged(this, Choice, Choices == null ? Choice.ToString() : Choices[Choice]);
 				}
 				
 				if(RightButtonRectangle.Contains(Game.Input.MousePosition))
 				{
 					Choice++;
-					if(Choice > Choices.Length - 1)
-						Choice = 0;
+					if(Choice > (Choices == null ? MaxValue : Choices.Length - 1))
+						Choice = Choices == null ? MinValue : 0;
 
-					ChoiceChanged(this, Choice, Choices[Choice]);
+                    if(ChoiceChanged != null)
+                        ChoiceChanged(this, Choice, Choices == null ? Choice.ToString() : Choices[Choice]);
 				}
 			}
 		}
@@ -102,13 +107,13 @@ namespace TeamStor.RPG.Editor
 				Game.Assets.Get<Texture2D>("editor/arrow.png"), 
 				Color.White * (RightButtonRectangle.Contains(Game.Input.MousePosition) ? Game.Input.Mouse(MouseButton.Left) ? 1.0f : 0.8f : 0.6f));
 
-			Vector2 measure = Font.Measure(13, Choices[Choice]);
+			Vector2 measure = Font.Measure(13, Choices == null ? Choice.ToString() : Choices[Choice]);
 			int width = RightButtonRectangle.X - (LeftButtonRectangle.X + LeftButtonRectangle.Width);
 			width -= 8;
 			Rectangle rect = new Rectangle(LeftButtonRectangle.X + LeftButtonRectangle.Width + 4, LeftButtonRectangle.Y, width, 32);
 			
-			batch.Text(Font, 13, 
-				Choices[Choice], 
+			batch.Text(Font, 13,
+                Choices == null ? Choice.ToString() : Choices[Choice], 
 				new Vector2(rect.X + rect.Width / 2 - measure.X / 2, Position.Value.Y + 7), 
 				TextColor * 0.6f);
 		}
