@@ -37,7 +37,19 @@ namespace TeamStor.RPG
 
             public static Tile Water = new WaterTile(0, Tile.MapLayer.Terrain, "Water", new Point(0, 0), 4, 2, true);
 
-            public static Tile Grass = new VariationsTile(10, Tile.MapLayer.Terrain, "Grass", 
+            public class NatureTransitionTile : VariationsTile
+            {
+                public NatureTransitionTile(byte id, MapLayer layer, string name, Point[] textureSlots, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlots, solid, transitionPriority)
+                {
+                }
+
+                public override string TransitionTexture(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
+                {
+                    return "tiles/transitions/nature.png";
+                }
+            }
+
+            public static Tile Grass = new NatureTransitionTile(10, Tile.MapLayer.Terrain, "Grass", 
                 new Point[] {
                     // 5/11 chance
                     new Point(4, 0),
@@ -55,8 +67,9 @@ namespace TeamStor.RPG
 
                     /// 1/11 chance
                     new Point(6, 0)
-			});
-            public static Tile Dirt = new VariationsTile(11, Tile.MapLayer.Terrain, "Dirt",
+			}, false, 1001);
+
+            public static Tile Dirt = new NatureTransitionTile(11, Tile.MapLayer.Terrain, "Dirt",
                 new Point[] {
                     // 4/5 chance
                     new Point(7, 0),
@@ -67,6 +80,7 @@ namespace TeamStor.RPG
                     // 1/5 chance
                     new Point(8, 0)
 			});
+
 			public static Tile Stone = new Tile(12, Tile.MapLayer.Terrain, "Stone", new Point(9, 0), true);
 			
 			public static Tile Wood = new InsideTile(20, Tile.MapLayer.Terrain, "Wood", new Point(1, 1), true, -1);
