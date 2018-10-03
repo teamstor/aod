@@ -477,7 +477,6 @@ namespace TeamStor.RPG.Editor
             }
 			
 			// TODO: 
-			// gör så att textfield är multiline
 			// skapa fler tile attribute editors
 			// kasper fick något konstigt när den hamnade en massa roof uppe i hörnet
 			// kanske har med threading att göra

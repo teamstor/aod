@@ -10,7 +10,6 @@ namespace TeamStor.RPG.Attributes
 	public class MultiLineTextAttributeEditor : TileAttributeEditor
 	{
 		public TextField TextField { get; private set; }
-		public int MaxLines { get; private set; }
 
 		public override string ValueAsString
 		{
@@ -28,19 +27,17 @@ namespace TeamStor.RPG.Attributes
 			}
 		}
 
-		public MultiLineTextAttributeEditor(string name, MapEditorState state, int maxLines, ref int currentY) : base(name, state, ref currentY)
-		{
-			MaxLines = maxLines;
-			
+		public MultiLineTextAttributeEditor(string name, MapEditorState state, int maxLines, bool monospace, ref int currentY) : base(name, state, ref currentY)
+		{			
 			State.TextFields.Add("editor-" + GetType().Name + "-" + Name, TextField = new TextField()
 			{
 				Label = name + ": ",
 				Text = "",
 				Position = new TweenedVector2(state.Game, new Vector2(state.Game.GraphicsDevice.Viewport.Bounds.Width / 2 - 400 / 2, currentY)),
-				Font = state.Game.DefaultFonts.Bold,
+				Font = monospace ? state.Game.DefaultFonts.MonoBold : state.Game.DefaultFonts.Bold,
 				Width = 400,
-				
-			});
+                Lines = maxLines
+            });
 
 			currentY += TextField.Rectangle.Height + 4;
 		}

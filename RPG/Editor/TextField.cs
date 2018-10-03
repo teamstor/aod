@@ -19,6 +19,8 @@ namespace TeamStor.RPG.Editor
 		public Font Font;
 		public bool Focused;
 		public Color TextColor = Color.White;
+        public int MaxChars = 30;
+        public int Lines = 1;
 
 		public delegate void OnTextChanged(TextField field, string newText);
 		public OnTextChanged TextChanged;
@@ -30,7 +32,7 @@ namespace TeamStor.RPG.Editor
 		{
 			get
 			{
-				return new Rectangle((int)Position.Value.X, (int)Position.Value.Y, Width, 32);
+				return new Rectangle((int)Position.Value.X, (int)Position.Value.Y, Width, 32 + (15 + 4) * (Lines - 1));
 			}
 		}
 
@@ -66,25 +68,38 @@ namespace TeamStor.RPG.Editor
 			if(Focused)
 			{
 				string oldText = Text;
-				
-				if(e.Character == '\b' && Text.Length > 0)
-					Text = Text.Substring(0, Text.Length - 1);
-				else if(Char.IsLetterOrDigit(e.Character) || Char.IsPunctuation(e.Character) || e.Character == ' ')
-					Text += e.Character;
+
+                if(e.Character == '\b' && Text.Length > 0)
+                    Text = Text.Substring(0, Text.Length - 1);
+                else if(Char.IsLetterOrDigit(e.Character) || Char.IsPunctuation(e.Character) || e.Character == ' ')
+                    Text += e.Character;
 
 				Text = Text.TrimStart();
 
+                string[] split = Text.Split('\n');
+                int lineCount = split.Length;
+
 				if(e.Key == Keys.Enter)
 				{
-					Focused = false;
-					if(FocusChanged != null)
-						FocusChanged(this, false);
+                    if(Lines == 1)
+                    {
+                        Focused = false;
+                        if(FocusChanged != null)
+                            FocusChanged(this, false);
+                    }
+                    else if(lineCount < Lines)
+                        Text += '\n';
 				}
-					
-				if(Text.Length > 30)
-					Text = Text.Substring(0, 30);
 
-				if(Text != oldText && TextChanged != null)
+                if(split[split.Length - 1].Length > MaxChars)
+                {
+                    split[split.Length - 1] = split[split.Length - 1].Substring(0, MaxChars);
+                    Text = String.Join("\n", split);
+                    if(lineCount < Lines)
+                        Text += '\n';
+                }
+
+                if(Text != oldText && TextChanged != null)
 					TextChanged(this, Text);
 			}
 		}

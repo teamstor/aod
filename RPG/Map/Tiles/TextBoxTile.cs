@@ -22,7 +22,7 @@ namespace TeamStor.RPG
 		{
 			return new TileAttributeEditor[]
 			{
-				new MultiLineTextAttributeEditor("textbox-text", state, 4, ref currentY)
+				new MultiLineTextAttributeEditor("value", state, 8, true, ref currentY)
 			};
 		}
 	}

@@ -282,8 +282,8 @@ namespace TeamStor.RPG.Editor.States
 
                 string tileName = Tile.Find(BaseState.Map[Layer, SelectedTile.X, SelectedTile.Y], Layer).Name(BaseState.Map.GetMetadata(Layer, SelectedTile.X, SelectedTile.Y), BaseState.Map.Info.Environment);
                 string str = "\"" + tileName + "\" (" + SelectedTile.X + ", " + SelectedTile.Y + ")";
-                Vector2 measure = Game.DefaultFonts.Bold.Measure(16, str);
-                batch.Text(FontStyle.Bold, 16, str, new Vector2(screenSize.X / 2 - measure.X / 2, screenSize.Y / 2 - 300 / 2), Color.White);
+                Vector2 measure = Game.DefaultFonts.Bold.Measure(15, str);
+                batch.Text(FontStyle.Bold, 15, str, new Vector2(screenSize.X / 2 - measure.X / 2, screenSize.Y / 2 - 300 / 2), Color.White);
             }
 
             if(!BaseState.IsPointObscured(Input.MousePosition) && SelectedTile == new Point(-1, -1))
