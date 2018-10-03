@@ -476,8 +476,7 @@ namespace TeamStor.RPG.Editor
                 batch.Text(FontStyle.Bold, 32, text, screenSize / 2 - measure / 2, Color.White);
             }
 			
-			batch.Text(FontStyle.Bold, 32, "BYGG INTE MAPS MED DEN HÄR TACK\nMapEditorState.cs LINJE 479", new Vector2(20, 20), Color.Red);
-			// TODO: crash i Map.SetMetadata som har med RemoveAt att göra
+			// TODO: 
 			// gör så att textfield är multiline
 			// skapa fler tile attribute editors
 			// rita titel och ett sätt att gå ut i editattributesstate

@@ -178,10 +178,9 @@ namespace TeamStor.RPG
             return GetMetadataSlot(layer, x, y) != 0;
         }
 
-        private byte GetMetadataSlot(Tile.MapLayer layer, int x, int y)
+        public int GetMetadataSlot(Tile.MapLayer layer, int x, int y)
         {
-            // TODO något är fortfarande fel
-            return (byte)((LayerToTileArray(layer)[(y * Width) + x] & 0xff00) >> 8);
+            return (LayerToTileArray(layer)[(y * Width) + x] & 0xff00) >> 8;
         }
 
         /// <summary>
@@ -214,20 +213,18 @@ namespace TeamStor.RPG
         {
             if(HasMetadata(layer, x, y))
             {
-                byte slot = GetMetadataSlot(layer, x, y);
-                LayerToMetadataArray(layer).RemoveAt(slot);
-                LayerToTileArray(layer)[(y * Width) + x] = (byte)(LayerToTileArray(layer)[(y * Width) + x] & 0xff);
+                int slot = GetMetadataSlot(layer, x, y);
+                LayerToMetadataArray(layer).RemoveAt(slot - 1);
+                LayerToTileArray(layer)[(y * Width) + x] = LayerToTileArray(layer)[(y * Width) + x] & 0xff;
 
                 for(int i = 0; i < Width * Height; i++)
                 {
-                    if((LayerToTileArray(layer)[i] & 0xff00) >> 8 > slot)
+                    if((LayerToTileArray(layer)[i] & 0xff00) >> 8 >= slot)
                     {
-                        byte lastMetadataAttr = (byte)((LayerToTileArray(layer)[i] & 0xff00) >> 8);
+                        int lastMetadataAttr = (LayerToTileArray(layer)[i] & 0xff00) >> 8;
                         lastMetadataAttr--;
 
-                        LayerToTileArray(layer)[i] = (int)(
-                            (LayerToTileArray(layer)[i] & 0xff) |
-                            (lastMetadataAttr << 8));
+                        LayerToTileArray(layer)[i] = (LayerToTileArray(layer)[i] & 0xff) | (lastMetadataAttr << 8);
                     }
                 }
             }
@@ -235,9 +232,7 @@ namespace TeamStor.RPG
             if(metadata != null)
             {
                 LayerToMetadataArray(layer).Add(metadata);
-                LayerToTileArray(layer)[(y * Width) + x] = (int)(
-                    (LayerToTileArray(layer)[(y * Width) + x] & 0xff) |
-                    ((LayerToMetadataArray(layer).Count) << 8));
+                LayerToTileArray(layer)[(y * Width) + x] = (LayerToTileArray(layer)[(y * Width) + x] & 0xff) | ((LayerToMetadataArray(layer).Count) << 8);
             }
         }
 

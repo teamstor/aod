@@ -251,7 +251,7 @@ namespace TeamStor.RPG.Editor.States
                             size = *(*(int**)&th + 1);
                         }
 
-                        str = "Edit \"" + tileName + "\" (" + HoveredTile.X + ", " + HoveredTile.Y + ") [" + (size / (double) 1024).ToString("0.00") + " KB, " + attribs.Count + " attributes set]";
+                        str = "Edit \"" + tileName + "\" (" + HoveredTile.X + ", " + HoveredTile.Y + ") [" + (size / (double) 1024).ToString("0.00") + " KB @ slot " + BaseState.Map.GetMetadataSlot(Layer, HoveredTile.X, HoveredTile.Y) + "]";
                     }
                 }
                 else
