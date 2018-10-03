@@ -168,6 +168,9 @@ namespace TeamStor.RPG.Editor.States
             
             _editors = null;
             SelectedTile = new Point(-1, -1);
+
+            if(BaseState.Buttons.ContainsKey("exit-edit-button"))
+                BaseState.Buttons.Remove("exit-edit-button");
         }
 
         public override void Update(double deltaTime, double totalTime, long count)
@@ -211,7 +214,23 @@ namespace TeamStor.RPG.Editor.States
                                 editor.ValueFromExistingTile(attribs[editor.Name]);
                         }
                     }
+
+                    BaseState.Buttons.Add("exit-edit-button", new Button()
+                    {
+                        Text = "Finish editing",
+                        Font = Game.DefaultFonts.Bold,
+                        Position = new TweenedVector2(Game, Vector2.Zero),
+                        Clicked = (btn) => { FinalizeEdit(); }
+                    });
                 }
+            }
+
+            if(BaseState.Buttons.ContainsKey("exit-edit-button"))
+            {
+                BaseState.Buttons["exit-edit-button"].Position.
+                    TweenTo(new Vector2(
+                        Game.GraphicsDevice.Viewport.Bounds.Width / 2 - BaseState.Buttons["exit-edit-button"].Rectangle.Width / 2,
+                        Game.GraphicsDevice.Viewport.Bounds.Height / 2 + 300 / 2 - 32), TweenEaseType.Linear, 0);
             }
 
             Vector2 offset = new Vector2(
@@ -269,6 +288,9 @@ namespace TeamStor.RPG.Editor.States
 
             if(!BaseState.IsPointObscured(Input.MousePosition) && SelectedTile == new Point(-1, -1))
             {
+                if(BaseState.Map[Layer, HoveredTile.X, HoveredTile.Y] == 0)
+                    return;
+
                 batch.Transform = BaseState.Camera.Transform;
 
                 bool canCurrentTileHaveMetadata = Tile.Find(BaseState.Map[Layer, HoveredTile.X, HoveredTile.Y], Layer).HasEditableAttributes;

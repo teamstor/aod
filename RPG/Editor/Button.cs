@@ -28,13 +28,13 @@ namespace TeamStor.RPG.Editor
         {
             get
             {
-                Rectangle rectangle = new Rectangle((int)Position.Value.X, (int)Position.Value.Y, 4, 32);
+                Rectangle rectangle = new Rectangle((int)Position.Value.X, (int)Position.Value.Y, Text != "" ? 8 : 4, 32);
 
                 if(Icon != null)
                     rectangle.Width += Icon.Width + 4;
 
                 if(Text != "")
-                    rectangle.Width += (int)Font.Measure(15, Text).X + 4;
+                    rectangle.Width += (int)Font.Measure(15, Text).X + 8;
 
                 return rectangle;
             }
@@ -62,7 +62,7 @@ namespace TeamStor.RPG.Editor
                 batch.Texture(new Vector2(Position.Value.X + 4, Position.Value.Y + 4), Icon, Color.White * (hovered ? 1f : 0.6f) * Alpha * (Disabled ? 0.6f : 1.0f));
 
             if(Text != "")
-                batch.Text(Font, 15, Text, new Vector2(Position.Value.X + (Icon != null ? Icon.Width + 8 : 4), Position.Value.Y + 6), Color.White * (hovered ? 1f : 0.6f) * Alpha * (Disabled ? 0.6f : 1.0f));
+                batch.Text(Font, 15, Text, new Vector2(Position.Value.X + (Icon != null ? Icon.Width + 8 : 8), Position.Value.Y + 6), Color.White * (hovered ? 1f : 0.6f) * Alpha * (Disabled ? 0.6f : 1.0f));
         }
     }
 }
