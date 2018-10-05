@@ -11,15 +11,15 @@ namespace TeamStor.RPG
 {
     public class BeamTile : Tile
     {
-        public BeamTile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlot, solid, transitionPriority)
+        public BeamTile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : 
+            base(id, layer, name, textureSlot, solid, transitionPriority)
         {
         }
 
         public override void Draw(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
         {
             bool faceLeft = mapPos.X - 1 > 0 &&
-                map[Layer, mapPos.X - 1, mapPos.Y] >= Tiles.Decoration.RoofOrange.ID &&
-                map[Layer, mapPos.X - 1, mapPos.Y] <= Tiles.Decoration.RoofRed.ID;
+                map[Layer, mapPos.X - 1, mapPos.Y] == Tiles.Decoration.Wood.ID;
 
             game.Batch.Texture(
                 new Vector2(mapPos.X * 16, mapPos.Y * 16),
