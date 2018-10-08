@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 using Microsoft.Xna.Framework.Input;
+using TeamStor.Engine.Coroutine;
 
 namespace TeamStor.RPG.Gameplay.World
 {
@@ -18,6 +19,8 @@ namespace TeamStor.RPG.Gameplay.World
     /// </summary>
     public class WorldState : GameState
     {
+        private bool _debug;
+        
         /// <summary>
         /// The player.
         /// </summary>
@@ -68,6 +71,11 @@ namespace TeamStor.RPG.Gameplay.World
             get; private set;
         }
 
+        /// <summary>
+        /// If the world should be paused.
+        /// </summary>
+        public bool Paused { get; private set; }
+
         public WorldState(Map map)
         {
             Map = map;
@@ -90,29 +98,67 @@ namespace TeamStor.RPG.Gameplay.World
 
         public override void Update(double deltaTime, double totalTime, long count)
         {
-            Point lastPlayerPos = Player.Position;
-            Player.Update(deltaTime, totalTime, count);
-
-            foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
+            if(Input.KeyPressed(Keys.F5))
+                _debug = !_debug;
+            
+            if(!Paused)
             {
-                TileEventBase oldEvents = Tile.Find(Map[layer, lastPlayerPos.X, lastPlayerPos.Y], layer).Events;
-                TileEventBase newEvents = Tile.Find(Map[layer, Player.Position.X, Player.Position.Y], layer).Events;
+                Point lastPlayerPos = Player.Position;
+                Player.Update(deltaTime, totalTime, count);
 
-                if(Player.Position != lastPlayerPos)
+                foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
                 {
-                    oldEvents?.OnWalkLeave(Map.GetMetadata(layer, lastPlayerPos.X, lastPlayerPos.Y), this, lastPlayerPos);
-                    newEvents?.OnWalkEnter(Map.GetMetadata(layer, Player.Position.X, Player.Position.Y), this, Player.Position);
+                    TileEventBase oldEvents = Tile.Find(Map[layer, lastPlayerPos.X, lastPlayerPos.Y], layer).Events;
+                    TileEventBase newEvents = Tile.Find(Map[layer, Player.Position.X, Player.Position.Y], layer).Events;
+
+                    if(Player.Position != lastPlayerPos)
+                    {
+                        oldEvents?.OnWalkLeave(Map.GetMetadata(layer, lastPlayerPos.X, lastPlayerPos.Y), this, lastPlayerPos);
+                        newEvents?.OnWalkEnter(Map.GetMetadata(layer, Player.Position.X, Player.Position.Y), this, Player.Position);
+                    }
                 }
             }
         }
 
         public override void FixedUpdate(long count)
         {
+            if(!Paused)
+            {
+                foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
+                {
+                    TileEventBase events = Tile.Find(Map[layer, Player.Position.X, Player.Position.Y], layer).Events;
+                    events?.OnStandingOn(Map.GetMetadata(layer, Player.Position.X, Player.Position.Y), this, Player.Position, count);
+                }
+            }
+        }
+
+        private string DebugTileString(Point position)
+        {
+            if(position.X < 0 || position.Y < 0 || position.X >= Map.Width || position.Y >= Map.Height)
+                return "(nothing)";
+
+            string str = "";
+
             foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
             {
-                TileEventBase events = Tile.Find(Map[layer, Player.Position.X, Player.Position.Y], layer).Events;
-                events?.OnStandingOn(Map.GetMetadata(layer, Player.Position.X, Player.Position.Y), this, Player.Position, count);
+                SortedDictionary<string, string> metadata = Map.GetMetadata(layer, position.X, position.Y);
+                str += layer + " - " + 
+                       "\"" + Tile.Find(Map[layer, position.X, position.Y], layer).Name(metadata, Map.Info.Environment) + "\" " + 
+                       "(id " + Map[layer, position.X, position.Y] + ") " +
+                       " metadata: ";
+
+                if(metadata == null || metadata.Count == 0)
+                    str += "(none)";
+                else
+                {
+                    foreach(KeyValuePair<string, string> pair in metadata)
+                        str += "\n    " + pair.Key + ": " + pair.Value;
+                }
+
+                str += "\n";
             }
+
+            return str;
         }
 
         public override void Draw(SpriteBatch batch, Vector2 screenSize)
@@ -124,7 +170,11 @@ namespace TeamStor.RPG.Gameplay.World
             
             // TODO: följ kameran
             Rectangle drawRectangle = new Rectangle(-1000, -1000, Map.Width * 16 + 2000, Map.Height * 16 + 2000);
-            batch.Texture(drawRectangle, Assets.Get<Texture2D>("tiles/water/" + (int)((Game.Time * 2) % 4) + ".png"), Color.White, drawRectangle);
+            // TODO: byt texture med environment
+            if(Map.Info.Environment == Map.Environment.Inside)
+                batch.Rectangle(drawRectangle, Color.Black);
+            else
+                batch.Texture(drawRectangle, Assets.Get<Texture2D>("tiles/water/" + (int)((Game.Time * 2) % 4) + ".png"), Color.White, drawRectangle);
 
             Map.Draw(Tile.MapLayer.Terrain, Game, new Rectangle((int)-Camera.Offset.X, (int)-Camera.Offset.Y, (int)screenSize.X, (int)screenSize.Y));
 
@@ -134,7 +184,66 @@ namespace TeamStor.RPG.Gameplay.World
 
             Map.Draw(Tile.MapLayer.Decoration, Game, new Rectangle((int)-Camera.Offset.X, (int)-Camera.Offset.Y, (int)screenSize.X, (int)screenSize.Y));
 
+            if(_debug)
+            {
+                batch.Outline(new Rectangle(Player.Position.X * 16, Player.Position.Y * 16, 16, 16), Color.Red);
+                batch.Outline(new Rectangle(Player.NextPosition.X * 16, Player.NextPosition.Y * 16, 16, 16), Color.Green);
+                batch.Outline(new Rectangle(Player.NextPosition.X * 16 + Player.Heading.ToPoint().X * 16, Player.NextPosition.Y * 16 + Player.Heading.ToPoint().Y * 16, 16, 16), Color.Blue);
+            }
+            
             Program.BlackBorders(batch);
+
+            if(_debug)
+            {
+                Rectangle rectangle = new Rectangle(4, 4, 0, 0);
+                
+                rectangle.Width = Math.Max(rectangle.Width, (int)Game.DefaultFonts.MonoBold.Measure(12, DebugTileString(Player.Position)).X);
+                if(Player.NextPosition != Player.Position)
+                    rectangle.Width = Math.Max(rectangle.Width, (int)Game.DefaultFonts.MonoBold.Measure(12, DebugTileString(Player.NextPosition)).X);
+                rectangle.Width = Math.Max(rectangle.Width, (int)Game.DefaultFonts.MonoBold.Measure(12, DebugTileString(Player.NextPosition + Player.Heading.ToPoint())).X);
+
+                rectangle.Height += (int)Game.DefaultFonts.MonoBold.Measure(12, DebugTileString(Player.Position)).Y;
+                rectangle.Height += 8;
+                
+                if(Player.NextPosition != Player.Position)
+                {
+                    rectangle.Height += (int) Game.DefaultFonts.MonoBold.Measure(12, DebugTileString(Player.NextPosition)).Y;
+                    rectangle.Height += 8;
+                }
+
+                rectangle.Height += (int)Game.DefaultFonts.MonoBold.Measure(12, DebugTileString(Player.NextPosition + Player.Heading.ToPoint())).Y;
+
+                rectangle.Width += 8;
+                rectangle.Height += 8;
+                
+                batch.Rectangle(rectangle, Color.Black * 0.7f);
+
+                int y = 8;
+
+                if(Player.NextPosition == Player.Position)
+                {
+                    batch.Text(SpriteBatch.FontStyle.MonoBold, 12, DebugTileString(Player.Position), new Vector2(8, y), Color.Green);
+                    y += (int) Game.DefaultFonts.MonoBold.Measure(12, DebugTileString(Player.Position)).Y + 8;
+                }
+                else
+                {
+                    batch.Text(SpriteBatch.FontStyle.MonoBold, 12, DebugTileString(Player.Position), new Vector2(8, y), Color.Red);
+                    y += (int) Game.DefaultFonts.MonoBold.Measure(12, DebugTileString(Player.Position)).Y + 8;
+                    batch.Text(SpriteBatch.FontStyle.MonoBold, 12, DebugTileString(Player.NextPosition), new Vector2(8, y), Color.Green);
+                    y += (int) Game.DefaultFonts.MonoBold.Measure(12, DebugTileString(Player.NextPosition)).Y + 8;
+                }
+                
+                batch.Text(SpriteBatch.FontStyle.MonoBold, 12, DebugTileString(Player.NextPosition + Player.Heading.ToPoint()), new Vector2(8, y), Color.Blue);
+            }
+        }
+
+        /// <summary>
+        /// Transitions to a new map.
+        /// </summary>
+        /// <param name="newMap">The new map to start in.</param>
+        public void TransitionToMap(Map newMap, Point spawnPosition, Direction spawnDirection)
+        {
+            
         }
     }
 }
