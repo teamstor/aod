@@ -168,14 +168,6 @@ namespace TeamStor.RPG.Gameplay.World
             batch.SamplerState = SamplerState.PointWrap;
             batch.Transform = Matrix.CreateTranslation(Camera.Offset.X, Camera.Offset.Y, 0) * batch.Transform;
             
-            // TODO: följ kameran
-            Rectangle drawRectangle = new Rectangle(-1000, -1000, Map.Width * 16 + 2000, Map.Height * 16 + 2000);
-            // TODO: byt texture med environment
-            if(Map.Info.Environment == Map.Environment.Inside)
-                batch.Rectangle(drawRectangle, Color.Black);
-            else
-                batch.Texture(drawRectangle, Assets.Get<Texture2D>("tiles/water/" + (int)((Game.Time * 2) % 4) + ".png"), Color.White, drawRectangle);
-
             Map.Draw(Tile.MapLayer.Terrain, Game, new Rectangle((int)-Camera.Offset.X, (int)-Camera.Offset.Y, (int)screenSize.X, (int)screenSize.Y));
 
             foreach(NPC npc in NPCs)

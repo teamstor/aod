@@ -501,6 +501,22 @@ namespace TeamStor.RPG
                 xMax++;
             if(yMax < Height - 1)
                 yMax++;
+            
+            Rectangle drawRectangle = new Rectangle(xMin, yMin, xMax - xMin, yMax - yMin);
+            drawRectangle.X *= 16;
+            drawRectangle.Y *= 16;
+            drawRectangle.Width *= 16;
+            drawRectangle.Height *= 16;
+            drawRectangle.Width += 16;
+            drawRectangle.Height += 16;
+
+            if(layer == Tile.MapLayer.Terrain)
+            {
+                if(Info.Environment == Environment.Inside)
+                    game.Batch.Rectangle(drawRectangle, Color.Black);
+                else
+                    game.Batch.Texture(drawRectangle, game.Assets.Get<Texture2D>("tiles/water/" + (int) ((game.Time * 2) % 4) + ".png"), Color.White, drawRectangle);
+            }
 
             int x, y;
 
@@ -509,7 +525,7 @@ namespace TeamStor.RPG
                 for(y = yMin; y <= yMax; y++)
                 {
                     byte tile = this[layer, x, y];
-                    if(layer == Tile.MapLayer.Terrain || (tile & 0xff) != 0)
+                    if((tile & 0xff) != 0) // water will be drawn by the map manually here
                         Tile.Find(tile, layer).Draw(game, new Point(x, y), this, GetMetadata(layer, x, y), Info.Environment);
                 }
             }
