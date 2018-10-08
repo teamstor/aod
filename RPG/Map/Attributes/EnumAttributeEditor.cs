@@ -53,9 +53,9 @@ namespace TeamStor.RPG.Attributes
                 // https://stackoverflow.com/questions/4138454/elegant-way-to-transform-arrays-in-c
                 Choices = Values.Select(e => e.ToString()).ToArray(),
                 Choice = 0,
-                Position = new TweenedVector2(state.Game, new Vector2(state.Game.GraphicsDevice.Viewport.Bounds.Width / 2 - 300 / 2, currentY)),
+                Position = new TweenedVector2(state.Game, new Vector2(state.Game.GraphicsDevice.Viewport.Bounds.Width / 2 - 400 / 2, currentY)),
                 Font = state.Game.DefaultFonts.Bold,
-                Width = 300
+                Width = 400
             });
 
             currentY += ChoiceField.Rectangle.Height + 4;

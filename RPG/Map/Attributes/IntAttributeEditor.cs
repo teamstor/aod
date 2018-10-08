@@ -40,9 +40,9 @@ namespace TeamStor.RPG.Attributes
                 Choice = minValue,
                 MinValue = minValue,
                 MaxValue = maxValue,
-                Position = new TweenedVector2(state.Game, new Vector2(state.Game.GraphicsDevice.Viewport.Bounds.Width / 2 - 300 / 2, currentY)),
+                Position = new TweenedVector2(state.Game, new Vector2(state.Game.GraphicsDevice.Viewport.Bounds.Width / 2 - 400 / 2, currentY)),
                 Font = state.Game.DefaultFonts.Bold,
-                Width = 300
+                Width = 400
             });
 
             currentY += ChoiceField.Rectangle.Height + 4;

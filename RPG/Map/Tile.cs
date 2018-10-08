@@ -229,6 +229,17 @@ namespace TeamStor.RPG
             return null;
         }
 
+        /// <summary>
+        /// Events for this tile in the world. Can return null.
+        /// </summary>
+        public virtual TileEventBase Events
+        {
+            get
+            {
+                return null;
+            }
+        }
+
         private static SortedDictionary<byte, Tile> _tilesTerrain = new SortedDictionary<byte, Tile>();
         private static SortedDictionary<byte, Tile> _tilesDecoration = new SortedDictionary<byte, Tile>();
         private static SortedDictionary<byte, Tile> _tilesNPC = new SortedDictionary<byte, Tile>();

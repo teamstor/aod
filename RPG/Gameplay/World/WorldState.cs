@@ -90,11 +90,29 @@ namespace TeamStor.RPG.Gameplay.World
 
         public override void Update(double deltaTime, double totalTime, long count)
         {
+            Point lastPlayerPos = Player.Position;
             Player.Update(deltaTime, totalTime, count);
+
+            foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
+            {
+                TileEventBase oldEvents = Tile.Find(Map[layer, lastPlayerPos.X, lastPlayerPos.Y], layer).Events;
+                TileEventBase newEvents = Tile.Find(Map[layer, Player.Position.X, Player.Position.Y], layer).Events;
+
+                if(Player.Position != lastPlayerPos)
+                {
+                    oldEvents?.OnWalkLeave(Map.GetMetadata(layer, lastPlayerPos.X, lastPlayerPos.Y), this, lastPlayerPos);
+                    newEvents?.OnWalkEnter(Map.GetMetadata(layer, Player.Position.X, Player.Position.Y), this, Player.Position);
+                }
+            }
         }
 
         public override void FixedUpdate(long count)
         {
+            foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
+            {
+                TileEventBase events = Tile.Find(Map[layer, Player.Position.X, Player.Position.Y], layer).Events;
+                events?.OnStandingOn(Map.GetMetadata(layer, Player.Position.X, Player.Position.Y), this, Player.Position, count);
+            }
         }
 
         public override void Draw(SpriteBatch batch, Vector2 screenSize)

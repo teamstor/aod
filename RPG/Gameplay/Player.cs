@@ -93,6 +93,19 @@ namespace TeamStor.RPG.Gameplay
                     if(!World.Map.IsPointBlocked(Position + Heading.ToPoint()))
                         MoveTo(Position + Heading.ToPoint());
                 }
+
+                if(World.Game.Input.KeyPressed(Keys.E))
+                {
+                    Point interactionPoint = Position + Heading.ToPoint();
+                    interactionPoint.X = MathHelper.Clamp(interactionPoint.X, 0, World.Map.Width - 1);
+                    interactionPoint.Y = MathHelper.Clamp(interactionPoint.Y, 0, World.Map.Height - 1);
+
+                    foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
+                    {
+                        TileEventBase events = Tile.Find(World.Map[layer, interactionPoint.X, interactionPoint.Y], layer).Events;
+                        events?.OnInteract(World.Map.GetMetadata(layer, interactionPoint.X, interactionPoint.Y), World, interactionPoint);
+                    }
+                }
             }
         }
 

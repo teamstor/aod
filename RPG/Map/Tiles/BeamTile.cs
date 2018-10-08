@@ -19,7 +19,9 @@ namespace TeamStor.RPG
         public override void Draw(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
         {
             bool faceLeft = mapPos.X - 1 > 0 &&
-                map[Layer, mapPos.X - 1, mapPos.Y] == Tiles.Decoration.Wood.ID;
+                (map[Layer, mapPos.X - 1, mapPos.Y] == Tiles.Decoration.Wood.ID ||
+                map[Layer, mapPos.X - 1, mapPos.Y] == Tiles.Decoration.StairsWood.ID ||
+                map[Layer, mapPos.X - 1, mapPos.Y] == Tiles.Decoration.BrickStone.ID);
 
             game.Batch.Texture(
                 new Vector2(mapPos.X * 16, mapPos.Y * 16),

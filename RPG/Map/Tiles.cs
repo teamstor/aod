@@ -135,8 +135,7 @@ namespace TeamStor.RPG
 		{
 			public static Tile Empty = new Tile(0, Tile.MapLayer.Control, "Empty", new Point(0, 0));
 
-            public static Tile TextBoxTrigger = new TextBoxTile(10, "Textbox Trigger", new Point(0, 0), true);
-            public static Tile TextBoxInteraction = new TextBoxTile(11, "Textbox Interaction", new Point(1, 0), false);
+            public static Tile TextBoxTrigger = new TextBoxTile(10, "Textbox", new Point(0, 0));
 
             public static Tile EnemyTrigger = new Tile(20, Tile.MapLayer.Control, "Enemy Trigger", new Point(2, 0));
 
@@ -147,6 +146,8 @@ namespace TeamStor.RPG
 
             public static Tile NPCPathStart = new NPCPathTile(50, Tile.MapLayer.Control, "NPC Path Start", new Point(6, 0), false);
             public static Tile NPCPath = new Tile(51, Tile.MapLayer.Control, "NPC Path", new Point(7, 0), false);
+
+            public static Tile MapPortal = new PortalTile(60, Tile.MapLayer.Control, "Map Portal", new Point(8, 0), false);
         }
         #endregion
     }
