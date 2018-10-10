@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Graphics;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 using Microsoft.Xna.Framework.Input;
 using TeamStor.Engine.Coroutine;
+using Game = TeamStor.Engine.Game;
 
 namespace TeamStor.RPG.Gameplay.World
 {
@@ -49,6 +50,15 @@ namespace TeamStor.RPG.Gameplay.World
                 return _npcs;
             }
         }
+        
+        public class DrawEventArgs : EventArgs
+        {
+            public SpriteBatch Batch;
+            public Vector2 ScreenSize;
+        }
+
+        public event EventHandler<Game.UpdateEventArgs> UpdateHook;
+        public event EventHandler<DrawEventArgs> DrawHook;
 
         /// <summary>
         /// Spawns a new NPC in the world.
@@ -74,7 +84,7 @@ namespace TeamStor.RPG.Gameplay.World
         /// <summary>
         /// If the world should be paused.
         /// </summary>
-        public bool Paused { get; private set; }
+        public bool Paused { get; set; }
 
         public WorldState(Map map)
         {
@@ -118,6 +128,9 @@ namespace TeamStor.RPG.Gameplay.World
                     }
                 }
             }
+            
+            if(UpdateHook != null)
+                UpdateHook(this, new Game.UpdateEventArgs(deltaTime, totalTime, count));
         }
 
         public override void FixedUpdate(long count)
@@ -176,6 +189,9 @@ namespace TeamStor.RPG.Gameplay.World
 
             Map.Draw(Tile.MapLayer.Decoration, Game, new Rectangle((int)-Camera.Offset.X, (int)-Camera.Offset.Y, (int)screenSize.X, (int)screenSize.Y));
 
+            if(DrawHook != null)
+                DrawHook(this, new DrawEventArgs { Batch = batch, ScreenSize = screenSize });
+                    
             if(_debug)
             {
                 batch.Outline(new Rectangle(Player.Position.X * 16, Player.Position.Y * 16, 16, 16), Color.Red);

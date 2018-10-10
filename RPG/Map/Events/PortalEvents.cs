@@ -30,6 +30,7 @@ namespace TeamStor.RPG
             if(metadata != null && metadata.ContainsKey("needs-user-interaction") && metadata["needs-user-interaction"] == "False")
                 DoTeleport(metadata, world, mapPos);
         }
+        
         public override void OnStandingOn(SortedDictionary<string, string> metadata, WorldState world, Point mapPos, long tickCount)
         {
         }
