@@ -6,9 +6,11 @@ namespace TeamStor.RPG
 {
 	public class TextBoxTile : Tile
 	{
-		
+		private TextBoxEvents _events;
+
 		public TextBoxTile(byte id, string name, Point textureSlot) : base(id, MapLayer.Control, name, textureSlot, false, -1)
 		{
+			_events = new TextBoxEvents(this);
 		}
 
 		public override bool HasEditableAttributes
@@ -24,5 +26,7 @@ namespace TeamStor.RPG
                 new BoolAttributeEditor("needs-user-interaction", state, true, ref currentY)
 			};
 		}
+		
+		public override TileEventBase Events { get { return _events; } }
 	}
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using TeamStor.Engine.Coroutine;
 using TeamStor.Engine.Graphics;
 using TeamStor.RPG.Gameplay.World;
@@ -16,14 +17,21 @@ namespace TeamStor.RPG
 		{
 			SpriteBatch batch = args.Batch;
 			Vector2 screenSize = args.ScreenSize;
+
+			batch.Text(SpriteBatch.FontStyle.Bold, 16, "AAAAAAAAAAAA", new Vector2(4, 4), Color.White);
 		}
 
-		private IEnumerator<ICoroutineOperation> TextBoxCoroutine(WorldState world)
+		private IEnumerator<ICoroutineOperation> TextBoxCoroutine(object worldObj)
 		{
+			WorldState world = worldObj as WorldState;
+			
 			world.Paused = true;
 			world.DrawHook += DrawHook;
 
-			yield return null;
+			while(!world.Game.Input.KeyPressed(Keys.Enter))
+			{
+				yield return null;
+			}
 			
 			world.DrawHook -= DrawHook;
 			world.Paused = false;
