@@ -89,7 +89,7 @@ namespace TeamStor.RPG.Editor.States
                         {
                             foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
                             {
-                                if(!Tile.Find(BaseState.Map[layer, x, y], layer).Filter(BaseState.Map.Info.Environment))
+                                if(BaseState.Map[layer, x, y] != 0 && !Tile.Find(BaseState.Map[layer, x, y], layer).Filter(BaseState.Map.Info.Environment))
                                     BaseState.Map[layer, x, y] = 0;
                             }
                         }

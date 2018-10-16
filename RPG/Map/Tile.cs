@@ -22,6 +22,8 @@ namespace TeamStor.RPG
         
         public const string TRANSTION_GENERIC = "tiles/transitions/generic.png";
 
+        public static Tile.MapLayer[] CachedAllMapLayers = Enum.GetValues(typeof(Tile.MapLayer)).Cast<Tile.MapLayer>().ToArray();
+
         /// <param name="layer">The layer.</param>
         /// <returns>The texture name used by the specified layer.</returns>
         public static string LayerToTextureName(MapLayer layer)
