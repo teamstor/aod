@@ -179,6 +179,7 @@ namespace TeamStor.RPG.Gameplay.World
             screenSize = Program.ScaleBatch(batch);
 
             batch.SamplerState = SamplerState.PointWrap;
+            Matrix oldTransform = batch.Transform;
             batch.Transform = Matrix.CreateTranslation(Camera.Offset.X, Camera.Offset.Y, 0) * batch.Transform;
             
             Map.Draw(Tile.MapLayer.Terrain, Game, new Rectangle((int)-Camera.Offset.X, (int)-Camera.Offset.Y, (int)screenSize.X, (int)screenSize.Y));
@@ -189,16 +190,17 @@ namespace TeamStor.RPG.Gameplay.World
 
             Map.Draw(Tile.MapLayer.Decoration, Game, new Rectangle((int)-Camera.Offset.X, (int)-Camera.Offset.Y, (int)screenSize.X, (int)screenSize.Y));
 
-            if(DrawHook != null)
-                DrawHook(this, new DrawEventArgs { Batch = batch, ScreenSize = screenSize });
-                    
             if(_debug)
             {
                 batch.Outline(new Rectangle(Player.Position.X * 16, Player.Position.Y * 16, 16, 16), Color.Red);
                 batch.Outline(new Rectangle(Player.NextPosition.X * 16, Player.NextPosition.Y * 16, 16, 16), Color.Green);
                 batch.Outline(new Rectangle(Player.NextPosition.X * 16 + Player.Heading.ToPoint().X * 16, Player.NextPosition.Y * 16 + Player.Heading.ToPoint().Y * 16, 16, 16), Color.Blue);
             }
-            
+
+            batch.Transform = oldTransform;
+            if(DrawHook != null)
+                DrawHook(this, new DrawEventArgs { Batch = batch, ScreenSize = screenSize });
+                                
             Program.BlackBorders(batch);
 
             if(_debug)

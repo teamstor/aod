@@ -4,45 +4,35 @@ using Microsoft.Xna.Framework.Input;
 using TeamStor.Engine.Coroutine;
 using TeamStor.Engine.Graphics;
 using TeamStor.RPG.Gameplay.World;
+using System;
+using TeamStor.Engine.Tween;
+using TeamStor.RPG.Gameplay.World.UI;
 
 namespace TeamStor.RPG
 {
 	public class TextBoxEvents : TileEventBase
 	{
+        // TODO: doesn't work if multiple maps are using this but that won't ever happen anyway
+        private string _currentDrawText = "";
+        private TweenedDouble _drawY;
+
 		public TextBoxEvents(TextBoxTile tile) : base(tile)
 		{
 		}
 
-		private void DrawHook(object sender, WorldState.DrawEventArgs args)
-		{
-			SpriteBatch batch = args.Batch;
-			Vector2 screenSize = args.ScreenSize;
-
-			batch.Text(SpriteBatch.FontStyle.Bold, 16, "AAAAAAAAAAAA", new Vector2(4, 4), Color.White);
-		}
-
-		private IEnumerator<ICoroutineOperation> TextBoxCoroutine(object worldObj)
-		{
-			WorldState world = worldObj as WorldState;
-			
-			world.Paused = true;
-			world.DrawHook += DrawHook;
-
-			while(!world.Game.Input.KeyPressed(Keys.Enter))
-			{
-				yield return null;
-			}
-			
-			world.DrawHook -= DrawHook;
-			world.Paused = false;
-		}
-		
 		private void DoTextBox(SortedDictionary<string, string> metadata, WorldState world, Point mapPos)
 		{
-			world.Coroutine.Start(TextBoxCoroutine, world);
-		}
-		
-		public override void OnInteract(SortedDictionary<string, string> metadata, WorldState world, Point mapPos)
+            string text = metadata != null && metadata.ContainsKey("value") ? metadata["value"] :
+                "ERROR!!! VA FAN DET ÄR ERROR!!! FÖR HELVETE ERROR!!! (du måste sätta värdet av textboxen i map editorn)";
+
+            TextBox.Show(world, new TextBoxContent
+            {
+                Speaker = metadata != null && metadata.ContainsKey("speaker") ? metadata["speaker"] : "Unknown",
+                Text = text
+            });
+        }
+
+        public override void OnInteract(SortedDictionary<string, string> metadata, WorldState world, Point mapPos)
 		{
 			if(metadata == null || !metadata.ContainsKey("needs-user-interaction") || metadata["needs-user-interaction"] == "True")
 				DoTextBox(metadata, world, mapPos);

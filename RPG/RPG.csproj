@@ -73,6 +73,7 @@
     <Compile Include="Gameplay\World\Camera.cs" />
     <Compile Include="Gameplay\World\NPC.cs" />
     <Compile Include="Gameplay\World\PositionedEntity.cs" />
+    <Compile Include="Gameplay\World\UI\TextBox.cs" />
     <Compile Include="Gameplay\World\WorldState.cs" />
     <Compile Include="Map\Attributes\BoolAttributeEditor.cs" />
     <Compile Include="Map\Attributes\EnumAttributeEditor.cs" />
