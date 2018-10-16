@@ -9,6 +9,9 @@ using TeamStor.Engine.Graphics;
 using System.IO;
 using TeamStor.RPG.Gameplay;
 using TeamStor.RPG.Gameplay.World;
+using Microsoft.Xna.Framework.Graphics;
+
+using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 
 namespace TeamStor.RPG.Menu
 {
@@ -52,10 +55,12 @@ namespace TeamStor.RPG.Menu
         public override void Draw(SpriteBatch batch, Vector2 screenSize)
         {
             screenSize = Program.ScaleBatch(batch);
+
+            batch.Texture(new Vector2(screenSize.X / 2 - 160 / 2, 20), Assets.Get<Texture2D>("ui/logo.png"), Color.White);
             
             _menuController.Draw(batch, new Vector2(
                 screenSize.X / 2 - _menuController.Size.X / 2, 
-                screenSize.Y / 2 - _menuController.Size.Y / 2 + 20), true);
+                screenSize.Y / 2 - _menuController.Size.Y / 2 + 40), true);
             
             Program.BlackBorders(batch);
         }
