@@ -252,7 +252,7 @@ namespace TeamStor.RPG
             Width = newWidth;
             Height = newHeight;
 
-            foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
+            foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
             {
                 int[] tiles = LayerToTileArray(layer);
                 int[] oldTiles = new int[oldWidth * oldHeight];

@@ -100,7 +100,7 @@ namespace TeamStor.RPG.Gameplay
                     interactionPoint.X = MathHelper.Clamp(interactionPoint.X, 0, World.Map.Width - 1);
                     interactionPoint.Y = MathHelper.Clamp(interactionPoint.Y, 0, World.Map.Height - 1);
 
-                    foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
+                    foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
                     {
                         TileEventBase events = Tile.Find(World.Map[layer, interactionPoint.X, interactionPoint.Y], layer).Events;
                         events?.OnInteract(World.Map.GetMetadata(layer, interactionPoint.X, interactionPoint.Y), World, interactionPoint);

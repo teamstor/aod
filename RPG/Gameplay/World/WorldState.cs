@@ -116,7 +116,7 @@ namespace TeamStor.RPG.Gameplay.World
                 Point lastPlayerPos = Player.Position;
                 Player.Update(deltaTime, totalTime, count);
 
-                foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
+                foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
                 {
                     TileEventBase oldEvents = Tile.Find(Map[layer, lastPlayerPos.X, lastPlayerPos.Y], layer).Events;
                     TileEventBase newEvents = Tile.Find(Map[layer, Player.Position.X, Player.Position.Y], layer).Events;
@@ -137,7 +137,7 @@ namespace TeamStor.RPG.Gameplay.World
         {
             if(!Paused)
             {
-                foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
+                foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
                 {
                     TileEventBase events = Tile.Find(Map[layer, Player.Position.X, Player.Position.Y], layer).Events;
                     events?.OnStandingOn(Map.GetMetadata(layer, Player.Position.X, Player.Position.Y), this, Player.Position, count);
@@ -152,7 +152,7 @@ namespace TeamStor.RPG.Gameplay.World
 
             string str = "";
 
-            foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
+            foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
             {
                 SortedDictionary<string, string> metadata = Map.GetMetadata(layer, position.X, position.Y);
                 str += layer + " - " + 

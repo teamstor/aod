@@ -87,7 +87,7 @@ namespace TeamStor.RPG.Editor.States
                     {
                         for(int y = 0; y < BaseState.Map.Height; y++)
                         {
-                            foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
+                            foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
                             {
                                 if(BaseState.Map[layer, x, y] != 0 && !Tile.Find(BaseState.Map[layer, x, y], layer).Filter(BaseState.Map.Info.Environment))
                                     BaseState.Map[layer, x, y] = 0;

@@ -388,7 +388,7 @@ namespace TeamStor.RPG.Editor
 			Vector2 scissorPos = Vector2.Transform(Vector2.Zero, Camera.Transform);
 			batch.Scissor = new Rectangle((int)scissorPos.X, (int)scissorPos.Y, (int)(Map.Width * 16 * Camera.Zoom.Value), (int)(Map.Height * 16 * Camera.Zoom.Value));
 
-            foreach(Tile.MapLayer layer in Enum.GetValues(typeof(Tile.MapLayer)))
+            foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
             {
 	            if(layer == Tile.MapLayer.Control)
 	            {
