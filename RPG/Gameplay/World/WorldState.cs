@@ -108,7 +108,7 @@ namespace TeamStor.RPG.Gameplay.World
 
         public override void Update(double deltaTime, double totalTime, long count)
         {
-            if(Input.KeyPressed(Keys.F5))
+            if(Input.Key(Keys.LeftShift) && Input.KeyPressed(Keys.F5))
                 _debug = !_debug;
             
             if(!Paused)

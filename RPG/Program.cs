@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TeamStor.Engine;
 using Game = TeamStor.Engine.Game;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 using Microsoft.Xna.Framework.Input;
+using TeamStor.Engine.Coroutine;
 using TeamStor.RPG.Editor;
 
 namespace TeamStor.RPG
@@ -65,6 +68,19 @@ namespace TeamStor.RPG
                 game.Input.KeyPressed(Keys.F8) && 
                 game.CurrentState.GetType() != typeof(MapEditorState))
                 game.CurrentState = new MapEditorState();
+
+            if(game.Input.Key(Keys.LeftShift) &&
+               game.Input.KeyPressed(Keys.F9) && 
+               game.CurrentState.GetType() != typeof(OpenMapState))
+            {
+                OpenMapState state = new OpenMapState();
+                state.Game = game;
+                GameState prevState = game.CurrentState;
+                
+                // do it manually so we don't call OnLeave in the other state
+                typeof(Game).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(game, state);
+                state.OnEnter(prevState);
+            }
         }
 
         public static Vector2 ScaleBatch(SpriteBatch batch)
