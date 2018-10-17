@@ -20,6 +20,7 @@ namespace TeamStor.RPG.Gameplay.World
     /// </summary>
     public class WorldState : GameState
     {
+        private BlendState _multiply = new BlendState();
         private bool _debug;
         
         /// <summary>
@@ -90,6 +91,10 @@ namespace TeamStor.RPG.Gameplay.World
         {
             Map = map;
 
+            _multiply.ColorBlendFunction = BlendFunction.Add;
+            _multiply.ColorSourceBlend = Blend.DestinationColor;
+            _multiply.ColorDestinationBlend = Blend.Zero;
+
             if(Map.TransitionCache != null)
                 Map.TransitionCache.Clear();
         }
@@ -115,6 +120,7 @@ namespace TeamStor.RPG.Gameplay.World
             {
                 Point lastPlayerPos = Player.Position;
                 Player.Update(deltaTime, totalTime, count);
+                Camera.Update(deltaTime);
 
                 foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
                 {

@@ -23,7 +23,7 @@ namespace TeamStor.RPG
 		private void DoTextBox(SortedDictionary<string, string> metadata, WorldState world, Point mapPos)
 		{
             string text = metadata != null && metadata.ContainsKey("value") ? metadata["value"] :
-                "ERROR!!! VA FAN DET ÄR ERROR!!! FÖR HELVETE ERROR!!! (du måste sätta värdet av textboxen i map editorn)";
+                "ERROR!!! VA FAN DET ÄR ERROR!!! FÖR HELVETE ERROR!!!\n(du måste sätta värdet av textboxen i map editorn)";
 
             TextBox.Show(world, new TextBoxContent
             {

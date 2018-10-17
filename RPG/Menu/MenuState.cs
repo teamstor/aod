@@ -61,7 +61,10 @@ namespace TeamStor.RPG.Menu
             _menuController.Draw(batch, new Vector2(
                 screenSize.X / 2 - _menuController.Size.X / 2, 
                 screenSize.Y / 2 - _menuController.Size.Y / 2 + 40), true);
-            
+
+            batch.Rectangle(new Rectangle((int)((480 + 30) * Math.Sin(Game.Time * 0.3f)), 10, 30, 30), Color.DarkSeaGreen);
+
+
             Program.BlackBorders(batch);
         }
     }
