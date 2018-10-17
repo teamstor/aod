@@ -58,6 +58,8 @@ namespace TeamStor.RPG.Gameplay.World
             _offset = new Vector2(World.Player.WorldPosition.X - 480 / 2, World.Player.WorldPosition.Y - 270 / 2);
             _lastMoveTime = World.Game.Time;
             _lastPlayerPos = World.Player.WorldPosition;
+
+            Update(World.Game.DeltaTime);
         }
 
         public void Update(double deltaTime)

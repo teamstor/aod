@@ -12,6 +12,7 @@ using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 using Microsoft.Xna.Framework.Input;
 using TeamStor.Engine.Coroutine;
 using Game = TeamStor.Engine.Game;
+using TeamStor.Engine.Tween;
 
 namespace TeamStor.RPG.Gameplay.World
 {
@@ -20,7 +21,6 @@ namespace TeamStor.RPG.Gameplay.World
     /// </summary>
     public class WorldState : GameState
     {
-        private BlendState _multiply = new BlendState();
         private bool _debug;
         
         /// <summary>
@@ -61,6 +61,28 @@ namespace TeamStor.RPG.Gameplay.World
         public event EventHandler<Game.UpdateEventArgs> UpdateHook;
         public event EventHandler<DrawEventArgs> DrawHook;
 
+        // Used when spawning the player.
+        public struct SpawnArgs
+        {
+            public SpawnArgs(Point position, Direction direction)
+            {
+                Position = position;
+                Direction = direction;
+            }
+
+            /// <summary>
+            /// Position the player will spawn at. (-1, -1) = default
+            /// </summary>
+            public Point Position;
+
+            /// <summary>
+            /// Direction the player will spawn in.
+            /// </summary>
+            public Direction Direction;
+        }
+
+        private SpawnArgs _spawnArgs;
+
         /// <summary>
         /// Spawns a new NPC in the world.
         /// </summary>
@@ -87,24 +109,42 @@ namespace TeamStor.RPG.Gameplay.World
         /// </summary>
         public bool Paused { get; set; }
 
-        public WorldState(Map map)
+        private TweenedDouble _transitionCover;
+        private bool _useTransiton = false;
+
+        public WorldState(Map map, SpawnArgs spawnArgs, bool transition = false)
         {
             Map = map;
-
-            _multiply.ColorBlendFunction = BlendFunction.Add;
-            _multiply.ColorSourceBlend = Blend.DestinationColor;
-            _multiply.ColorDestinationBlend = Blend.Zero;
-
-            if(Map.TransitionCache != null)
-                Map.TransitionCache.Clear();
+            _spawnArgs = spawnArgs;
+            _useTransiton = transition;
         }
+
+        public WorldState(Map map, bool transition = false) : this(map, new SpawnArgs(new Point(-1, -1), Direction.Down), transition) { }
 
         public override void OnEnter(GameState previousState)
         {
             Player = new Player(this);
+
+            if(_spawnArgs.Position != new Point(-1, -1))
+                Player.MoveInstantly(_spawnArgs.Position);
+
+            Player.Heading = _spawnArgs.Direction;
+
+            if(_useTransiton)
+            {
+                _transitionCover = new TweenedDouble(Game, 1);
+                _transitionCover.TweenTo(0, TweenEaseType.EaseOutCubic, 0.4);
+                Paused = true;
+            }
+            else
+                _transitionCover = new TweenedDouble(Game, 0);
+
             Camera = new Camera(this);
 
             Game.IsMouseVisible = false;
+
+            if(Map.TransitionCache != null)
+                Map.TransitionCache.Clear();
         }
 
         public override void OnLeave(GameState nextState)
@@ -116,6 +156,9 @@ namespace TeamStor.RPG.Gameplay.World
             if(Input.Key(Keys.LeftShift) && Input.KeyPressed(Keys.F5))
                 _debug = !_debug;
             
+            if(_useTransiton && _transitionCover.IsComplete && Paused)
+                _useTransiton = Paused = false;
+
             if(!Paused)
             {
                 Point lastPlayerPos = Player.Position;
@@ -197,7 +240,7 @@ namespace TeamStor.RPG.Gameplay.World
             Player.Draw(batch);
 
             Map.Draw(Tile.MapLayer.Decoration, Game, new Rectangle((int)-Camera.Offset.X, (int)-Camera.Offset.Y, (int)screenSize.X, (int)screenSize.Y));
-
+         
             if(_debug)
             {
                 batch.Outline(new Rectangle(Player.Position.X * 16, Player.Position.Y * 16, 16, 16), Color.Red);
@@ -206,6 +249,16 @@ namespace TeamStor.RPG.Gameplay.World
             }
 
             batch.Transform = oldTransform;
+
+            Rectangle transitionRectangle = Rectangle.Empty;
+            if(Player.Heading == Direction.Up)
+                transitionRectangle = new Rectangle(0, 0, 480, (int)(270 * _transitionCover));
+            if(Player.Heading == Direction.Down)
+                transitionRectangle = new Rectangle(0, (int)(270 * (1.0 - _transitionCover)), 480, 270);
+
+            batch.Rectangle(transitionRectangle, Color.Black);
+            batch.Rectangle(new Rectangle(0, 0, 480, 270), Color.Black * _transitionCover);
+
             if(DrawHook != null)
                 DrawHook(this, new DrawEventArgs { Batch = batch, ScreenSize = screenSize });
                                 
@@ -255,13 +308,33 @@ namespace TeamStor.RPG.Gameplay.World
             }
         }
 
+        private IEnumerator<ICoroutineOperation> WaitForTransition(GameState state)
+        {
+            yield return Wait.Seconds(Game, 0.4);
+            Game.CurrentState = state;
+        }
+
         /// <summary>
-        /// Transitions to a new map.
+        /// Transitions to a new map with this existing player.
         /// </summary>
         /// <param name="newMap">The new map to start in.</param>
-        public void TransitionToMap(Map newMap, Point spawnPosition, Direction spawnDirection)
+        /// <param name="transition">If a transition should be used when going between the maps.</param>
+        /// <param name="spawnArgs">Used for determining where the player will spawn.</param>
+        public void TransitionToMap(Map newMap, bool transition, SpawnArgs? spawnArgs = null)
         {
-            
+            // TODO: transition
+            WorldState newState = 
+                spawnArgs.HasValue ? new WorldState(newMap, spawnArgs.Value, transition) : 
+                new WorldState(newMap, transition);
+
+            if(transition)
+            {
+                _transitionCover.TweenTo(1, TweenEaseType.EaseInCubic, 0.4);
+                Paused = true;
+                Coroutine.AddExisting(WaitForTransition(newState));
+            }
+            else
+                Game.CurrentState = newState;
         }
     }
 }

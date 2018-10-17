@@ -14,6 +14,7 @@ using System.Windows.Forms;
 using System.Threading;
 using System.Threading.Tasks;
 using static TeamStor.Engine.Graphics.SpriteBatch;
+using TeamStor.RPG.Menu;
 
 namespace TeamStor.RPG.Editor
 {
@@ -26,7 +27,9 @@ namespace TeamStor.RPG.Editor
 			Info,
 			Keybinds
 		}
-		
+
+        private bool _exiting = false;
+
         private TweenedDouble _topTextY;
         private TweenedDouble _fade;
         private TweenedDouble _topTextFade;
@@ -210,7 +213,7 @@ namespace TeamStor.RPG.Editor
 				Icon = Assets.Get<Texture2D>("editor/exit.png"),
 				Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 6)),
 				Font = Game.DefaultFonts.Normal,
-				Clicked = (btn) => { },
+				Clicked = (btn) => { _exiting = true; },
 
 				Active = false
 			});
@@ -343,6 +346,9 @@ namespace TeamStor.RPG.Editor
 
             if(_dataOperation == DataOperation.None)
                 CurrentState.Update(deltaTime, totalTime, count);
+
+            if(_exiting)
+                Game.CurrentState = new MenuState();
         }
 
 		public bool IsPointObscured(Vector2 point)
