@@ -451,6 +451,9 @@ namespace TeamStor.RPG
         /// <returns>true if the terrain, decoration or control layer has a solid tile at the specified point.</returns>
         public bool IsPointBlocked(Point point)
         {
+            if(point.X < 0 || point.Y < 0 || point.X >= Width || point.Y >= Height)
+                return true;
+
             return Tile.Find(this[Tile.MapLayer.Terrain, point.X, point.Y], Tile.MapLayer.Terrain).Solid(GetMetadata(Tile.MapLayer.Terrain, point.X, point.Y)) ||
                 Tile.Find(this[Tile.MapLayer.Decoration, point.X, point.Y], Tile.MapLayer.Decoration).Solid(GetMetadata(Tile.MapLayer.Decoration, point.X, point.Y)) ||
                 Tile.Find(this[Tile.MapLayer.Control, point.X, point.Y], Tile.MapLayer.Control).Solid(GetMetadata(Tile.MapLayer.Control, point.X, point.Y));

@@ -178,6 +178,8 @@ namespace TeamStor.RPG.Gameplay.World
         {
             screenSize = Program.ScaleBatch(batch);
 
+            batch.Rectangle(new Rectangle(0, 0, (int)screenSize.X, (int)screenSize.Y), Color.Black);
+
             batch.SamplerState = SamplerState.PointWrap;
             Matrix oldTransform = batch.Transform;
             batch.Transform = Matrix.CreateTranslation(Camera.Offset.X, Camera.Offset.Y, 0) * batch.Transform;

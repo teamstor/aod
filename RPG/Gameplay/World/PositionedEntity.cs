@@ -123,6 +123,8 @@ namespace TeamStor.RPG.Gameplay.World
         /// <returns>The time the move will complete.</returns>
         public virtual double MoveTo(Point position)
         {
+            position = Vector2.Clamp(position.ToVector2(), new Vector2(0, 0), new Vector2(World.Map.Width - 1, World.Map.Height - 1)).ToPoint();
+
             if(IsWalking || position == NextPosition)
                 return _walkCompletionTime;
 
@@ -145,6 +147,8 @@ namespace TeamStor.RPG.Gameplay.World
         /// <returns>The time the move will complete.</returns>
         public virtual double MoveWithSpeed(Point position, double speed)
         {
+            position = Vector2.Clamp(position.ToVector2(), new Vector2(0, 0), new Vector2(World.Map.Width - 1, World.Map.Height - 1)).ToPoint();
+
             if(IsWalking || position == NextPosition)
                 return _walkCompletionTime;
 
@@ -167,6 +171,8 @@ namespace TeamStor.RPG.Gameplay.World
         /// <returns>The time the move will complete.</returns>
         public virtual double MoveUntilTime(Point position, double time)
         {
+            position = Vector2.Clamp(position.ToVector2(), new Vector2(0, 0), new Vector2(World.Map.Width - 1, World.Map.Height - 1)).ToPoint();
+
             if(IsWalking || position == NextPosition)
                 return _walkCompletionTime;
 
@@ -187,6 +193,7 @@ namespace TeamStor.RPG.Gameplay.World
         /// <param name="position">The new position the entity should move to.</param>
         public virtual void MoveInstantly(Point position)
         {
+            position = Vector2.Clamp(position.ToVector2(), new Vector2(0, 0), new Vector2(World.Map.Width - 1, World.Map.Height - 1)).ToPoint();
             NextPosition = position;
 
             UpdateDirection();
