@@ -71,11 +71,11 @@ namespace TeamStor.RPG
 
 			public static Tile Stone = new Tile(12, Tile.MapLayer.Terrain, "Stone", new Point(9, 0), true);
 			
-			public static Tile Wood = new InsideTile(20, Tile.MapLayer.Terrain, "Wood", new Point(1, 1), true, -1);
-            public static Tile WoodenPanel = new InsideTile(21, Tile.MapLayer.Terrain, "Wooden Panel", new Point(1, 2), true, -1);
-            public static Tile HouseWall = new InsideTile(22, Tile.MapLayer.Terrain, "Wall", new Point(0, 2), true, -1);
+			public static Tile Wood = new InsideTile(20, Tile.MapLayer.Terrain, "Wood", new Point(1, 1), false, -1);
 
             public static Tile RoadCity = new RoadCityTile(50, Tile.MapLayer.Terrain, "City Road", new Point(0, 1), false, 1002);
+            public static Tile StairsWood = new Tile(51, Tile.MapLayer.Terrain, "Wooden Stairs", new Point(0, 2), false, -1);
+            public static Tile Doormat = new InsideTile(52, Tile.MapLayer.Terrain, "Doormat", new Point(1, 2), false, -1);
         }
         #endregion
 
@@ -99,8 +99,9 @@ namespace TeamStor.RPG
             }
 
 			public static Tile Tree = new TreeTile(10, Tile.MapLayer.Decoration, "Tree", new Point(0, 1), true);
-			
-			public static Tile Wood = new Tile(20, Tile.MapLayer.Decoration, "Wood", new Point(2, 0), true);
+            public static Tile Bush = new BushTile(11, Tile.MapLayer.Decoration, "Bush", new Point(0, 4), true);
+
+            public static Tile Wood = new Tile(20, Tile.MapLayer.Decoration, "Wood", new Point(2, 0), true);
             public static Tile Brick = new Tile(21, Tile.MapLayer.Decoration, "Bricks", new Point(3, 0), true);
 			public static Tile BrickStone = new Tile(22, Tile.MapLayer.Decoration, "Stone Bricks", new Point(4, 0), true);
 
@@ -114,11 +115,31 @@ namespace TeamStor.RPG
             public static Tile WindowBlue = new Tile(37, Tile.MapLayer.Decoration, "Blue Window", new Point(5, 2), true);
             public static Tile WindowPurple = new Tile(38, Tile.MapLayer.Decoration, "Purple Window", new Point(6, 2), true);
             public static Tile WindowRed = new Tile(39, Tile.MapLayer.Decoration, "Red Window", new Point(7, 2), true);
+            public static Tile WindowStone = new Tile(40, Tile.MapLayer.Decoration, "Stone Window", new Point(2, 1), true);
 
-            public static Tile StairsWood = new Tile(40, Tile.MapLayer.Decoration, "Wood Stairs", new Point(2, 1));
+            public static Tile DoorWood = new DoubleTile(42, Tile.MapLayer.Decoration, "Wooden Door/Wood BG", new Point(1, 1), true);
+            public static Tile DoorStone = new DoubleTile(43, Tile.MapLayer.Decoration, "Wooden Door/Stone BG", new Point(1, 3), true);
+            public static Tile Sign = new Tile(44, Tile.MapLayer.Decoration, "Sign", new Point(8, 1), true);
 
-            public static Tile DoorWood = new DoubleTile(50, Tile.MapLayer.Decoration, "Wooden Door", new Point(1, 1), true);
-		}
+            public static Tile WoodenPanel = new InsideTile(50, Tile.MapLayer.Decoration, "Wooden Panel", new Point(9, 0), true, -1);
+            public static Tile HouseWall = new InsideTile(51, Tile.MapLayer.Decoration, "Wall", new Point(8, 0), true, -1);
+
+            public class DoorInsideTile : DoubleTile
+            {
+                public DoorInsideTile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlot, solid, transitionPriority)
+                {
+                }
+
+                public override bool Filter(Map.Environment environment)
+                {
+                    return environment == Map.Environment.Inside;
+                }
+            }
+
+            public static Tile DoorWoodInside = new DoorInsideTile(53, Tile.MapLayer.Decoration, "Wooden Door", new Point(10, 1), true);
+
+            public static Tile Waterwheel = new WaterwheelTile(60, Tile.MapLayer.Decoration, "Waterwheel", new Point(3, 5), true);
+        }
         #endregion
 
         #region NPC

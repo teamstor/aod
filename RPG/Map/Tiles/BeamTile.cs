@@ -20,7 +20,7 @@ namespace TeamStor.RPG
         {
             bool faceLeft = mapPos.X - 1 > 0 &&
                 (map[Layer, mapPos.X - 1, mapPos.Y] == Tiles.Decoration.Wood.ID ||
-                map[Layer, mapPos.X - 1, mapPos.Y] == Tiles.Decoration.StairsWood.ID ||
+                map[Tile.MapLayer.Terrain, mapPos.X - 1, mapPos.Y] == Tiles.Terrain.StairsWood.ID ||
                 map[Layer, mapPos.X - 1, mapPos.Y] == Tiles.Decoration.BrickStone.ID);
 
             game.Batch.Texture(

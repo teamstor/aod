@@ -87,6 +87,7 @@
     <Compile Include="Map\TileEventBase.cs" />
     <Compile Include="Map\Tiles.cs" />
     <Compile Include="Map\Tiles\AnimatedTile.cs" />
+    <Compile Include="Map\Tiles\BushTile.cs" />
     <Compile Include="Map\Tiles\DoubleTile.cs" />
     <Compile Include="Map\Tiles\GrassTile.cs" />
     <Compile Include="Map\Tiles\InsideTile.cs" />
@@ -98,6 +99,7 @@
     <Compile Include="Map\Tiles\RoofTile.cs" />
     <Compile Include="Map\Tiles\TextBoxTile.cs" />
     <Compile Include="Map\Tiles\VariationsTile.cs" />
+    <Compile Include="Map\Tiles\WaterwheelTile.cs" />
     <Compile Include="Map\TileTransitionCache.cs" />
     <Compile Include="Menu\MenuButton.cs" />
     <Compile Include="Menu\MenuController.cs" />

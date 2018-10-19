@@ -325,9 +325,17 @@ namespace TeamStor.RPG
                 for(int i = 0; i < width * height; i++)
                 {
                     map._layerTerrain[i] = reader.ReadInt32();
+                    if(!Tile.Exists((byte)(map._layerTerrain[i] & 0xff), Tile.MapLayer.Terrain))
+                        map._layerTerrain[i] = 0;
                     map._layerDecoration[i] = reader.ReadInt32();
+                    if(!Tile.Exists((byte)(map._layerDecoration[i] & 0xff), Tile.MapLayer.Decoration))
+                        map._layerDecoration[i] = 0;
                     map._layerNPC[i] = reader.ReadInt32();
+                    if(!Tile.Exists((byte)(map._layerNPC[i] & 0xff), Tile.MapLayer.NPC))
+                        map._layerNPC[i] = 0;
                     map._layerControl[i] = reader.ReadInt32();
+                    if(!Tile.Exists((byte)(map._layerControl[i] & 0xff), Tile.MapLayer.Control))
+                        map._layerControl[i] = 0;
                 }
 
                 int count = reader.ReadInt32();
@@ -453,6 +461,9 @@ namespace TeamStor.RPG
         {
             if(point.X < 0 || point.Y < 0 || point.X >= Width || point.Y >= Height)
                 return true;
+
+            if(this[Tile.MapLayer.Control, point.X, point.Y] == Tiles.Control.InvertedBarrier.ID)
+                return false;
 
             return Tile.Find(this[Tile.MapLayer.Terrain, point.X, point.Y], Tile.MapLayer.Terrain).Solid(GetMetadata(Tile.MapLayer.Terrain, point.X, point.Y)) ||
                 Tile.Find(this[Tile.MapLayer.Decoration, point.X, point.Y], Tile.MapLayer.Decoration).Solid(GetMetadata(Tile.MapLayer.Decoration, point.X, point.Y)) ||

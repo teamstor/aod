@@ -12,10 +12,6 @@ namespace TeamStor.RPG
 {
 	public class TextBoxEvents : TileEventBase
 	{
-        // TODO: doesn't work if multiple maps are using this but that won't ever happen anyway
-        private string _currentDrawText = "";
-        private TweenedDouble _drawY;
-
 		public TextBoxEvents(TextBoxTile tile) : base(tile)
 		{
 		}

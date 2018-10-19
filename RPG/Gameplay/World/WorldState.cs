@@ -22,6 +22,8 @@ namespace TeamStor.RPG.Gameplay.World
     public class WorldState : GameState
     {
         private bool _debug;
+        private bool _hasDrawnName = false;
+        private float _drawNameAlpha = 0;
         
         /// <summary>
         /// The player.
@@ -133,11 +135,14 @@ namespace TeamStor.RPG.Gameplay.World
             if(_useTransiton)
             {
                 _transitionCover = new TweenedDouble(Game, 1);
-                _transitionCover.TweenTo(0, TweenEaseType.EaseOutCubic, 0.4);
+                _transitionCover.TweenTo(0, TweenEaseType.Linear, 0.4);
                 Paused = true;
             }
             else
+            {
                 _transitionCover = new TweenedDouble(Game, 0);
+                Coroutine.Start(ShowMapName);
+            }
 
             Camera = new Camera(this);
 
@@ -155,9 +160,12 @@ namespace TeamStor.RPG.Gameplay.World
         {
             if(Input.Key(Keys.LeftShift) && Input.KeyPressed(Keys.F5))
                 _debug = !_debug;
-            
+
             if(_useTransiton && _transitionCover.IsComplete && Paused)
+            {
                 _useTransiton = Paused = false;
+                Coroutine.Start(ShowMapName);
+            }
 
             if(!Paused)
             {
@@ -256,7 +264,17 @@ namespace TeamStor.RPG.Gameplay.World
             if(Player.Heading == Direction.Down)
                 transitionRectangle = new Rectangle(0, (int)(270 * (1.0 - _transitionCover)), 480, 270);
 
-            batch.Rectangle(transitionRectangle, Color.Black);
+            Vector2 measure = Assets.Get<Font>("fonts/Alkhemikal.ttf").Measure(16, Map.Info.Name);
+
+            batch.Text(Assets.Get<Font>("fonts/Alkhemikal.ttf"), 16, Map.Info.Name, 
+                new Vector2(screenSize.X / 2 - measure.X / 2, 40), 
+                Color.Goldenrod * _drawNameAlpha);
+
+            batch.Line(new Vector2(screenSize.X / 2 - measure.X / 2 - 4, 40 + measure.Y + 2),
+                new Vector2(screenSize.X / 2 + measure.X / 2 + 4, 40 + measure.Y + 2),
+                Color.Goldenrod * _drawNameAlpha);
+
+            //batch.Rectangle(transitionRectangle, Color.Black);
             batch.Rectangle(new Rectangle(0, 0, 480, 270), Color.Black * _transitionCover);
 
             if(DrawHook != null)
@@ -308,9 +326,34 @@ namespace TeamStor.RPG.Gameplay.World
             }
         }
 
+        private IEnumerator<ICoroutineOperation> ShowMapName()
+        {
+            yield return Wait.Seconds(Game, 0.1);
+
+            while(_drawNameAlpha < 1.0f)
+            {
+                _drawNameAlpha += (float)Game.DeltaTime * 8;
+                yield return null;
+            }
+
+            _drawNameAlpha = 1.0f;
+
+            yield return Wait.Seconds(Game, 2);
+
+            while(_drawNameAlpha > 0.0f)
+            {
+                _drawNameAlpha -= (float)Game.DeltaTime * 8;
+                yield return null;
+            }
+
+            _drawNameAlpha = 0.0f;
+
+            _hasDrawnName = true;
+        }
+
         private IEnumerator<ICoroutineOperation> WaitForTransition(GameState state)
         {
-            yield return Wait.Seconds(Game, 0.4);
+            yield return Wait.Seconds(Game, 0.8);
             Game.CurrentState = state;
         }
 
@@ -329,7 +372,7 @@ namespace TeamStor.RPG.Gameplay.World
 
             if(transition)
             {
-                _transitionCover.TweenTo(1, TweenEaseType.EaseInCubic, 0.4);
+                _transitionCover.TweenTo(1, TweenEaseType.Linear, 0.4);
                 Paused = true;
                 Coroutine.AddExisting(WaitForTransition(newState));
             }
