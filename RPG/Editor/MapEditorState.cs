@@ -15,6 +15,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using static TeamStor.Engine.Graphics.SpriteBatch;
 using TeamStor.RPG.Menu;
+using TeamStor.RPG.Gameplay.World;
+using System.Reflection;
 
 namespace TeamStor.RPG.Editor
 {
@@ -29,12 +31,15 @@ namespace TeamStor.RPG.Editor
 		}
 
         private bool _exiting = false;
+        private bool _doPlaytest = false;
 
         private TweenedDouble _topTextY;
         private TweenedDouble _fade;
         private TweenedDouble _topTextFade;
 
 		private MapEditorModeState _state;
+
+        private double _returnFromPlaytestWarning = 0;
 
         private enum DataOperation
         {
@@ -81,7 +86,10 @@ namespace TeamStor.RPG.Editor
         public override void OnEnter(GameState previousState)
 		{
             Game.IsMouseVisible = true;
-			Map = new Map(50, 50, new Map.Information("Untitled", Map.Environment.Forest, Map.Weather.Sunny));
+            if(previousState is WorldState)
+                Map = (previousState as WorldState).Map;
+            else
+                Map = new Map(50, 50, new Map.Information("Untitled", Map.Environment.Forest, Map.Weather.Sunny));
 
 			if(Map.TransitionCache != null)
 				Map.TransitionCache.Clear();
@@ -152,17 +160,31 @@ namespace TeamStor.RPG.Editor
 				Active = false
 			});
 			
-			Buttons.Add("load", new Button
+			Buttons.Add("playtest", new Button
 			{
 				Text = "",
-				Icon = Assets.Get<Texture2D>("editor/load.png"),
+				Icon = Assets.Get<Texture2D>("editor/arrow.png"),
 				Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 4)),
 				Font = Game.DefaultFonts.Normal,
 				Clicked = (btn) =>
 				{
-					OpenFileDialog dialog = new OpenFileDialog();
-					
-					dialog.Filter = "Map files (*.map)|*.map|All files (*.*)|*.*";
+                    _doPlaytest = true;
+				},
+
+				Active = false
+			});
+
+            Buttons.Add("load", new Button
+            {
+                Text = "",
+                Icon = Assets.Get<Texture2D>("editor/load.png"),
+                Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 5)),
+                Font = Game.DefaultFonts.Normal,
+                Clicked = (btn) =>
+                {
+                    OpenFileDialog dialog = new OpenFileDialog();
+
+                    dialog.Filter = "Map files (*.map)|*.map|All files (*.*)|*.*";
                     if(dialog.ShowDialog() == DialogResult.OK)
                     {
                         _dataOperation = DataOperation.Loading;
@@ -172,19 +194,19 @@ namespace TeamStor.RPG.Editor
                             _dataOperation = DataOperation.None;
                         });
                     }
-					
-					dialog.Dispose();
-					Application.DoEvents();
-				},
 
-				Active = false
-			});
-			
-			Buttons.Add("save", new Button
+                    dialog.Dispose();
+                    Application.DoEvents();
+                },
+
+                Active = false
+            });
+
+            Buttons.Add("save", new Button
 			{
 				Text = "",
 				Icon = Assets.Get<Texture2D>("editor/save.png"),
-				Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 5)),
+				Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 6)),
 				Font = Game.DefaultFonts.Normal,
 				Clicked = (btn) =>
 				{
@@ -211,7 +233,7 @@ namespace TeamStor.RPG.Editor
 			{
 				Text = "",
 				Icon = Assets.Get<Texture2D>("editor/exit.png"),
-				Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 6)),
+				Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 7)),
 				Font = Game.DefaultFonts.Normal,
 				Clicked = (btn) => { _exiting = true; },
 
@@ -222,10 +244,11 @@ namespace TeamStor.RPG.Editor
             Buttons["edit-attributes-mode"].Position.TweenTo(new Vector2(10, 114 + 32), TweenEaseType.EaseOutQuad, 0.65f);
             Buttons["edit-info-mode"].Position.TweenTo(new Vector2(10, 114 + 32 * 2), TweenEaseType.EaseOutQuad, 0.65f);
 			Buttons["keybinds-help-mode"].Position.TweenTo(new Vector2(10, 114 + 32 * 3), TweenEaseType.EaseOutQuad, 0.65f);
-			
-			Buttons["load"].Position.TweenTo(new Vector2(10, 118 + 32 * 4), TweenEaseType.EaseOutQuad, 0.65f);
-			Buttons["save"].Position.TweenTo(new Vector2(10, 118 + 32 * 5), TweenEaseType.EaseOutQuad, 0.65f);
-			Buttons["exit"].Position.TweenTo(new Vector2(10, 118 + 32 * 6), TweenEaseType.EaseOutQuad, 0.65f);
+
+            Buttons["playtest"].Position.TweenTo(new Vector2(10, 118 + 32 * 4), TweenEaseType.EaseOutQuad, 0.65f);
+            Buttons["load"].Position.TweenTo(new Vector2(10, 118 + 32 * 5), TweenEaseType.EaseOutQuad, 0.65f);
+			Buttons["save"].Position.TweenTo(new Vector2(10, 118 + 32 * 6), TweenEaseType.EaseOutQuad, 0.65f);
+			Buttons["exit"].Position.TweenTo(new Vector2(10, 118 + 32 * 7), TweenEaseType.EaseOutQuad, 0.65f);
 
             _topTextY = new TweenedDouble(Game, -300);
             _topTextY.TweenTo(10, TweenEaseType.EaseOutQuad, 0.65f);
@@ -258,8 +281,10 @@ namespace TeamStor.RPG.Editor
 					return "Edit map info";
 				if(!Buttons["keybinds-help-mode"].Active && Buttons["keybinds-help-mode"].Rectangle.Contains(Input.MousePosition))
 					return "Show key bindings";
-				
-				if(!Buttons["load"].Active && Buttons["load"].Rectangle.Contains(Input.MousePosition))
+
+                if(!Buttons["playtest"].Active && Buttons["playtest"].Rectangle.Contains(Input.MousePosition))
+                    return "Playtest map";
+                if(!Buttons["load"].Active && Buttons["load"].Rectangle.Contains(Input.MousePosition))
 					return "Load map file";
 				if(!Buttons["save"].Active && Buttons["save"].Rectangle.Contains(Input.MousePosition))
 					return "Save map file";
@@ -344,11 +369,65 @@ namespace TeamStor.RPG.Editor
             else if(!topTextRectangle.Contains(Input.MousePosition) && topTextRectangle.Contains(Input.PreviousMousePosition))
                 _topTextFade.TweenTo(2.0, TweenEaseType.EaseOutQuad, 0.4f);
 
+            if(_returnFromPlaytestWarning > 0)
+                _returnFromPlaytestWarning -= deltaTime;
+            if(_returnFromPlaytestWarning < 0)
+                _returnFromPlaytestWarning = 0;
+
             if(_dataOperation == DataOperation.None)
                 CurrentState.Update(deltaTime, totalTime, count);
 
             if(_exiting)
                 Game.CurrentState = new MenuState();
+
+            if(_doPlaytest)
+            {
+                WorldState world = new WorldState(Map, true);
+                EventHandler<Engine.Game.UpdateEventArgs> watcher = null;
+                watcher = (s, e) =>
+                {
+                    if(Game.CurrentState != world)
+                    {
+                        // galet
+                        Game.CurrentState.OnLeave(world);
+                        // helt bananas
+                        typeof(Engine.Game).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(Game, world);
+
+                        MapEditorState mapState = new MapEditorState();
+                        mapState._returnFromPlaytestWarning = 5;
+                        Game.CurrentState = mapState;
+                        Game.OnUpdateAfterState -= watcher;
+                    }
+                };
+
+                Game.OnUpdateAfterState += watcher;
+
+                world.UpdateHook += (s, e) =>
+                {
+                    if(Game.Input.KeyPressed(Keys.Escape))
+                    {
+                        MapEditorState mapState = new MapEditorState();
+                        Game.CurrentState = mapState;
+                        Game.OnUpdateAfterState -= watcher;
+                    }
+                };
+
+                world.DrawHook += (s, e) =>
+                {
+                    Matrix oldTransform = e.Batch.Transform;
+                    e.Batch.Transform = Matrix.Identity;
+
+                    e.Batch.Text(FontStyle.ItalicBold, 
+                        16, 
+                        "Playtesting map \"" + Map.Info.Name + "\"\nPress ESC to return to the map editor", 
+                        new Vector2(8, 8), 
+                        Color.White * (0.8f + (float)(0.2f * Math.Sin(Game.Time * 4))));
+
+                    e.Batch.Transform = oldTransform;
+                };
+
+                Game.CurrentState = world;
+            }
         }
 
 		public bool IsPointObscured(Vector2 point)
@@ -480,6 +559,14 @@ namespace TeamStor.RPG.Editor
 
                 batch.Rectangle(new Rectangle(0, 0, (int)screenSize.X, (int)screenSize.Y), Color.Black * alpha);
                 batch.Text(FontStyle.Bold, 32, text, screenSize / 2 - measure / 2, Color.White);
+            }
+
+            if(_returnFromPlaytestWarning > 0)
+            {
+                Vector2 measure = Game.DefaultFonts.ItalicBold.Measure(24, "Using a map portal during playtest is not allowed.");
+                batch.Text(FontStyle.ItalicBold, 24, "Using a map portal during playtest is not allowed.", screenSize / 2 - measure / 2 + new Vector2(0, 60), Color.White * (float)Math.Min(_returnFromPlaytestWarning, 1));
+
+                batch.Texture(new Vector2(screenSize.X / 2 - 160 / 2, screenSize.Y / 2 - 140), Assets.Get<Texture2D>("crash_recovery/angrymonkey" + ((Game.TotalFixedUpdates / 6) % 7) + ".png"), Color.White * (float)Math.Min(_returnFromPlaytestWarning, 1));
             }
         }
 	}
