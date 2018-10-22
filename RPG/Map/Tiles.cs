@@ -21,21 +21,27 @@ namespace TeamStor.RPG
 
                 public override string Name(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
                 {
-                    if(environment == Map.Environment.Inside)
+                    if(environment == Map.Environment.Inside && ID == 0)
                         return "Void";
                     return base.Name(metadata, environment);
                 }
 
                 public override void Draw(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
                 {
-                    if(environment == Map.Environment.Inside)
+                    if(environment == Map.Environment.Inside && ID == 0)
                         game.Batch.Rectangle(new Rectangle(mapPos.X * 16, mapPos.Y * 16, 16, 16), Color.Black);
                     else
                         base.Draw(game, mapPos, map, metadata, environment, color);
                 }
+
+                public override string TransitionTexture(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
+                {
+                    return "tiles/transitions/water.png";
+                }
             }
 
             public static Tile Water = new WaterTile(0, Tile.MapLayer.Terrain, "Water", new Point(0, 0), 4, 2, true);
+            public static Tile ShallowWater = new WaterTile(1, Tile.MapLayer.Terrain, "Shallow Water", new Point(0, 3), 4, 3, true);
 
             public static Tile Grass = new GrassTile(10, Tile.MapLayer.Terrain, "Grass", 
                 new Point[] {
