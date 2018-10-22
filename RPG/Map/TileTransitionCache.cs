@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TeamStor.Engine;
 using Game = TeamStor.Engine.Game;
 
 namespace TeamStor.RPG
@@ -17,6 +18,7 @@ namespace TeamStor.RPG
 		
 		private List<Texture2D> _textures = new List<Texture2D>();
 		private Point _currentPointOnTexture = Point.Zero;
+        private List<string> _usedAssets = new List<string>();
 
 		private struct TileTransition
 		{
@@ -38,6 +40,8 @@ namespace TeamStor.RPG
 
                     Color[] data = new Color[16 * 16];
                     Game.Assets.Get<Texture2D>(transitionBase).GetData(data);
+                    if(!_usedAssets.Any(a => a == transitionBase))
+                        _usedAssets.Add(transitionBase);
 
                     for(int i = 0; i < data.Length; i++)
                         _masks[transitionBase][i] = data[i] == Color.Black;
@@ -69,6 +73,8 @@ namespace TeamStor.RPG
             if(transitionBase.Contains("_color"))
             {
                 Game.Assets.Get<Texture2D>(transitionBase).GetData(tileTransition);
+                if(!_usedAssets.Any(a => a == transitionBase))
+                    _usedAssets.Add(transitionBase);
                 Game.Assets.UnloadAsset(transitionBase);
             }
             else
@@ -99,14 +105,21 @@ namespace TeamStor.RPG
 		public TileTransitionCache(Game game)
 		{
 			Game = game;
+            Game.Assets.AssetChanged += OnAssetChanged;
 		}
 
-		/// <param name="tile">The tile to get the transition for.</param>
-		/// <param name="metadata">The metadata for the tile.</param>
-		/// <param name="environment">The environment the tile is in.</param>
-		/// <param name="pointOnTexture">The point on the texture the tile is on.</param>
-		/// <returns>The texture for the specified tile.</returns>
-		public Texture2D TextureForTile(Tile tile, SortedDictionary<string, string> metadata, Map.Environment environment, out Point pointOnTexture)
+        private void OnAssetChanged(object sender, AssetsManager.AssetChangedEventArgs e)
+        {
+            if(_usedAssets.Any(a => a == e.Name))
+                Clear();
+        }
+
+        /// <param name="tile">The tile to get the transition for.</param>
+        /// <param name="metadata">The metadata for the tile.</param>
+        /// <param name="environment">The environment the tile is in.</param>
+        /// <param name="pointOnTexture">The point on the texture the tile is on.</param>
+        /// <returns>The texture for the specified tile.</returns>
+        public Texture2D TextureForTile(Tile tile, SortedDictionary<string, string> metadata, Map.Environment environment, out Point pointOnTexture)
 		{
 			if(!HasTransition(tile, metadata, environment))
 				GenerateTileTransition(tile, metadata, environment);
@@ -138,7 +151,8 @@ namespace TeamStor.RPG
 			_textures.Clear();
 			_cachedTransitions.Clear();
 			_masks.Clear();
-		}
+            _usedAssets.Clear();
+        }
 
 		public void Dispose()
 		{

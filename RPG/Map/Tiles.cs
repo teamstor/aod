@@ -36,12 +36,14 @@ namespace TeamStor.RPG
 
                 public override string TransitionTexture(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
                 {
-                    return "tiles/transitions/water.png";
+                    return ID == ShallowWater.ID ?
+                        "tiles/transitions/water_light_color.png" :
+                        "tiles/transitions/water_color.png";
                 }
             }
 
             public static Tile Water = new WaterTile(0, Tile.MapLayer.Terrain, "Water", new Point(0, 0), 4, 2, true);
-            public static Tile ShallowWater = new WaterTile(1, Tile.MapLayer.Terrain, "Shallow Water", new Point(0, 3), 4, 3, true);
+            public static Tile ShallowWater = new WaterTile(1, Tile.MapLayer.Terrain, "Shallow Water", new Point(0, 3), 4, 3, true, 999);
 
             public static Tile Grass = new GrassTile(10, Tile.MapLayer.Terrain, "Grass", 
                 new Point[] {
@@ -75,7 +77,7 @@ namespace TeamStor.RPG
                     new Point(8, 0)
 			});
 
-			public static Tile Stone = new Tile(12, Tile.MapLayer.Terrain, "Stone", new Point(9, 0), true);
+			public static Tile Stone = new Tile(12, Tile.MapLayer.Terrain, "Stone", new Point(9, 0), false);
 			
 			public static Tile Wood = new InsideTile(20, Tile.MapLayer.Terrain, "Wood", new Point(1, 1), false, -1);
 
