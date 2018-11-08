@@ -9,7 +9,7 @@ namespace TeamStor.RPG
 {
     public class GrassTile : VariationsTile
     {
-        public GrassTile(byte id, MapLayer layer, string name, Point[] textureSlots, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlots, solid, transitionPriority)
+        public GrassTile(string id, MapLayer layer, string name, Point[] textureSlots, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlots, solid, transitionPriority)
         {
         }
 

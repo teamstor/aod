@@ -39,6 +39,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\team-stor-engine\Dependencies\MonoGame.Framework.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="SharpFont">
       <HintPath>..\team-stor-engine\Dependencies\SharpFont.dll</HintPath>
     </Reference>
@@ -81,7 +85,9 @@
     <Compile Include="Map\Attributes\TextAttributeEditor.cs" />
     <Compile Include="Map\Events\PortalEvents.cs" />
     <Compile Include="Map\Events\TextBoxEvents.cs" />
+    <Compile Include="Map\Legacy\OldMapLoader.cs" />
     <Compile Include="Map\Map.cs" />
+    <Compile Include="Map\Legacy\MapConverterIDMap.cs" />
     <Compile Include="Map\Tile.cs" />
     <Compile Include="Map\TileAttributeEditor.cs" />
     <Compile Include="Map\TileEventBase.cs" />

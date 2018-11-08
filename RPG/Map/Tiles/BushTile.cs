@@ -15,7 +15,7 @@ namespace TeamStor.RPG
 
         private Point _slotOverride = new Point(-1, -1);
 
-        public BushTile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlot, solid, transitionPriority)
+        public BushTile(string id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlot, solid, transitionPriority)
         {
         }
 
@@ -35,19 +35,19 @@ namespace TeamStor.RPG
             _slotOverride = TextureSlot(metadata, environment);
             _slotOverride.X += slot == 3 ? 1 : 0;
 
-            if(mapPos.Y - 1 > 0 && map[MapLayer.Decoration, mapPos.X, mapPos.Y - 1] == ID &&
-                mapPos.Y + 1 < map.Height && map[MapLayer.Decoration, mapPos.X, mapPos.Y + 1] == ID)
+            if(mapPos.Y - 1 > 0 && map[MapLayer.Decoration, mapPos.X, mapPos.Y - 1] == this &&
+                mapPos.Y + 1 < map.Height && map[MapLayer.Decoration, mapPos.X, mapPos.Y + 1] == this)
                 _slotOverride.X += 12;
-            else if(mapPos.Y - 1 > 0 && map[MapLayer.Decoration, mapPos.X, mapPos.Y - 1] == ID)
+            else if(mapPos.Y - 1 > 0 && map[MapLayer.Decoration, mapPos.X, mapPos.Y - 1] == this)
                 _slotOverride.X += 10;
-            else if(mapPos.Y + 1 < map.Height && map[MapLayer.Decoration, mapPos.X, mapPos.Y + 1] == ID)
+            else if(mapPos.Y + 1 < map.Height && map[MapLayer.Decoration, mapPos.X, mapPos.Y + 1] == this)
                 _slotOverride.X += 8;
-            else if(mapPos.X - 1 > 0 && map[MapLayer.Decoration, mapPos.X - 1, mapPos.Y] == ID &&
-                mapPos.X + 1 < map.Width && map[MapLayer.Decoration, mapPos.X + 1, mapPos.Y] == ID)
+            else if(mapPos.X - 1 > 0 && map[MapLayer.Decoration, mapPos.X - 1, mapPos.Y] == this &&
+                mapPos.X + 1 < map.Width && map[MapLayer.Decoration, mapPos.X + 1, mapPos.Y] == this)
                 _slotOverride.X += 6;
-            else if(mapPos.X + 1 < map.Width && map[MapLayer.Decoration, mapPos.X + 1, mapPos.Y] == ID)
+            else if(mapPos.X + 1 < map.Width && map[MapLayer.Decoration, mapPos.X + 1, mapPos.Y] == this)
                 _slotOverride.X += 4;
-            else if(mapPos.X - 1 > 0 && map[MapLayer.Decoration, mapPos.X - 1, mapPos.Y] == ID)
+            else if(mapPos.X - 1 > 0 && map[MapLayer.Decoration, mapPos.X - 1, mapPos.Y] == this)
                 _slotOverride.X += 2;
 
             base.Draw(game, mapPos, map, metadata, environment, color);

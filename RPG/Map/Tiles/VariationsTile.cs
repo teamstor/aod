@@ -25,7 +25,7 @@ namespace TeamStor.RPG
             get; private set;
         }
 
-        public VariationsTile(byte id, MapLayer layer, string name, Point[] textureSlots, bool solid = false, int transitionPriority = 1000) :
+        public VariationsTile(string id, MapLayer layer, string name, Point[] textureSlots, bool solid = false, int transitionPriority = 1000) :
             base(id, layer, name, textureSlots[0], solid, transitionPriority)
         {
             TextureSlots = textureSlots;

@@ -308,13 +308,13 @@ namespace TeamStor.RPG.Editor
                 while(Map.Width + xadd < 1)
                     xadd++;
 
-                while(Map.Width + xadd > 4096)
+                while(Map.Width + xadd > 256)
                     xadd--;
 
                 while(Map.Height + yadd < 1)
                     yadd++;
 
-                while(Map.Height + yadd > 4096)
+                while(Map.Height + yadd > 256)
                     yadd--;
 
                 if(Input.Key(Keys.LeftShift) || Input.Key(Keys.RightShift))
@@ -526,7 +526,27 @@ namespace TeamStor.RPG.Editor
                 str = str.Replace("[PLACEHOLDER PLACEHOLDER PLACEHOLDER]", CurrentHelpText)
                     .Replace("Map Editor\n", "");
 
-                batch.Text(SpriteBatch.FontStyle.Bold, 15, "Map Editor", new Vector2(20, (int)_topTextY + 10),
+                int size = Map.Width * Map.Height * 4;
+
+                int x, y;
+                foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
+                {
+                    for(x = 0; x < Map.Width; x++)
+                    {
+                        for(y = 0; y < Map.Height; y++)
+                        {
+                            SortedDictionary<string, string> meta = Map.GetMetadata(layer, x, y);
+
+                            if(meta != null && meta.Count > 0)
+                            {
+                                foreach(KeyValuePair<string, string> pair in meta)
+                                    size += (pair.Key.Length + pair.Value.Length) * 2;
+                            }
+                        }
+                    }
+                }
+
+                batch.Text(SpriteBatch.FontStyle.Bold, 15, "Map Editor (data: " + (size / (double)1024).ToString("0.00") + " KB)", new Vector2(20, (int)_topTextY + 10),
                     Color.White * MathHelper.Clamp(_topTextFade, 0, 1));
                 batch.Text(SpriteBatch.FontStyle.Bold, 15, str, new Vector2(20, (int)_topTextY + 10 + (15 * 1.25f)),
                     Color.White * (MathHelper.Clamp(_topTextFade, 0, 1) * 0.8f));

@@ -17,7 +17,7 @@ namespace TeamStor.RPG
             Repeat
         };
 
-        public NPCPathTile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlot, solid, transitionPriority)
+        public NPCPathTile(string id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlot, solid, transitionPriority)
         {
         }
 

@@ -175,8 +175,8 @@ namespace TeamStor.RPG.Gameplay.World
 
                 foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
                 {
-                    TileEventBase oldEvents = Tile.Find(Map[layer, lastPlayerPos.X, lastPlayerPos.Y], layer).Events;
-                    TileEventBase newEvents = Tile.Find(Map[layer, Player.Position.X, Player.Position.Y], layer).Events;
+                    TileEventBase oldEvents = Map[layer, lastPlayerPos.X, lastPlayerPos.Y].Events;
+                    TileEventBase newEvents = Map[layer, Player.Position.X, Player.Position.Y].Events;
 
                     if(Player.Position != lastPlayerPos)
                     {
@@ -196,7 +196,7 @@ namespace TeamStor.RPG.Gameplay.World
             {
                 foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
                 {
-                    TileEventBase events = Tile.Find(Map[layer, Player.Position.X, Player.Position.Y], layer).Events;
+                    TileEventBase events = Map[layer, Player.Position.X, Player.Position.Y].Events;
                     events?.OnStandingOn(Map.GetMetadata(layer, Player.Position.X, Player.Position.Y), this, Player.Position, count);
                 }
             }
@@ -213,7 +213,7 @@ namespace TeamStor.RPG.Gameplay.World
             {
                 SortedDictionary<string, string> metadata = Map.GetMetadata(layer, position.X, position.Y);
                 str += layer + " - " + 
-                       "\"" + Tile.Find(Map[layer, position.X, position.Y], layer).Name(metadata, Map.Info.Environment) + "\" " + 
+                       "\"" + Map[layer, position.X, position.Y].Name(metadata, Map.Info.Environment) + "\" " + 
                        "(id " + Map[layer, position.X, position.Y] + ") " +
                        " metadata: ";
 

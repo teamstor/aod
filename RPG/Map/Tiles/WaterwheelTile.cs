@@ -12,7 +12,7 @@ namespace TeamStor.RPG
     {
         private Point _slotOverride = new Point(-1, -1);
 
-        public WaterwheelTile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlot, solid, transitionPriority)
+        public WaterwheelTile(string id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlot, solid, transitionPriority)
         {
         }
 
@@ -24,7 +24,7 @@ namespace TeamStor.RPG
                 {
                     if(rect.X < 0 || rect.Y < 0 || rect.X >= map.Width || rect.Y >= map.Height)
                         return false;
-                    if(map[Tile.MapLayer.Decoration, x, y] != ID)
+                    if(map[Tile.MapLayer.Decoration, x, y] != this)
                         return false;
                 }
             }

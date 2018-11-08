@@ -196,7 +196,7 @@ namespace TeamStor.RPG.Editor.States
 
             if(Game.Input.MousePressed(MouseButton.Left) && !BaseState.IsPointObscured(Input.MousePosition) && SelectedTile == new Point(-1, -1))
             {
-                bool canCurrentTileHaveMetadata = Tile.Find(BaseState.Map[Layer, HoveredTile.X, HoveredTile.Y], Layer).HasEditableAttributes;
+                bool canCurrentTileHaveMetadata = BaseState.Map[Layer, HoveredTile.X, HoveredTile.Y].HasEditableAttributes;
 
                 if(canCurrentTileHaveMetadata)
                 {
@@ -204,7 +204,7 @@ namespace TeamStor.RPG.Editor.States
                     SortedDictionary<string, string> attribs = BaseState.Map.GetMetadata(Layer, SelectedTile.X, SelectedTile.Y);
 
                     int currentY = Game.GraphicsDevice.Viewport.Bounds.Height / 2 - 300 / 2 + 30;
-                    _editors = Tile.Find(BaseState.Map[Layer, SelectedTile.X, SelectedTile.Y], Layer).AttributeEditors(BaseState, ref currentY);
+                    _editors = BaseState.Map[Layer, SelectedTile.X, SelectedTile.Y].AttributeEditors(BaseState, ref currentY);
 
                     if(attribs != null)
                     {
@@ -280,7 +280,7 @@ namespace TeamStor.RPG.Editor.States
             {
                 batch.Rectangle(new Rectangle(Point.Zero, screenSize.ToPoint()), Color.Black * 0.6f);
 
-                string tileName = Tile.Find(BaseState.Map[Layer, SelectedTile.X, SelectedTile.Y], Layer).Name(BaseState.Map.GetMetadata(Layer, SelectedTile.X, SelectedTile.Y), BaseState.Map.Info.Environment);
+                string tileName = BaseState.Map[Layer, SelectedTile.X, SelectedTile.Y].Name(BaseState.Map.GetMetadata(Layer, SelectedTile.X, SelectedTile.Y), BaseState.Map.Info.Environment);
                 string str = "\"" + tileName + "\" (" + SelectedTile.X + ", " + SelectedTile.Y + ")";
                 Vector2 measure = Game.DefaultFonts.Bold.Measure(15, str);
                 batch.Text(FontStyle.Bold, 15, str, new Vector2(screenSize.X / 2 - measure.X / 2, screenSize.Y / 2 - 300 / 2), Color.White);
@@ -288,19 +288,19 @@ namespace TeamStor.RPG.Editor.States
 
             if(!BaseState.IsPointObscured(Input.MousePosition) && SelectedTile == new Point(-1, -1))
             {
-                if(BaseState.Map[Layer, HoveredTile.X, HoveredTile.Y] == 0)
+                if(BaseState.Map[Layer, HoveredTile.X, HoveredTile.Y].ID == "")
                     return;
 
                 batch.Transform = BaseState.Camera.Transform;
 
-                bool canCurrentTileHaveMetadata = Tile.Find(BaseState.Map[Layer, HoveredTile.X, HoveredTile.Y], Layer).HasEditableAttributes;
+                bool canCurrentTileHaveMetadata = BaseState.Map[Layer, HoveredTile.X, HoveredTile.Y].HasEditableAttributes;
                 SortedDictionary<string, string> attribs = BaseState.Map.GetMetadata(Layer, HoveredTile.X, HoveredTile.Y);
                 batch.Outline(new Rectangle(HoveredTile.X * 16, HoveredTile.Y * 16, 16, 16),
                     canCurrentTileHaveMetadata ? Color.White * 0.6f : Color.DarkRed * 0.6f, 1, false);
 
                 batch.Reset();
 
-                string tileName = Tile.Find(BaseState.Map[Layer, HoveredTile.X, HoveredTile.Y], Layer).Name(BaseState.Map.GetMetadata(Layer, HoveredTile.X, HoveredTile.Y), BaseState.Map.Info.Environment);
+                string tileName = BaseState.Map[Layer, HoveredTile.X, HoveredTile.Y].Name(BaseState.Map.GetMetadata(Layer, HoveredTile.X, HoveredTile.Y), BaseState.Map.Info.Environment);
                 string str = "";
                 if(canCurrentTileHaveMetadata)
                 {

@@ -8,7 +8,7 @@ namespace TeamStor.RPG
 	{
 		private TextBoxEvents _events;
 
-		public TextBoxTile(byte id, string name, Point textureSlot) : base(id, MapLayer.Control, name, textureSlot, false, -1)
+		public TextBoxTile(string id, string name, Point textureSlot) : base(id, MapLayer.Control, name, textureSlot, false, -1)
 		{
 			_events = new TextBoxEvents(this);
 		}

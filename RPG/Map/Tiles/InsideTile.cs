@@ -12,7 +12,7 @@ namespace TeamStor.RPG
     /// </summary>
     public class InsideTile : Tile
     {
-        public InsideTile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlot, solid, transitionPriority)
+        public InsideTile(string id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlot, solid, transitionPriority)
         {
         }
 

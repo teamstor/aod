@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
 using Game = TeamStor.Engine.Game;
 
 namespace TeamStor.RPG
@@ -18,7 +22,7 @@ namespace TeamStor.RPG
         /// <summary>
         /// Map save version.
         /// </summary>
-        public const int MAP_FORMAT_VERSION = 1;
+        public const int MAP_FORMAT_VERSION = 2;
         
         /// <summary>
         /// Map environment.
@@ -70,12 +74,13 @@ namespace TeamStor.RPG
             public Weather Weather;
         }
 
-        // The lower 8 bits of the layer arrays are the ID of the tile. The higher 8 bits are the position into the metadata array.
-        // If the higher 8 bits are all 0 the tile doesn't have any metadata.
-        private int[] _layerTerrain, _layerDecoration, _layerNPC, _layerControl;
+        // (ID 16 bit) | (Metadata 16 bit)
+        private uint[] _layerTerrain, _layerDecoration, _layerNPC, _layerControl;
+        private Tile[] _idmapTerrain, _idmapDecoration, _idmapNPC, _idmapControl;
         private List<SortedDictionary<string, string>> _metadataTerrain, _metadataDecoration, _metadataNPC, _metadataControl;
 
-        private int[] LayerToTileArray(Tile.MapLayer layer)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private uint[] LayerToTileArray(Tile.MapLayer layer)
         {
             switch(layer)
             {
@@ -95,6 +100,28 @@ namespace TeamStor.RPG
             return null;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private Tile[] LayerToIDMap(Tile.MapLayer layer)
+        {
+            switch(layer)
+            {
+                case Tile.MapLayer.Terrain:
+                    return _idmapTerrain;
+
+                case Tile.MapLayer.Decoration:
+                    return _idmapDecoration;
+
+                case Tile.MapLayer.NPC:
+                    return _idmapNPC;
+
+                case Tile.MapLayer.Control:
+                    return _idmapControl;
+            }
+
+            return null;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private List<SortedDictionary<string, string>> LayerToMetadataArray(Tile.MapLayer layer)
         {
             switch(layer)
@@ -145,10 +172,18 @@ namespace TeamStor.RPG
 
             Info = info;
 
-            _layerTerrain = new int[w * h];
-            _layerDecoration = new int[w * h];
-            _layerNPC = new int[w * h];
-            _layerControl = new int[w * h];
+            _layerTerrain = new uint[w * h];
+            _layerDecoration = new uint[w * h];
+            _layerNPC = new uint[w * h];
+            _layerControl = new uint[w * h];
+
+            _idmapTerrain = new Tile[ushort.MaxValue];
+            _idmapDecoration = new Tile[ushort.MaxValue];
+            _idmapNPC = new Tile[ushort.MaxValue];
+            _idmapControl = new Tile[ushort.MaxValue];
+
+            foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
+                LayerToIDMap(layer)[0] = Tile.Find("", layer);
 
             _metadataTerrain = new List<SortedDictionary<string, string>>();
             _metadataDecoration = new List<SortedDictionary<string, string>>();
@@ -156,16 +191,58 @@ namespace TeamStor.RPG
             _metadataControl = new List<SortedDictionary<string, string>>();
         }
 
-        public byte this[Tile.MapLayer layer, int x, int y]
+        public Tile this[Tile.MapLayer layer, int x, int y]
         {
             get
             {
-                return (byte)(LayerToTileArray(layer)[(y * Width) + x] & 0xff);
+                // & 0xFFFF = lower 16 bits
+                return LayerToIDMap(layer)[(ushort)(LayerToTileArray(layer)[(y * Width) + x] & 0xFFFF)];
             }
             set
             {
                 SetMetadata(layer, x, y, null);
-                LayerToTileArray(layer)[(y * Width) + x] = value;
+
+                /*Tile oldTile = this[layer, x, y];
+
+                bool oldTileExists = oldTile == value;
+                if(!oldTileExists)
+                {
+                    int ix, iy;
+                    for(ix = 0; ix < Width; ix++)
+                    {
+                        for(iy = 0; iy < Height; iy++)
+                        {
+                            if(ix != x || iy != y)
+                            {
+                                if(this[layer, ix, iy] == oldTile)
+                                {
+                                    oldTileExists = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                if(!oldTileExists)
+                    LayerToIDMap(layer).Remove((ushort)(LayerToTileArray(layer)[(y * Width) + x] & 0xFFFF)); */
+                // TODO: behövs det här???
+
+                int newValue = Array.IndexOf(LayerToIDMap(layer), value);
+                if(newValue == -1)
+                {
+                    for(int i = 0; i < ushort.MaxValue; i++)
+                    {
+                        if(LayerToIDMap(layer)[i] == null)
+                        {
+                            newValue = i;
+                            break;
+                        }
+                    }
+
+                    LayerToIDMap(layer)[newValue] = value;
+                }
+
+                LayerToTileArray(layer)[(y * Width) + x] = (ushort)newValue;
             }
         }
 
@@ -178,9 +255,9 @@ namespace TeamStor.RPG
             return GetMetadataSlot(layer, x, y) != 0;
         }
 
-        public int GetMetadataSlot(Tile.MapLayer layer, int x, int y)
+        public ushort GetMetadataSlot(Tile.MapLayer layer, int x, int y)
         {
-            return (LayerToTileArray(layer)[(y * Width) + x] & 0xff00) >> 8;
+            return (ushort)((LayerToTileArray(layer)[(y * Width) + x] & 0xFFFF0000) >> 16);
         }
 
         /// <summary>
@@ -192,6 +269,7 @@ namespace TeamStor.RPG
         /// <returns>The metadata or null.</returns>
         public SortedDictionary<string, string> GetMetadata(Tile.MapLayer layer, int x, int y)
         {
+            // TODO: MetadataAccess class helper
             if(HasMetadata(layer, x, y))
             {
                 if(LayerToMetadataArray(layer).Count <= GetMetadataSlot(layer, x, y) - 1)
@@ -213,18 +291,18 @@ namespace TeamStor.RPG
         {
             if(HasMetadata(layer, x, y))
             {
-                int slot = GetMetadataSlot(layer, x, y);
+                ushort slot = GetMetadataSlot(layer, x, y);
                 LayerToMetadataArray(layer).RemoveAt(slot - 1);
                 LayerToTileArray(layer)[(y * Width) + x] = LayerToTileArray(layer)[(y * Width) + x] & 0xff;
 
                 for(int i = 0; i < Width * Height; i++)
                 {
-                    if((LayerToTileArray(layer)[i] & 0xff00) >> 8 >= slot)
+                    if((LayerToTileArray(layer)[i] & 0xFFFF0000) >> 16 >= slot)
                     {
-                        int lastMetadataAttr = (LayerToTileArray(layer)[i] & 0xff00) >> 8;
+                        ushort lastMetadataAttr = (ushort)((LayerToTileArray(layer)[i] & 0xFFFF0000) >> 16);
                         lastMetadataAttr--;
 
-                        LayerToTileArray(layer)[i] = (LayerToTileArray(layer)[i] & 0xff) | (lastMetadataAttr << 8);
+                        LayerToTileArray(layer)[i] = (uint)((LayerToTileArray(layer)[i] & 0xFFFF) | (lastMetadataAttr << 16));
                     }
                 }
             }
@@ -232,7 +310,7 @@ namespace TeamStor.RPG
             if(metadata != null)
             {
                 LayerToMetadataArray(layer).Add(metadata);
-                LayerToTileArray(layer)[(y * Width) + x] = (LayerToTileArray(layer)[(y * Width) + x] & 0xff) | ((LayerToMetadataArray(layer).Count) << 8);
+                LayerToTileArray(layer)[(y * Width) + x] = (uint)((LayerToTileArray(layer)[(y * Width) + x] & 0xFFFF) | ((LayerToMetadataArray(layer).Count) << 16));
             }
         }
 
@@ -254,8 +332,8 @@ namespace TeamStor.RPG
 
             foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
             {
-                int[] tiles = LayerToTileArray(layer);
-                int[] oldTiles = new int[oldWidth * oldHeight];
+                uint[] tiles = LayerToTileArray(layer);
+                uint[] oldTiles = new uint[oldWidth * oldHeight];
                 Array.Copy(tiles, oldTiles, oldWidth * oldHeight);
 
                 Array.Resize(ref tiles, newWidth * newHeight);
@@ -300,87 +378,8 @@ namespace TeamStor.RPG
         /// <param name="stream">The stream to load from.</param>
         public static Map Load(Stream stream)
         {
-            Information info = new Information("???", Environment.Forest, Weather.Sunny);
-            int width = 0, height = 0;
-
-            using(BinaryReader reader = new BinaryReader(stream, Encoding.UTF8))
-            {
-                if(reader.ReadString() != "rpg:map")
-                    throw new Exception("Not a valid map stream");
-
-                int readVersion;
-                if((readVersion = reader.ReadInt32()) != MAP_FORMAT_VERSION)
-                    throw new Exception("Map loaded from " + 
-                                        (readVersion > MAP_FORMAT_VERSION ? "a newer" : "an older") + 
-                                        " version (" + MAP_FORMAT_VERSION + " != " + readVersion + ")");
-                
-                info.Name = reader.ReadString();
-                info.Environment = (Environment)reader.ReadByte();
-                info.Weather = (Weather)reader.ReadByte();
-
-                width = reader.ReadInt32();
-                height = reader.ReadInt32();
-				
-                Map map = new Map(width, height, info);
-                for(int i = 0; i < width * height; i++)
-                {
-                    map._layerTerrain[i] = reader.ReadInt32();
-                    if(!Tile.Exists((byte)(map._layerTerrain[i] & 0xff), Tile.MapLayer.Terrain))
-                        map._layerTerrain[i] = 0;
-                    map._layerDecoration[i] = reader.ReadInt32();
-                    if(!Tile.Exists((byte)(map._layerDecoration[i] & 0xff), Tile.MapLayer.Decoration))
-                        map._layerDecoration[i] = 0;
-                    map._layerNPC[i] = reader.ReadInt32();
-                    if(!Tile.Exists((byte)(map._layerNPC[i] & 0xff), Tile.MapLayer.NPC))
-                        map._layerNPC[i] = 0;
-                    map._layerControl[i] = reader.ReadInt32();
-                    if(!Tile.Exists((byte)(map._layerControl[i] & 0xff), Tile.MapLayer.Control))
-                        map._layerControl[i] = 0;
-                }
-
-                int count = reader.ReadInt32();
-                for(int i = 0; i < count; i++)
-                {
-                    map._metadataTerrain.Add(new SortedDictionary<string, string>());
-                    int pairs = reader.ReadInt32();
-
-                    for(int i2 = 0; i2 < pairs; i2++)
-                        map._metadataTerrain[map._metadataTerrain.Count - 1].Add(reader.ReadString(), reader.ReadString());
-                }
-
-                count = reader.ReadInt32();
-                for(int i = 0; i < count; i++)
-                {
-                    map._metadataDecoration.Add(new SortedDictionary<string, string>());
-                    int pairs = reader.ReadInt32();
-
-                    for(int i2 = 0; i2 < pairs; i2++)
-                        map._metadataDecoration[map._metadataDecoration.Count - 1].Add(reader.ReadString(), reader.ReadString());
-                }
-                
-                count = reader.ReadInt32();
-                for(int i = 0; i < count; i++)
-                {
-                    map._metadataNPC.Add(new SortedDictionary<string, string>());
-                    int pairs = reader.ReadInt32();
-
-                    for(int i2 = 0; i2 < pairs; i2++)
-                        map._metadataNPC[map._metadataNPC.Count - 1].Add(reader.ReadString(), reader.ReadString());
-                }
-                
-                count = reader.ReadInt32();
-                for(int i = 0; i < count; i++)
-                {
-                    map._metadataControl.Add(new SortedDictionary<string, string>());
-                    int pairs = reader.ReadInt32();
-
-                    for(int i2 = 0; i2 < pairs; i2++)
-                        map._metadataControl[map._metadataControl.Count - 1].Add(reader.ReadString(), reader.ReadString());
-                }
-                GC.Collect();
-
-                return map;
-            }
+            // TODO
+            return null;
         }
         
         /// <summary>
@@ -389,68 +388,73 @@ namespace TeamStor.RPG
         /// <param name="stream">The stream to save to.</param>
         public void Save(Stream stream)
         {
-            using(BinaryWriter writer = new BinaryWriter(stream, Encoding.UTF8))
+            using(StreamWriter swriter = new StreamWriter(stream, Encoding.UTF8))
             {
-                writer.Write("rpg:map");
-                writer.Write(MAP_FORMAT_VERSION);
-                
-                writer.Write(Info.Name);
-                writer.Write((byte)Info.Environment);
-                writer.Write((byte)Info.Weather);
-                
-                writer.Write(Width);
-                writer.Write(Height);
+                using(JsonWriter writer = new JsonTextWriter(swriter))
+                {
+                    writer.WriteStartObject();
 
-                for(int i = 0; i < Width * Height; i++)
-                {
-                    writer.Write(_layerTerrain[i]);
-                    writer.Write(_layerDecoration[i]);
-                    writer.Write(_layerNPC[i]);
-                    writer.Write(_layerControl[i]);
-                }
+                    writer.WritePropertyName("version");
+                    writer.WriteValue(MAP_FORMAT_VERSION);
 
-                writer.Write(_metadataTerrain.Count);
-                foreach(SortedDictionary<string, string> s in _metadataTerrain)
-                {
-                    writer.Write(s.Count);
-                    foreach(KeyValuePair<string, string> pair in s)
+                    writer.WritePropertyName("info");
+                    writer.WriteStartObject();
+                    writer.WritePropertyName("name");
+                    writer.WriteValue(Info.Name);
+                    writer.WritePropertyName("environment");
+                    writer.WriteValue(Info.Environment);
+                    writer.WritePropertyName("weather");
+                    writer.WriteValue(Info.Weather);
+                    writer.WriteEndObject();
+
+                    writer.WritePropertyName("width");
+                    writer.WriteValue(Width);
+                    writer.WritePropertyName("height");
+                    writer.WriteValue(Height);
+
+                    writer.WritePropertyName("layers");
+                    writer.WriteStartObject();
+
+                    foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
                     {
-                        writer.Write(pair.Key);
-                        writer.Write(pair.Value);
+                        writer.WritePropertyName(layer.ToString().ToLowerInvariant());
+                        writer.WriteStartArray();
+
+                        int x, y;
+                        for(x = 0; x < Width; x++)
+                        {
+                            for(y = 0; y < Height; y++)
+                            {
+                                SortedDictionary<string, string> metadata = GetMetadata(layer, x, y);
+
+                                if(metadata != null && metadata.Count > 0)
+                                {
+                                    writer.WriteStartObject();
+                                    writer.WritePropertyName("id");
+                                    writer.WriteValue(this[layer, x, y]);
+                                    writer.WritePropertyName("metadata");
+                                    writer.WriteStartObject();
+
+                                    foreach(KeyValuePair<string, string> pair in metadata)
+                                    {
+                                        writer.WritePropertyName(pair.Key);
+                                        writer.WriteValue(pair.Value);
+                                    }
+
+                                    writer.WriteEndObject();
+                                    writer.WriteEndObject();
+                                }
+                                else
+                                    writer.WriteValue(this[layer, x, y]);
+                            }
+                        }
+
+                        writer.WriteEndArray();
                     }
-                }
-                
-                writer.Write(_metadataDecoration.Count);
-                foreach(SortedDictionary<string, string> s in _metadataDecoration)
-                {
-                    writer.Write(s.Count);
-                    foreach(KeyValuePair<string, string> pair in s)
-                    {
-                        writer.Write(pair.Key);
-                        writer.Write(pair.Value);
-                    }
-                }
-                
-                writer.Write(_metadataNPC.Count);
-                foreach(SortedDictionary<string, string> s in _metadataNPC)
-                {
-                    writer.Write(s.Count);
-                    foreach(KeyValuePair<string, string> pair in s)
-                    {
-                        writer.Write(pair.Key);
-                        writer.Write(pair.Value);
-                    }
-                }
-                
-                writer.Write(_metadataControl.Count);
-                foreach(SortedDictionary<string, string> s in _metadataControl)
-                {
-                    writer.Write(s.Count);
-                    foreach(KeyValuePair<string, string> pair in s)
-                    {
-                        writer.Write(pair.Key);
-                        writer.Write(pair.Value);
-                    }
+
+                    writer.WriteEndObject();
+
+                    writer.WriteEndObject();
                 }
             }
         }
@@ -462,19 +466,19 @@ namespace TeamStor.RPG
             if(point.X < 0 || point.Y < 0 || point.X >= Width || point.Y >= Height)
                 return true;
 
-            if(this[Tile.MapLayer.Control, point.X, point.Y] == Tiles.Control.InvertedBarrier.ID)
+            if(this[Tile.MapLayer.Control, point.X, point.Y] == Tiles.Control.InvertedBarrier)
                 return false;
 
-            return Tile.Find(this[Tile.MapLayer.Terrain, point.X, point.Y], Tile.MapLayer.Terrain).Solid(GetMetadata(Tile.MapLayer.Terrain, point.X, point.Y)) ||
-                Tile.Find(this[Tile.MapLayer.Decoration, point.X, point.Y], Tile.MapLayer.Decoration).Solid(GetMetadata(Tile.MapLayer.Decoration, point.X, point.Y)) ||
-                Tile.Find(this[Tile.MapLayer.Control, point.X, point.Y], Tile.MapLayer.Control).Solid(GetMetadata(Tile.MapLayer.Control, point.X, point.Y));
+            return this[Tile.MapLayer.Terrain, point.X, point.Y].Solid(GetMetadata(Tile.MapLayer.Terrain, point.X, point.Y)) ||
+                this[Tile.MapLayer.Decoration, point.X, point.Y].Solid(GetMetadata(Tile.MapLayer.Decoration, point.X, point.Y)) ||
+                this[Tile.MapLayer.Control, point.X, point.Y].Solid(GetMetadata(Tile.MapLayer.Control, point.X, point.Y));
         }
 
         /// <summary>
         /// The tile transition cache.
         /// </summary>
         public static TileTransitionCache TransitionCache { get; private set; }
-        
+
         /// <summary>
         /// Draws this map.
         /// </summary>
@@ -538,9 +542,9 @@ namespace TeamStor.RPG
             {
                 for(y = yMin; y <= yMax; y++)
                 {
-                    byte tile = this[layer, x, y];
-                    if((tile & 0xff) != 0) // water will be drawn by the map manually here
-                        Tile.Find(tile, layer).Draw(game, new Point(x, y), this, GetMetadata(layer, x, y), Info.Environment);
+                    Tile tile = this[layer, x, y];
+                    if(tile.ID != "") // water will be drawn by the map manually here
+                        tile.Draw(game, new Point(x, y), this, GetMetadata(layer, x, y), Info.Environment);
                 }
             }
             
@@ -548,33 +552,33 @@ namespace TeamStor.RPG
             {
                 for(y = yMin; y <= yMax; y++)
                 {
-                    byte tile = this[layer, x, y];
-                    if(layer == Tile.MapLayer.Terrain || (tile & 0xff) != 0)
+                    Tile tile = this[layer, x, y];
+                    if(layer == Tile.MapLayer.Terrain || tile.ID != "")
                     {
-                        Point[] points = new Point[]
-                        {
-                            new Point(x - 1, y),
-                            new Point(x + 1, y),
-                            new Point(x, y - 1),
-                            new Point(x, y + 1)
-                        };
+                        Point p1 = new Point(x - 1, y);
+                        Point p2 = new Point(x + 1, y);
+                        Point p3 = new Point(x, y - 1);
+                        Point p4 = new Point(x, y + 1);
 
-                        for(int i = 0; i < points.Length; i++)
+                        for(int i = 0; i < 4; i++)
                         {
-                            Point point = points[i];
+                            Point point = i == 0 ? p1 :
+                                i == 1 ? p2 :
+                                i == 2 ? p3 :
+                                p4;
                             
                             if(point.X >= 0 && point.Y >= 0 && point.X < Width && point.Y < Height &&
-                               Tile.Find(tile, layer).UseTransition(
+                               tile.UseTransition(
                                    new Point(x, y),
                                    point,
                                    this, 
-                                   Tile.Find(this[layer, point.X, point.Y], layer), 
+                                   tile, 
                                    GetMetadata(layer, x, y), 
                                    GetMetadata(layer, point.X, point.Y)))
                             {
                                 Point transitionPoint;
                                 Texture2D transitionTexture = TransitionCache.TextureForTile(
-                                    Tile.Find(tile, layer), 
+                                    tile, 
                                     GetMetadata(layer, x, y), 
                                     Info.Environment, 
                                     out transitionPoint);
@@ -616,9 +620,9 @@ namespace TeamStor.RPG
             {
                 for(y = yMin; y <= yMax; y++)
                 {
-                    byte tile = this[layer, x, y];
-                    if(layer == Tile.MapLayer.Terrain || (tile & 0xff) != 0)
-                        Tile.Find(tile, layer).DrawAfterTransition(game, new Point(x, y), this, GetMetadata(layer, x, y), Info.Environment);
+                    Tile tile = this[layer, x, y];
+                    if(layer == Tile.MapLayer.Terrain || tile.ID != "")
+                        tile.DrawAfterTransition(game, new Point(x, y), this, GetMetadata(layer, x, y), Info.Environment);
                 }
             }
         }

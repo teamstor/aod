@@ -10,13 +10,13 @@ namespace TeamStor.RPG
 {
     public class RoofTile : Tile
     {
-        public RoofTile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlot, solid, transitionPriority)
+        public RoofTile(string id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlot, solid, transitionPriority)
         {
         }
 
         public override void DrawAfterTransition(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
         {
-            if(mapPos.Y + 1 < map.Height && map[Layer, mapPos.X, mapPos.Y + 1] == Tiles.Decoration.Wood.ID)
+            if(mapPos.Y + 1 < map.Height && map[Layer, mapPos.X, mapPos.Y + 1] == Tiles.Decoration.Wood)
             {
                 game.Batch.Texture(
                     new Vector2(mapPos.X * 16, mapPos.Y * 16 + 16),

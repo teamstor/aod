@@ -15,6 +15,7 @@ namespace TeamStor.RPG
 {
     public class Tile
     {
+        // TODO: bygg ett atlas
         public const string TILE_TEXTURE_LAYER_TERRAIN = "tiles/terrain.png";
         public const string TILE_TEXTURE_LAYER_DECORATION = "tiles/decoration.png";
         public const string TILE_TEXTURE_LAYER_NPC = "tiles/template.png"; // NPCs draw their own textures.
@@ -79,9 +80,9 @@ namespace TeamStor.RPG
         }
         
         /// <summary>
-        /// The ID of the texture to use in map data.
+        /// The ID of the tile.
         /// </summary>
-        public byte ID { get; private set; }
+        public string ID { get; private set; }
         
         /// <summary>
         /// The layer this tile is on.
@@ -161,7 +162,7 @@ namespace TeamStor.RPG
                 if(other.TransitionPriority(otherMetadata) < TransitionPriority(metadata))
                     return true;
                 else if(other.TransitionPriority(otherMetadata) == TransitionPriority(metadata))
-                    return other.ID < ID;
+                    return other.ID.GetHashCode() > ID.GetHashCode();
             }
 
             return false;
@@ -172,7 +173,7 @@ namespace TeamStor.RPG
         public virtual bool Filter(Map.Environment environment)
         {
             // A tile with ID 0 always exists
-            if(ID == 0 || Layer == MapLayer.Control)
+            if(ID == "" || Layer == MapLayer.Control)
                 return true;
             return environment != Map.Environment.Inside;
         }
@@ -242,12 +243,12 @@ namespace TeamStor.RPG
             }
         }
 
-        private static SortedDictionary<byte, Tile> _tilesTerrain = new SortedDictionary<byte, Tile>();
-        private static SortedDictionary<byte, Tile> _tilesDecoration = new SortedDictionary<byte, Tile>();
-        private static SortedDictionary<byte, Tile> _tilesNPC = new SortedDictionary<byte, Tile>();
-        private static SortedDictionary<byte, Tile> _tilesControl = new SortedDictionary<byte, Tile>();
+        private static Dictionary<string, Tile> _tilesTerrain = new Dictionary<string, Tile>();
+        private static Dictionary<string, Tile> _tilesDecoration = new Dictionary<string, Tile>();
+        private static Dictionary<string, Tile> _tilesNPC = new Dictionary<string, Tile>();
+        private static Dictionary<string, Tile> _tilesControl = new Dictionary<string, Tile>();
 
-        private static SortedDictionary<byte, Tile> LayerToDictionary(MapLayer layer)
+        private static Dictionary<string, Tile> LayerToDictionary(MapLayer layer)
         {
             switch(layer)
             {
@@ -267,7 +268,7 @@ namespace TeamStor.RPG
             return null;
         }
 
-        public Tile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000)
+        public Tile(string id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000)
         {            
             ID = id;
             Layer = layer;
@@ -276,10 +277,10 @@ namespace TeamStor.RPG
             _solid = solid;
             _transitionPriority = transitionPriority;
             
-            if(LayerToDictionary(layer).ContainsKey(id))
+            if(LayerToDictionary(layer).ContainsKey(ID))
                 throw new ArgumentException("ID (" + id + "," + layer + ") already in use by another tile.");
             
-            LayerToDictionary(layer).Add(id, this);
+            LayerToDictionary(layer).Add(ID, this);
         }
 
         /// <summary>
@@ -299,13 +300,11 @@ namespace TeamStor.RPG
                     dhash ^= pair.Key.GetHashCode() ^ pair.Value.GetHashCode();
             }
 
-            long id = dhash;
-            id |= (long)ID << 36;
-            id |= (long)environment << 44;
-            id |= (long)Layer << 52;
+            long id = dhash & 0xFFFF;
+            id |= (long)ID.GetHashCode() << 16;
+            id |= (long)environment << 48;
+            id |= (long)Layer << 56;
             
-            // TODO: can have 16 more bits here
-
             return id;
         }
 
@@ -315,7 +314,7 @@ namespace TeamStor.RPG
         /// <param name="id">The ID of the tile.</param>
         /// <param name="layer">The layer the tile belongs to.</param>
         /// <returns>The tile, or an exception.</returns>
-        public static Tile Find(byte id, MapLayer layer)
+        public static Tile Find(string id, MapLayer layer)
         {
             return LayerToDictionary(layer)[id];
         }
@@ -340,7 +339,7 @@ namespace TeamStor.RPG
         /// <param name="name">The ID of the tile.</param>
         /// <param name="layer">The layer the tile belongs to.</param>
         /// <returns>true if a tile with the specified ID exists.</returns>
-        public static bool Exists(byte id, MapLayer layer)
+        public static bool Exists(string id, MapLayer layer)
         {
             return LayerToDictionary(layer).ContainsKey(id);
         }

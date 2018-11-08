@@ -14,7 +14,7 @@ namespace TeamStor.RPG
     {
         private PortalEvents _events;
 
-        public PortalTile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlot, solid, transitionPriority)
+        public PortalTile(string id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlot, solid, transitionPriority)
         {
             _events = new PortalEvents(this);
         }

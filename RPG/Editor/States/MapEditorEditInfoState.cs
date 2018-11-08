@@ -30,7 +30,7 @@ namespace TeamStor.RPG.Editor.States
 			if(!int.TryParse(text[1], out y))
 				return null;
 			
-			return new Vector2(MathHelper.Clamp(x, 1, 4096), MathHelper.Clamp(y, 1, 4096));
+			return new Vector2(MathHelper.Clamp(x, 1, 256), MathHelper.Clamp(y, 1, 256));
 		}
 
 		public override void OnEnter(GameState previousState)
@@ -89,8 +89,8 @@ namespace TeamStor.RPG.Editor.States
                         {
                             foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
                             {
-                                if(BaseState.Map[layer, x, y] != 0 && !Tile.Find(BaseState.Map[layer, x, y], layer).Filter(BaseState.Map.Info.Environment))
-                                    BaseState.Map[layer, x, y] = 0;
+                                if(BaseState.Map[layer, x, y].ID != "" && !BaseState.Map[layer, x, y].Filter(BaseState.Map.Info.Environment))
+                                    BaseState.Map[layer, x, y] = Tile.Find("", layer);
                             }
                         }
                     }

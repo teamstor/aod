@@ -30,7 +30,7 @@ namespace TeamStor.RPG.Gameplay
             {
                 for(int y = 0; y < world.Map.Height; y++)
                 {
-                    if(world.Map[Tile.MapLayer.Control, x, y] == Tiles.Control.SpawnPoint.ID)
+                    if(world.Map[Tile.MapLayer.Control, x, y] == Tiles.Control.SpawnPoint)
                         MoveInstantly(new Point(x, y));
                 }
             }
@@ -102,7 +102,7 @@ namespace TeamStor.RPG.Gameplay
 
                     foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
                     {
-                        TileEventBase events = Tile.Find(World.Map[layer, interactionPoint.X, interactionPoint.Y], layer).Events;
+                        TileEventBase events = World.Map[layer, interactionPoint.X, interactionPoint.Y].Events;
                         events?.OnInteract(World.Map.GetMetadata(layer, interactionPoint.X, interactionPoint.Y), World, interactionPoint);
                     }
                 }

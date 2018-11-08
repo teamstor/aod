@@ -10,7 +10,7 @@ namespace TeamStor.RPG
 {
     public class RoadCityTile : Tile
     {
-        public RoadCityTile(byte id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlot, solid, transitionPriority)
+        public RoadCityTile(string id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlot, solid, transitionPriority)
         {
         }
 
@@ -18,7 +18,7 @@ namespace TeamStor.RPG
         {
             Rectangle mapRect = new Rectangle(0, 0, map.Width, map.Height);
 
-            if(mapRect.Contains(mapPos - new Point(1, 1)) && map[Layer, mapPos.X - 1, mapPos.Y - 1] != ID)
+            if(mapRect.Contains(mapPos - new Point(1, 1)) && map[Layer, mapPos.X - 1, mapPos.Y - 1] != this)
             {
                 game.Batch.Texture(
                     new Vector2(mapPos.X * 16 - 16, mapPos.Y * 16 - 16),
@@ -30,7 +30,7 @@ namespace TeamStor.RPG
                     SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically);
             }
 
-            if(mapRect.Contains(mapPos + new Point(-1, 1)) && map[Layer, mapPos.X - 1, mapPos.Y + 1] != ID)
+            if(mapRect.Contains(mapPos + new Point(-1, 1)) && map[Layer, mapPos.X - 1, mapPos.Y + 1] != this)
             {
                 game.Batch.Texture(
                     new Vector2(mapPos.X * 16 - 16, mapPos.Y * 16 + 16),
@@ -42,7 +42,7 @@ namespace TeamStor.RPG
                     SpriteEffects.FlipHorizontally);
             }
 
-            if(mapRect.Contains(mapPos + new Point(1, -1)) && map[Layer, mapPos.X + 1, mapPos.Y - 1] != ID)
+            if(mapRect.Contains(mapPos + new Point(1, -1)) && map[Layer, mapPos.X + 1, mapPos.Y - 1] != this)
             {
                 game.Batch.Texture(
                     new Vector2(mapPos.X * 16 + 16, mapPos.Y * 16 - 16),
@@ -54,7 +54,7 @@ namespace TeamStor.RPG
                     SpriteEffects.FlipVertically);
             }
 
-            if(mapRect.Contains(mapPos + new Point(1, 1)) && map[Layer, mapPos.X + 1, mapPos.Y + 1] != ID)
+            if(mapRect.Contains(mapPos + new Point(1, 1)) && map[Layer, mapPos.X + 1, mapPos.Y + 1] != this)
             {
                 game.Batch.Texture(
                     new Vector2(mapPos.X * 16 + 16, mapPos.Y * 16 + 16),

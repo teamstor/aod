@@ -90,8 +90,7 @@ namespace TeamStor.RPG.Editor.States
             {
                 if(tile.Filter(BaseState.Map.Info.Environment))
                 {
-                    if(tiles.Count > 0 && tile.ID - Tile.FindByName(tiles[tiles.Count - 1], layer, BaseState.Map.Info.Environment).ID > 1)
-                        tiles.Add(SelectionMenu.SPACING);
+                    // TODO tiles.Add(SelectionMenu.SPACING);
                     tiles.Add(tile.Name(null, BaseState.Map.Info.Environment));
                 }
             }
@@ -109,8 +108,7 @@ namespace TeamStor.RPG.Editor.States
             {
                 if(tile.Filter(BaseState.Map.Info.Environment))
                 {
-                    if(tiles.Count > 0 && tile.ID - Tile.FindByName(tiles[tiles.Count - 1], Layer, BaseState.Map.Info.Environment).ID > 1)
-                        tiles.Add(SelectionMenu.SPACING);
+                    // TODO tiles.Add(SelectionMenu.SPACING);
                     tiles.Add(tile.Name(null, BaseState.Map.Info.Environment));
                 }
             }
@@ -132,6 +130,10 @@ namespace TeamStor.RPG.Editor.States
 
         public override void OnEnter(GameState previousState)
 		{
+            // Generate all font sizes for zooming
+            //for(double i = 1; i <= 4; i += 0.01)
+                //Game.DefaultFonts.MonoBold.Measure((uint)(8 * i), "");
+
             UpdateSelectTileMenu(previousState == null);
 			
 			BaseState.Buttons.Add("tool-paintone", new Button
@@ -365,7 +367,7 @@ namespace TeamStor.RPG.Editor.States
 		        {
 			        case EditTool.PaintOne:
 				        if(Input.Mouse(MouseButton.Left))
-							BaseState.Map[Layer, SelectedTile.X, SelectedTile.Y] = Tile.FindByName(BaseState.SelectionMenus["select-tile-menu"].SelectedValue, Layer, BaseState.Map.Info.Environment).ID;
+							BaseState.Map[Layer, SelectedTile.X, SelectedTile.Y] = Tile.FindByName(BaseState.SelectionMenus["select-tile-menu"].SelectedValue, Layer, BaseState.Map.Info.Environment);
 				        break;
 				        
 			        case EditTool.PaintRectangle:
@@ -376,7 +378,7 @@ namespace TeamStor.RPG.Editor.States
 					        for(int x = _rectangleToolRect.X; x <= _rectangleToolRect.X + _rectangleToolRect.Width; x++)
 					        {
 						        for(int y = _rectangleToolRect.Y; y <= _rectangleToolRect.Y + _rectangleToolRect.Height; y++)
-                                    BaseState.Map[Layer, x, y] = Tile.FindByName(BaseState.SelectionMenus["select-tile-menu"].SelectedValue, Layer, BaseState.Map.Info.Environment).ID;
+                                    BaseState.Map[Layer, x, y] = Tile.FindByName(BaseState.SelectionMenus["select-tile-menu"].SelectedValue, Layer, BaseState.Map.Info.Environment);
                             }
 
                             _startingTile = new Point(-1, -1);
@@ -445,7 +447,7 @@ namespace TeamStor.RPG.Editor.States
 					if(!(_tool == EditTool.PaintRectangle && _startingTile.X != -1))
 					{
 						string str = "(" + SelectedTile.X + ", " + SelectedTile.Y + ") ";
-						str += "[" + Tile.Find(BaseState.Map[Layer, SelectedTile.X, SelectedTile.Y], Layer).Name(BaseState.Map.GetMetadata(Layer, SelectedTile.X, SelectedTile.Y), BaseState.Map.Info.Environment) + "]";
+						str += "[" + BaseState.Map[Layer, SelectedTile.X, SelectedTile.Y].Name(BaseState.Map.GetMetadata(Layer, SelectedTile.X, SelectedTile.Y), BaseState.Map.Info.Environment) + "]";
 
 						Vector2 pos = new Vector2(SelectedTile.X * 16, SelectedTile.Y * 16) * BaseState.Camera.Zoom + BaseState.Camera.Translation -
 						              new Vector2(0, 12 * BaseState.Camera.Zoom);

@@ -22,7 +22,7 @@ namespace TeamStor.RPG.Gameplay
         /// </summary>
         private class Tile : RPG.Tile
         {
-            public Tile(byte id, NPCTemplate npcTemplate) : 
+            public Tile(string id, NPCTemplate npcTemplate) : 
                 base(id, MapLayer.NPC, npcTemplate.Name, Point.Zero, true, -1)
             {
                 Template = npcTemplate;
@@ -138,11 +138,10 @@ namespace TeamStor.RPG.Gameplay
         /// Creates a tile on the NPC layer from this template.
         /// You can access this template with the function FromTile.
         /// </summary>
-        /// <param name="id">The ID to give the tile.</param>
         /// <returns>The newly created tile.</returns>
-        public RPG.Tile AsTile(byte id)
+        public RPG.Tile AsTile()
         {
-            return new Tile(id, this);
+            return new Tile(ID, this);
         }
 
         /// <summary>
