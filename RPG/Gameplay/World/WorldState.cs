@@ -13,6 +13,8 @@ using Microsoft.Xna.Framework.Input;
 using TeamStor.Engine.Coroutine;
 using Game = TeamStor.Engine.Game;
 using TeamStor.Engine.Tween;
+using System.IO;
+using System.Threading;
 
 namespace TeamStor.RPG.Gameplay.World
 {
@@ -357,27 +359,37 @@ namespace TeamStor.RPG.Gameplay.World
             Game.CurrentState = state;
         }
 
+        private void LoadMapAndTransition(string newMapFile, bool transition, SpawnArgs? spawnArgs = null)
+        {
+            using(FileStream file = File.OpenRead(newMapFile))
+            {
+                Map newMap = Map.Load(file);
+
+                WorldState newState =
+                    spawnArgs.HasValue ? new WorldState(newMap, spawnArgs.Value, transition) :
+                    new WorldState(newMap, transition);
+
+                if(transition)
+                {
+                    _transitionCover.TweenTo(1, TweenEaseType.Linear, 0.4);
+                    Coroutine.AddExisting(WaitForTransition(newState));
+                }
+                else
+                    Game.CurrentState = newState;
+            }
+        }
+
         /// <summary>
         /// Transitions to a new map with this existing player.
         /// </summary>
         /// <param name="newMap">The new map to start in.</param>
         /// <param name="transition">If a transition should be used when going between the maps.</param>
         /// <param name="spawnArgs">Used for determining where the player will spawn.</param>
-        public void TransitionToMap(Map newMap, bool transition, SpawnArgs? spawnArgs = null)
+        public void TransitionToMap(string newMap, bool transition, SpawnArgs? spawnArgs = null)
         {
-            // TODO: transition
-            WorldState newState = 
-                spawnArgs.HasValue ? new WorldState(newMap, spawnArgs.Value, transition) : 
-                new WorldState(newMap, transition);
+            Paused = true;
 
-            if(transition)
-            {
-                _transitionCover.TweenTo(1, TweenEaseType.Linear, 0.4);
-                Paused = true;
-                Coroutine.AddExisting(WaitForTransition(newState));
-            }
-            else
-                Game.CurrentState = newState;
+            Task.Run(() => LoadMapAndTransition(newMap, transition, spawnArgs));
         }
     }
 }

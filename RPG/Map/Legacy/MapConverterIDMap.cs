@@ -47,6 +47,12 @@ namespace TeamStor.RPG.Legacy
             { 60, Tiles.Decoration.Waterwheel }
         };
 
+        public static Dictionary<int, Tile> NPCMap = new Dictionary<int, Tile>()
+        {
+            { 0, Tiles.NPC.Empty },
+            { 1, Tiles.NPC.GreenPig }
+        };
+
         public static Dictionary<int, Tile> ControlMap = new Dictionary<int, Tile>()
         {
             { 0, Tiles.Control.Empty },

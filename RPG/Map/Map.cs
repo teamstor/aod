@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
+using TeamStor.RPG.Legacy;
 using Game = TeamStor.Engine.Game;
 
 namespace TeamStor.RPG
@@ -177,10 +178,10 @@ namespace TeamStor.RPG
             _layerNPC = new uint[w * h];
             _layerControl = new uint[w * h];
 
-            _idmapTerrain = new Tile[ushort.MaxValue];
-            _idmapDecoration = new Tile[ushort.MaxValue];
-            _idmapNPC = new Tile[ushort.MaxValue];
-            _idmapControl = new Tile[ushort.MaxValue];
+            _idmapTerrain = new Tile[32];
+            _idmapDecoration = new Tile[32];
+            _idmapNPC = new Tile[4];
+            _idmapControl = new Tile[16];
 
             foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
                 LayerToIDMap(layer)[0] = Tile.Find("", layer);
@@ -230,7 +231,16 @@ namespace TeamStor.RPG
                 int newValue = Array.IndexOf(LayerToIDMap(layer), value);
                 if(newValue == -1)
                 {
-                    for(int i = 0; i < ushort.MaxValue; i++)
+                    if(_idmapTerrain[_idmapTerrain.Length - 1] != null)
+                        Array.Resize(ref _idmapTerrain, _idmapTerrain.Length * 2);
+                    if(_idmapDecoration[_idmapDecoration.Length - 1] != null)
+                        Array.Resize(ref _idmapDecoration, _idmapDecoration.Length * 2);
+                    if(_idmapNPC[_idmapNPC.Length - 1] != null)
+                        Array.Resize(ref _idmapNPC, _idmapNPC.Length * 2);
+                    if(_idmapControl[_idmapControl.Length - 1] != null)
+                        Array.Resize(ref _idmapControl, _idmapControl.Length * 2);
+
+                    for(int i = 0; i < LayerToIDMap(layer).Length; i++)
                     {
                         if(LayerToIDMap(layer)[i] == null)
                         {
@@ -372,14 +382,190 @@ namespace TeamStor.RPG
             GC.Collect();
         }
 
+        private static void ReadJSONInfo(JsonReader reader, Information info)
+        {
+            while(reader.Read())
+            {
+                if(reader.TokenType == JsonToken.PropertyName)
+                {
+                    switch(reader.Value)
+                    {
+                        case "name":
+                            info.Name = reader.ReadAsString();
+                            break;
+
+                        case "environment":
+                            info.Environment = (Environment)reader.ReadAsInt32().Value;
+                            break;
+
+                        case "weather":
+                            info.Weather = (Weather)reader.ReadAsInt32().Value;
+                            break;
+                    }
+                }
+                else if(reader.TokenType == JsonToken.EndObject)
+                    return;
+            }
+        }
+
+        private static void ReadJSONComplexTileObject(JsonReader reader, Map map, Tile.MapLayer layer, int x, int y)
+        {
+            string id = "";
+            SortedDictionary<string, string> metadata = new SortedDictionary<string, string>();
+
+            while(reader.Read())
+            {
+                if(reader.TokenType == JsonToken.PropertyName)
+                {
+                    switch(reader.Value)
+                    {
+                        case "id":
+                            id = reader.ReadAsString();
+                            break;
+
+                        case "metadata":
+                            while(reader.Read())
+                            {
+                                if(reader.TokenType == JsonToken.PropertyName)
+                                    metadata.Add((string)reader.Value, reader.ReadAsString());
+                                else if(reader.TokenType == JsonToken.EndObject)
+                                    return;
+                            }
+                            break;
+                    }
+                }
+                else if(reader.TokenType == JsonToken.EndObject)
+                    break;
+            }
+        }
+
+        private static void ReadJSONLayer(JsonReader reader, Map map, Tile.MapLayer layer)
+        {
+            int pos = 0;
+
+            while(reader.Read())
+            {
+                int x = (int)Math.Floor(pos / (double)map.Height);
+                int y = pos % map.Height;
+
+                if(reader.TokenType == JsonToken.String)
+                {
+                    string id = reader.Value as string;
+                    if(Tile.Exists(id, layer))
+                        map[layer, x, y] = Tile.Find(id, layer);
+
+                    pos++;
+                }
+                else if(reader.TokenType == JsonToken.StartObject)
+                    ReadJSONComplexTileObject(reader, map, layer, x, y);
+                else if(reader.TokenType == JsonToken.EndArray)
+                    return;
+            }
+        }
+
+        private static void ReadJSONLayers(JsonReader reader, Map map)
+        {
+            while(reader.Read())
+            {
+                if(reader.TokenType == JsonToken.PropertyName)
+                {
+                    switch(reader.Value)
+                    {
+                        case "terrain":
+                            ReadJSONLayer(reader, map, Tile.MapLayer.Terrain);
+                            break;
+
+                        case "decoration":
+                            ReadJSONLayer(reader, map, Tile.MapLayer.Decoration);
+                            break;
+
+                        case "npc":
+                            ReadJSONLayer(reader, map, Tile.MapLayer.NPC);
+                            break;
+
+                        case "control":
+                            ReadJSONLayer(reader, map, Tile.MapLayer.Control);
+                            break;
+                    }
+                }
+                else if(reader.TokenType == JsonToken.EndObject)
+                    return;
+            }
+        }
+
         /// <summary>
         /// Loads a map from a stream.
         /// </summary>
         /// <param name="stream">The stream to load from.</param>
         public static Map Load(Stream stream)
         {
-            // TODO
-            return null;
+            using(StreamReader sreader = new StreamReader(stream, Encoding.UTF8))
+            {
+                try
+                {
+                    int w = 50;
+                    int h = 50;
+                    Information info = new Information("", Environment.Forest, Weather.Sunny);
+
+                    Map map = null;
+
+                    using(JsonReader reader = new JsonTextReader(sreader))
+                    {
+                        reader.CloseInput = false;
+
+                        while(reader.Read())
+                        {
+                            if(reader.TokenType == JsonToken.PropertyName)
+                            {
+                                switch(reader.Value)
+                                {
+                                    case "version":
+                                        int version = reader.ReadAsInt32().Value;
+                                        if(version != MAP_FORMAT_VERSION)
+                                        {
+                                            throw new Exception("Loaded map was created in " +
+                                                (version > MAP_FORMAT_VERSION ? "a newer" : "an older") +
+                                                " version (" + MAP_FORMAT_VERSION + " != " + version + ")");
+                                        }
+                                        break;
+
+                                    case "info":
+                                        ReadJSONInfo(reader, info);
+                                        break;
+
+                                    case "width":
+                                        w = reader.ReadAsInt32().Value;
+                                        break;
+
+                                    case "height":
+                                        h = reader.ReadAsInt32().Value;
+                                        break;
+
+                                    case "layers":
+                                        if(map == null)
+                                            map = new Map(w, h, info);
+
+                                        ReadJSONLayers(reader, map);
+                                        break;
+                                }
+                            }
+                        }
+                    }
+
+                    return map;
+                }
+                catch(JsonReaderException e)
+                {
+                    stream.Seek(0, SeekOrigin.Begin);
+
+                    // this might be an old map
+                    return OldMapLoader.Load(stream);
+                }
+                finally
+                {
+                    GC.Collect();
+                }
+            }
         }
         
         /// <summary>
@@ -431,7 +617,7 @@ namespace TeamStor.RPG
                                 {
                                     writer.WriteStartObject();
                                     writer.WritePropertyName("id");
-                                    writer.WriteValue(this[layer, x, y]);
+                                    writer.WriteValue(this[layer, x, y].ID);
                                     writer.WritePropertyName("metadata");
                                     writer.WriteStartObject();
 
@@ -445,7 +631,7 @@ namespace TeamStor.RPG
                                     writer.WriteEndObject();
                                 }
                                 else
-                                    writer.WriteValue(this[layer, x, y]);
+                                    writer.WriteValue(this[layer, x, y].ID);
                             }
                         }
 
@@ -457,6 +643,8 @@ namespace TeamStor.RPG
                     writer.WriteEndObject();
                 }
             }
+
+            GC.Collect();
         }
 
         /// <param name="point">Point to check.</param>

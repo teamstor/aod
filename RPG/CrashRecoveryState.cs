@@ -73,7 +73,7 @@ namespace TeamStor.RPG
                 {
                     try
                     {
-                        _mapTempSaveName = Environment.GetFolderPath(Environment.SpecialFolder.Desktop).Replace("\\", "/") + "/" + new Random().Next() + ".map";
+                        _mapTempSaveName = Environment.GetFolderPath(Environment.SpecialFolder.Desktop).Replace("\\", "/") + "/" + new Random().Next() + ".json";
                         ((MapEditorState)game.CurrentState).Map.Save(File.OpenWrite(_mapTempSaveName));
                         _recoveryState = RecoveryState.RecoveredMapData;
                     }

@@ -9,9 +9,14 @@ namespace TeamStor.RPG.Legacy
 {
     public class OldMapLoader
     {
-        /*public static Map Load(Stream stream)
+        /// <summary>
+        /// Old map version.
+        /// </summary>
+        public const int MAP_LEGACY_FORMAT_VERSION = 1;
+
+        public static Map Load(Stream stream)
         {
-            Map.Information info = new Map.Information("???", Environment.Forest, Weather.Sunny);
+            Map.Information info = new Map.Information("???", Map.Environment.Forest, Map.Weather.Sunny);
             int width = 0, height = 0;
 
             using(BinaryReader reader = new BinaryReader(stream, Encoding.UTF8))
@@ -20,79 +25,47 @@ namespace TeamStor.RPG.Legacy
                     throw new Exception("Not a valid map stream");
 
                 int readVersion;
-                if((readVersion = reader.ReadInt32()) != MAP_FORMAT_VERSION)
+                if((readVersion = reader.ReadInt32()) != MAP_LEGACY_FORMAT_VERSION)
                     throw new Exception("Map loaded from " +
-                                        (readVersion > MAP_FORMAT_VERSION ? "a newer" : "an older") +
-                                        " version (" + MAP_FORMAT_VERSION + " != " + readVersion + ")");
+                                        (readVersion > MAP_LEGACY_FORMAT_VERSION ? "a newer" : "an older") +
+                                        " version (" + MAP_LEGACY_FORMAT_VERSION + " != " + readVersion + ")");
 
                 info.Name = reader.ReadString();
-                info.Environment = (Environment)reader.ReadByte();
-                info.Weather = (Weather)reader.ReadByte();
+                info.Environment = (Map.Environment)reader.ReadByte();
+                info.Weather = (Map.Weather)reader.ReadByte();
 
                 width = reader.ReadInt32();
                 height = reader.ReadInt32();
 
                 Map map = new Map(width, height, info);
-                for(int i = 0; i < width * height; i++)
+                int x, y;
+                for(x = 0; x < width; x++)
                 {
-                    map._layerTerrain[i] = reader.ReadInt32();
-                    if(!Tile.Exists((byte)(map._layerTerrain[i] & 0xff), Tile.MapLayer.Terrain))
-                        map._layerTerrain[i] = 0;
-                    map._layerDecoration[i] = reader.ReadInt32();
-                    if(!Tile.Exists((byte)(map._layerDecoration[i] & 0xff), Tile.MapLayer.Decoration))
-                        map._layerDecoration[i] = 0;
-                    map._layerNPC[i] = reader.ReadInt32();
-                    if(!Tile.Exists((byte)(map._layerNPC[i] & 0xff), Tile.MapLayer.NPC))
-                        map._layerNPC[i] = 0;
-                    map._layerControl[i] = reader.ReadInt32();
-                    if(!Tile.Exists((byte)(map._layerControl[i] & 0xff), Tile.MapLayer.Control))
-                        map._layerControl[i] = 0;
+                    for(y = 0; y < height; y++)
+                    {
+                        Tile terrainTile = Tiles.Terrain.Water;
+                        MapConverterIDMap.TerrainMap.TryGetValue(reader.ReadInt32() & 0xff, out terrainTile);
+                        map[Tile.MapLayer.Terrain, x, y] = terrainTile;
+
+                        Tile decorationTile = Tiles.Decoration.Empty;
+                        MapConverterIDMap.DecorationMap.TryGetValue(reader.ReadInt32() & 0xff, out decorationTile);
+                        map[Tile.MapLayer.Decoration, x, y] = decorationTile;
+
+                        Tile npcTile = Tiles.NPC.Empty;
+                        MapConverterIDMap.NPCMap.TryGetValue(reader.ReadInt32() & 0xff, out npcTile);
+                        map[Tile.MapLayer.NPC, x, y] = npcTile;
+
+                        Tile controlTile = Tiles.Control.Empty;
+                        MapConverterIDMap.ControlMap.TryGetValue(reader.ReadInt32() & 0xff, out controlTile);
+                        map[Tile.MapLayer.Control, x, y] = controlTile;
+                    }
                 }
 
-                int count = reader.ReadInt32();
-                for(int i = 0; i < count; i++)
-                {
-                    map._metadataTerrain.Add(new SortedDictionary<string, string>());
-                    int pairs = reader.ReadInt32();
-
-                    for(int i2 = 0; i2 < pairs; i2++)
-                        map._metadataTerrain[map._metadataTerrain.Count - 1].Add(reader.ReadString(), reader.ReadString());
-                }
-
-                count = reader.ReadInt32();
-                for(int i = 0; i < count; i++)
-                {
-                    map._metadataDecoration.Add(new SortedDictionary<string, string>());
-                    int pairs = reader.ReadInt32();
-
-                    for(int i2 = 0; i2 < pairs; i2++)
-                        map._metadataDecoration[map._metadataDecoration.Count - 1].Add(reader.ReadString(), reader.ReadString());
-                }
-
-                count = reader.ReadInt32();
-                for(int i = 0; i < count; i++)
-                {
-                    map._metadataNPC.Add(new SortedDictionary<string, string>());
-                    int pairs = reader.ReadInt32();
-
-                    for(int i2 = 0; i2 < pairs; i2++)
-                        map._metadataNPC[map._metadataNPC.Count - 1].Add(reader.ReadString(), reader.ReadString());
-                }
-
-                count = reader.ReadInt32();
-                for(int i = 0; i < count; i++)
-                {
-                    map._metadataControl.Add(new SortedDictionary<string, string>());
-                    int pairs = reader.ReadInt32();
-
-                    for(int i2 = 0; i2 < pairs; i2++)
-                        map._metadataControl[map._metadataControl.Count - 1].Add(reader.ReadString(), reader.ReadString());
-                }
-                GC.Collect();
+                // metadata not read
 
                 return map;
             }
-        }*/
+        }
 
         /*public void Save(Stream stream)
         {

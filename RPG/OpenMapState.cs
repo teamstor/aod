@@ -49,9 +49,9 @@ namespace TeamStor.RPG
 				OnLeave(_lastState);
 			}
 
-			if(File.Exists("data/maps/" + _targetMap + ".map") && Input.KeyPressed(Keys.Enter))
+			if(File.Exists("data/maps/" + _targetMap) && Input.KeyPressed(Keys.Enter))
 			{
-				WorldState state = new WorldState(Map.Load(File.OpenRead("data/maps/" + _targetMap + ".map")));
+				WorldState state = new WorldState(Map.Load(File.OpenRead("data/maps/" + _targetMap)));
 				_lastState.OnLeave(state);
 
 				Game.CurrentState = state;
@@ -72,9 +72,9 @@ namespace TeamStor.RPG
 			Vector2 measure = Game.DefaultFonts.MonoBold.Measure(24, _targetMap + "|");
 			batch.Text(SpriteBatch.FontStyle.MonoBold, 24, _targetMap + (Game.TotalFixedUpdates % 40 > 20 ? "|" : " "), new Vector2(screenSize.X / 2 - measure.X / 2, 180), Color.White);
 
-			bool exists = File.Exists("data/maps/" + _targetMap + ".map");
-			measure = Game.DefaultFonts.MonoBold.Measure(14, "data/maps/" + _targetMap + ".map");
-			batch.Text(SpriteBatch.FontStyle.MonoBold, 14, "data/maps/" + _targetMap + ".map", new Vector2(screenSize.X / 2 - measure.X / 2, 210), exists ? Color.White * 0.7f : Color.Red * 0.7f);
+			bool exists = File.Exists("data/maps/" + _targetMap);
+			measure = Game.DefaultFonts.MonoBold.Measure(14, "data/maps/" + _targetMap);
+			batch.Text(SpriteBatch.FontStyle.MonoBold, 14, "data/maps/" + _targetMap, new Vector2(screenSize.X / 2 - measure.X / 2, 210), exists ? Color.White * 0.7f : Color.Red * 0.7f);
 		}
 	}
 }

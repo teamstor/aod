@@ -184,7 +184,7 @@ namespace TeamStor.RPG.Editor
                 {
                     OpenFileDialog dialog = new OpenFileDialog();
 
-                    dialog.Filter = "Map files (*.map)|*.map|All files (*.*)|*.*";
+                    dialog.Filter = "Map files (*.json)|*.json|All files (*.*)|*.*";
                     if(dialog.ShowDialog() == DialogResult.OK)
                     {
                         _dataOperation = DataOperation.Loading;

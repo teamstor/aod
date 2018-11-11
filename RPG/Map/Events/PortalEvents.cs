@@ -39,7 +39,7 @@ namespace TeamStor.RPG
             if(metadata.ContainsKey("spawn-direction"))
                 Enum.TryParse<Direction>(metadata["spawn-direction"], out args.Direction);
 
-            world.TransitionToMap(Map.Load(File.OpenRead("data/maps/" + metadata["map-file"])), 
+            world.TransitionToMap("data/maps/" + metadata["map-file"], 
                 !(metadata.ContainsKey("transition") && metadata["transition"] == "False"), 
                 args);
         }
