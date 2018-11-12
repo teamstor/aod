@@ -88,11 +88,8 @@ namespace TeamStor.RPG.Editor.States
             List<string> tiles = new List<string>();
             foreach(Tile tile in Tile.Values(layer))
             {
-                if(tile.Filter(BaseState.Map.Info.Environment))
-                {
-                    // TODO tiles.Add(SelectionMenu.SPACING);
-                    tiles.Add(tile.Name(null, BaseState.Map.Info.Environment));
-                }
+                // TODO tiles.Add(SelectionMenu.SPACING);
+                tiles.Add(tile.Name(null, BaseState.Map.Info.Environment));
             }
 
             return tiles.Count > 0;
@@ -106,11 +103,7 @@ namespace TeamStor.RPG.Editor.States
             List<string> tiles = new List<string>();
             foreach(Tile tile in Tile.Values(Layer))
             {
-                if(tile.Filter(BaseState.Map.Info.Environment))
-                {
-                    // TODO tiles.Add(SelectionMenu.SPACING);
-                    tiles.Add(tile.Name(null, BaseState.Map.Info.Environment));
-                }
+                tiles.Add(tile.Name(null, BaseState.Map.Info.Environment));
             }
 
             BaseState.SelectionMenus.Add("select-tile-menu", new SelectionMenu

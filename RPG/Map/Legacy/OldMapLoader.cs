@@ -43,7 +43,7 @@ namespace TeamStor.RPG.Legacy
                 {
                     for(y = 0; y < height; y++)
                     {
-                        Tile terrainTile = Tiles.Terrain.Water;
+                        /*TODO Tile terrainTile = Tiles.Terrain.Water;
                         MapConverterIDMap.TerrainMap.TryGetValue(reader.ReadInt32() & 0xff, out terrainTile);
                         map[Tile.MapLayer.Terrain, x, y] = terrainTile;
 
@@ -57,7 +57,7 @@ namespace TeamStor.RPG.Legacy
 
                         Tile controlTile = Tiles.Control.Empty;
                         MapConverterIDMap.ControlMap.TryGetValue(reader.ReadInt32() & 0xff, out controlTile);
-                        map[Tile.MapLayer.Control, x, y] = controlTile;
+                        map[Tile.MapLayer.Control, x, y] = controlTile;*/
                     }
                 }
 

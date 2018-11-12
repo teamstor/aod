@@ -23,7 +23,7 @@ namespace TeamStor.RPG.Gameplay
         private class Tile : RPG.Tile
         {
             public Tile(string id, NPCTemplate npcTemplate) : 
-                base(id, MapLayer.NPC, npcTemplate.Name, Point.Zero, true, -1)
+                base(id, MapLayer.NPC, npcTemplate.Name, NPC.DOWN_TEXTURE.Replace("{name}", npcTemplate.ID).Replace("{i}", "0"), true, -1)
             {
                 Template = npcTemplate;
             }
@@ -34,11 +34,6 @@ namespace TeamStor.RPG.Gameplay
                     new Vector2(mapPos.X * 16, mapPos.Y * 16),
                     Template.TextureForDirection(game, Direction.Down),
                     color.HasValue ? color.Value : Color.White);
-            }
-
-            public override bool Filter(Map.Environment environment)
-            {
-                return true;
             }
 
             /// <summary>

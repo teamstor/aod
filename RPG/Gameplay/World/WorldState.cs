@@ -152,6 +152,8 @@ namespace TeamStor.RPG.Gameplay.World
 
             if(Map.TransitionCache != null)
                 Map.TransitionCache.Clear();
+            if(Map.Atlas != null)
+                Map.Atlas.Clear();
         }
 
         public override void OnLeave(GameState nextState)

@@ -30,8 +30,8 @@ namespace TeamStor.RPG.Gameplay
             {
                 for(int y = 0; y < world.Map.Height; y++)
                 {
-                    if(world.Map[Tile.MapLayer.Control, x, y] == Tiles.Control.SpawnPoint)
-                        MoveInstantly(new Point(x, y));
+                    /*if(world.Map[Tile.MapLayer.Control, x, y] == Tiles.Control.SpawnPoint)
+                        MoveInstantly(new Point(x, y)); TODO*/
                 }
             }
 

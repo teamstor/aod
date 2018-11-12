@@ -93,8 +93,10 @@ namespace TeamStor.RPG.Editor
 
 			if(Map.TransitionCache != null)
 				Map.TransitionCache.Clear();
+            if(Map.Atlas != null)
+                Map.Atlas.Clear();
 
-			Camera = new Camera(this);
+            Camera = new Camera(this);
 
             Buttons.Add("edit-tiles-mode", new Button
             {

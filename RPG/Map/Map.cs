@@ -654,13 +654,18 @@ namespace TeamStor.RPG
             if(point.X < 0 || point.Y < 0 || point.X >= Width || point.Y >= Height)
                 return true;
 
-            if(this[Tile.MapLayer.Control, point.X, point.Y] == Tiles.Control.InvertedBarrier)
-                return false;
+            /* TODO if(this[Tile.MapLayer.Control, point.X, point.Y] == Tiles.Control.InvertedBarrier)
+                return false; */
 
             return this[Tile.MapLayer.Terrain, point.X, point.Y].Solid(GetMetadata(Tile.MapLayer.Terrain, point.X, point.Y)) ||
                 this[Tile.MapLayer.Decoration, point.X, point.Y].Solid(GetMetadata(Tile.MapLayer.Decoration, point.X, point.Y)) ||
                 this[Tile.MapLayer.Control, point.X, point.Y].Solid(GetMetadata(Tile.MapLayer.Control, point.X, point.Y));
         }
+
+        /// <summary>
+        /// The tile atlas cache.
+        /// </summary>
+        public static TileAtlas Atlas { get; private set; }
 
         /// <summary>
         /// The tile transition cache.
@@ -675,6 +680,15 @@ namespace TeamStor.RPG
         /// <param name="rectangle">The cropped part of the map to draw. null - draw whole map</param>
         public void Draw(Tile.MapLayer layer, Game game, Rectangle? rectangle = null)
         {
+            if(Atlas != null && Atlas.Game != game)
+            {
+                Atlas.Dispose();
+                Atlas = null;
+            }
+
+            if(Atlas == null)
+                Atlas = new TileAtlas(game);
+
             if(TransitionCache != null && TransitionCache.Game != game)
             {
                 TransitionCache.Dispose();
@@ -718,10 +732,12 @@ namespace TeamStor.RPG
 
             if(layer == Tile.MapLayer.Terrain)
             {
+                WaterTiles.DeepWaterOrVoid.UpdateCurrentFrameWithGame(game);
+
                 if(Info.Environment == Environment.Inside)
                     game.Batch.Rectangle(drawRectangle, Color.Black);
                 else
-                    game.Batch.Texture(drawRectangle, game.Assets.Get<Texture2D>("tiles/water/" + (int) ((game.Time * 2) % 4) + ".png"), Color.White, drawRectangle);
+                    game.Batch.Texture(drawRectangle, game.Assets.Get<Texture2D>(WaterTiles.DeepWaterOrVoid.TextureName()), Color.White, drawRectangle);
             }
 
             int x, y;

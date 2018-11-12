@@ -4,7 +4,7 @@ namespace TeamStor.RPG.Legacy
 {
     public static class MapConverterIDMap
     {
-        public static Dictionary<int, Tile> TerrainMap = new Dictionary<int, Tile>()
+       /* TODO public static Dictionary<int, Tile> TerrainMap = new Dictionary<int, Tile>()
         {
             { 0, Tiles.Terrain.Water },
             { 1, Tiles.Terrain.ShallowWater },
@@ -62,6 +62,6 @@ namespace TeamStor.RPG.Legacy
             { 40, Tiles.Control.Barrier },
             { 41, Tiles.Control.InvertedBarrier },
             { 60, Tiles.Control.MapPortal }
-        };
+        }; */
     }
 }

@@ -27,10 +27,8 @@ namespace TeamStor.RPG
                 SetProcessDPIAware();
 
             Game game = Game.Run(new Menu.MenuState(), "data", false);
-            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(Tiles.Terrain).TypeHandle);
-            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(Tiles.Decoration).TypeHandle);
-            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(Tiles.NPC).TypeHandle);
-            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(Tiles.Control).TypeHandle);
+
+            EarlyTileInitalizer.Initialize();
                 
             game.OnUpdateAfterState += OnUpdate;
 

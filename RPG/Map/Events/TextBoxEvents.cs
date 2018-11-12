@@ -10,7 +10,7 @@ using TeamStor.RPG.Gameplay.World.UI;
 
 namespace TeamStor.RPG
 {
-	public class TextBoxEvents : TileEventBase
+	/*public class TextBoxEvents : TileEventBase
 	{
 		public TextBoxEvents(TextBoxTile tile) : base(tile)
 		{
@@ -47,5 +47,5 @@ namespace TeamStor.RPG
 		public override void OnWalkLeave(SortedDictionary<string, string> metadata, WorldState world, Point mapPos)
 		{
 		}
-	}
+	}*/
 }

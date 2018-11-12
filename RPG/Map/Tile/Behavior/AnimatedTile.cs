@@ -10,15 +10,16 @@ namespace TeamStor.RPG
 {
     /// <summary>
     /// An animated tile that cycles through several textures.
+    /// {frame} in the texture name will be replaced by the current frame.
     /// </summary>
     public class AnimatedTile : Tile
     {
-        private Point _slotOverride = new Point(-1, -1);
+        private int _currentSlot = 0;
 
         /// <summary>
         /// Amount of texture slots this animation uses.
         /// </summary>
-        public int SlotCount
+        public int TextureCount
         {
             get; private set;
         }
@@ -31,25 +32,27 @@ namespace TeamStor.RPG
             get; private set;
         }
 
-        public AnimatedTile(string id, MapLayer layer, string name, Point firstSlot, int slotCount, int fps, bool solid = false, int transitionPriority = 1000) : 
-            base(id, layer, name, firstSlot, solid, transitionPriority)
+        public AnimatedTile(string id, MapLayer layer, string name, string textureNameTemplate, int textureCount, int fps, bool solid = false, int transitionPriority = 1000) : 
+            base(id, layer, name, textureNameTemplate, solid, transitionPriority)
         {
-            SlotCount = slotCount;
+            TextureCount = textureCount;
             FPS = fps;
         }
 
         public override void Draw(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
         {
-            _slotOverride = TextureSlot(metadata, environment) + new Point((int)(game.Time * FPS) % SlotCount, 0);
+            UpdateCurrentFrameWithGame(game);
             base.Draw(game, mapPos, map, metadata, environment, color);
-            _slotOverride = new Point(-1, -1);
         }
 
-        public override Point TextureSlot(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
+        public void UpdateCurrentFrameWithGame(Engine.Game game)
         {
-            if(_slotOverride != new Point(-1, -1))
-                return _slotOverride;
-            return base.TextureSlot(metadata, environment);
+            _currentSlot = (int)(game.Time * FPS) % TextureCount;
+        }
+
+        public override string TextureName(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
+        {
+            return base.TextureName(metadata, environment).Replace("{frame}", _currentSlot.ToString());
         }
     }
 }

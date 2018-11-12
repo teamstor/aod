@@ -83,30 +83,20 @@
     <Compile Include="Map\Attributes\EnumAttributeEditor.cs" />
     <Compile Include="Map\Attributes\IntAttributeEditor.cs" />
     <Compile Include="Map\Attributes\TextAttributeEditor.cs" />
+    <Compile Include="Map\Tile\Categories\DefaultTiles.cs" />
+    <Compile Include="Map\Tile\EarlyTileInitalizer.cs" />
     <Compile Include="Map\Events\PortalEvents.cs" />
     <Compile Include="Map\Events\TextBoxEvents.cs" />
     <Compile Include="Map\Legacy\OldMapLoader.cs" />
     <Compile Include="Map\Map.cs" />
     <Compile Include="Map\Legacy\MapConverterIDMap.cs" />
     <Compile Include="Map\Tile.cs" />
-    <Compile Include="Map\TileAttributeEditor.cs" />
-    <Compile Include="Map\TileEventBase.cs" />
-    <Compile Include="Map\Tiles.cs" />
-    <Compile Include="Map\Tiles\AnimatedTile.cs" />
-    <Compile Include="Map\Tiles\BushTile.cs" />
-    <Compile Include="Map\Tiles\DoubleTile.cs" />
-    <Compile Include="Map\Tiles\GrassTile.cs" />
-    <Compile Include="Map\Tiles\InsideTile.cs" />
-    <Compile Include="Map\Tiles\NPCPathTile.cs" />
-    <Compile Include="Map\Tiles\PortalTile.cs" />
-    <Compile Include="Map\Tiles\RoadCityTile.cs" />
-    <Compile Include="Map\Tiles\BeamTile.cs" />
-    <Compile Include="Map\Tiles\RoofBeamTile.cs" />
-    <Compile Include="Map\Tiles\RoofTile.cs" />
-    <Compile Include="Map\Tiles\TextBoxTile.cs" />
-    <Compile Include="Map\Tiles\VariationsTile.cs" />
-    <Compile Include="Map\Tiles\WaterwheelTile.cs" />
-    <Compile Include="Map\TileTransitionCache.cs" />
+    <Compile Include="Map\Tile\TileAtlas.cs" />
+    <Compile Include="Map\Tile\TileAttributeEditor.cs" />
+    <Compile Include="Map\Tile\TileEventBase.cs" />
+    <Compile Include="Map\Tile\Behavior\AnimatedTile.cs" />
+    <Compile Include="Map\Tile\Categories\WaterTiles.cs" />
+    <Compile Include="Map\Tile\TileTransitionCache.cs" />
     <Compile Include="Menu\MenuButton.cs" />
     <Compile Include="Menu\MenuController.cs" />
     <Compile Include="Menu\MenuState.cs" />
@@ -140,6 +130,7 @@
       <Name>TeamStor.Engine</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent Condition="'$(OS)' == 'Windows_NT' ">

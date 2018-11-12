@@ -15,44 +15,9 @@ namespace TeamStor.RPG
 {
     public class Tile
     {
-        // TODO: bygg ett atlas
-        public const string TILE_TEXTURE_LAYER_TERRAIN = "tiles/terrain.png";
-        public const string TILE_TEXTURE_LAYER_DECORATION = "tiles/decoration.png";
-        public const string TILE_TEXTURE_LAYER_NPC = "tiles/template.png"; // NPCs draw their own textures.
-        public const string TILE_TEXTURE_LAYER_CONTROL = "tiles/control.png";
-        
         public const string TRANSTION_GENERIC = "tiles/transitions/generic.png";
 
         public static Tile.MapLayer[] CachedAllMapLayers = Enum.GetValues(typeof(Tile.MapLayer)).Cast<Tile.MapLayer>().ToArray();
-
-        /// <param name="layer">The layer.</param>
-        /// <returns>The texture name used by the specified layer.</returns>
-        public static string LayerToTextureName(MapLayer layer)
-        {
-            switch(layer)
-            {
-                case MapLayer.Terrain:
-                    return TILE_TEXTURE_LAYER_TERRAIN;
-                
-                case MapLayer.Decoration:
-                    return TILE_TEXTURE_LAYER_DECORATION;
-                
-                case MapLayer.NPC:
-                    return TILE_TEXTURE_LAYER_NPC;
-                
-                case MapLayer.Control:
-                    return TILE_TEXTURE_LAYER_CONTROL;
-            }
-
-            return "";
-        }
-
-        /// <param name="layer">The layer.</param>
-        /// <returns>The texture used by the specified layer.</returns>
-        public static Texture2D LayerToTexture(Engine.Game game, MapLayer layer)
-        {
-            return game.Assets.Get<Texture2D>(LayerToTextureName(layer), true);
-        }
 
         /// <summary>
         /// Layer that a tile is on. 
@@ -100,15 +65,15 @@ namespace TeamStor.RPG
             return _name;
         }
         
-        private Point _textureSlot;
+        private string _textureName;
 
         /// <param name="metadata">Metadata for the tile being accessed.</param>
         /// <returns>
-        /// The texture slot to use when drawing the tile.
+        /// The texture to use when drawing the tile.
         /// </returns>
-        public virtual Point TextureSlot(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
+        public virtual string TextureName(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
         {
-            return _textureSlot;
+            return _textureName;
         }
         
         private bool _solid;
@@ -167,16 +132,6 @@ namespace TeamStor.RPG
 
             return false;
         }
-
-        /// <param name="environment">The environment to filter by.</param>
-        /// <returns>If this tile is allowed in a specified environment.</returns>
-        public virtual bool Filter(Map.Environment environment)
-        {
-            // A tile with ID 0 always exists
-            if(ID == "" || Layer == MapLayer.Control)
-                return true;
-            return environment != Map.Environment.Inside;
-        }
         
         /// <param name="metadata">Metadata for the tile being accessed.</param>
         /// <param name="environment">The environment the tile is in.</param>
@@ -196,12 +151,14 @@ namespace TeamStor.RPG
         /// <param name="environment">The environment the map is in.</param>
         public virtual void Draw(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
         {
+            TileAtlas.Region region = Map.Atlas[TextureName(metadata, environment)];
+
             game.Batch.Texture(
                 new Vector2(mapPos.X * 16, mapPos.Y * 16),
-                LayerToTexture(game, Layer),
+                region.Texture,
                 color.HasValue ? color.Value : Color.White,
                 Vector2.One,
-                new Rectangle(TextureSlot(metadata, environment).X * 16, TextureSlot(metadata, environment).Y * 16, 16, 16));
+                region.Rectangle);
         }
 
         /// <summary>
@@ -268,19 +225,22 @@ namespace TeamStor.RPG
             return null;
         }
 
-        public Tile(string id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000)
+        public Tile(string id, MapLayer layer, string name, string textureName, bool solid = false, int transitionPriority = 1000, bool createGlobally = true)
         {            
             ID = id;
             Layer = layer;
             _name = name;
-            _textureSlot = textureSlot;
+            _textureName = textureName;
             _solid = solid;
             _transitionPriority = transitionPriority;
-            
-            if(LayerToDictionary(layer).ContainsKey(ID))
-                throw new ArgumentException("ID (" + id + "," + layer + ") already in use by another tile.");
-            
-            LayerToDictionary(layer).Add(ID, this);
+
+            if(createGlobally)
+            {
+                if(LayerToDictionary(layer).ContainsKey(ID))
+                    throw new ArgumentException("ID (" + id + "," + layer + ") already in use by another tile.");
+
+                LayerToDictionary(layer).Add(ID, this);
+            }
         }
 
         /// <summary>

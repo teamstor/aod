@@ -14,7 +14,10 @@ namespace TeamStor.RPG
 	/// </summary>
 	public class TileTransitionCache : IDisposable
 	{
-		private Dictionary<string, BitArray> _masks = new Dictionary<string, BitArray>();
+        // Standard atlas size.
+        public const int CACHE_ATLAS_SIZE = 256;
+
+        private Dictionary<string, BitArray> _masks = new Dictionary<string, BitArray>();
 		
 		private List<Texture2D> _textures = new List<Texture2D>();
 		private Point _currentPointOnTexture = Point.Zero;
@@ -52,22 +55,24 @@ namespace TeamStor.RPG
 			
 			if(_textures.Count == 0 || _currentPointOnTexture.Y >= 16)
 			{
-				_textures.Add(new Texture2D(Game.GraphicsDevice, 256, 256));
+				_textures.Add(new Texture2D(Game.GraphicsDevice, CACHE_ATLAS_SIZE, CACHE_ATLAS_SIZE));
 				_currentPointOnTexture = new Point(0, 0);
 			}
 			
 			TileTransition transition = new TileTransition();
 			transition.Point = _currentPointOnTexture;
 			transition.Texture = _textures.Count - 1;
+
+            TileAtlas.Region region = Map.Atlas[tile.TextureName(metadata, environment)];
 			
 			Rectangle textureRectangle = new Rectangle(
-				tile.TextureSlot(metadata, environment).X * 16,
-				tile.TextureSlot(metadata, environment).Y * 16,
+                region.Rectangle.X,
+                region.Rectangle.Y,
 				16,
 				16);
 			
 			Color[] tileData = new Color[16 * 16];
-			Tile.LayerToTexture(Game, tile.Layer).GetData(0, textureRectangle, tileData, 0, 16 * 16);
+			region.Texture.GetData(0, textureRectangle, tileData, 0, 16 * 16);
 			
 			Color[] tileTransition = new Color[16 * 16];
             if(transitionBase.Contains("_color"))
@@ -92,8 +97,6 @@ namespace TeamStor.RPG
 			}
 
 			_cachedTransitions.Add(tile.UniqueIdentity(metadata, environment), transition);
-			
-			Console.WriteLine("Generated transition for " + tile.Name(metadata, environment) + " in environment " + environment + " (metadata: \"" + metadata + "\")");
 		}
 		
 		public Game Game
@@ -157,6 +160,7 @@ namespace TeamStor.RPG
 		public void Dispose()
 		{
 			Clear();
+            Game.Assets.AssetChanged -= OnAssetChanged;
 		}
 	}
 }
