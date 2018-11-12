@@ -10,9 +10,9 @@ using System.IO;
 
 namespace TeamStor.RPG
 {
-    /*public class PortalEvents : TileEventBase
+    public class PortalEvents : TileEventBase
     {
-        public PortalEvents(PortalTile tile) : base(tile)
+        public PortalEvents(Tile tile) : base(tile)
         {
         }
 
@@ -67,5 +67,5 @@ namespace TeamStor.RPG
         public override void OnWalkLeave(SortedDictionary<string, string> metadata, WorldState world, Point mapPos)
         {
         }
-    }*/
+    }
 }

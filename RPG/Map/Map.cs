@@ -732,7 +732,7 @@ namespace TeamStor.RPG
 
             if(layer == Tile.MapLayer.Terrain)
             {
-                WaterTiles.DeepWaterOrVoid.UpdateCurrentFrameWithGame(game);
+                (WaterTiles.DeepWaterOrVoid as AnimatedTile).UpdateCurrentFrameWithGame(game);
 
                 if(Info.Environment == Environment.Inside)
                     game.Batch.Rectangle(drawRectangle, Color.Black);

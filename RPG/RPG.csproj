@@ -83,7 +83,12 @@
     <Compile Include="Map\Attributes\EnumAttributeEditor.cs" />
     <Compile Include="Map\Attributes\IntAttributeEditor.cs" />
     <Compile Include="Map\Attributes\TextAttributeEditor.cs" />
+    <Compile Include="Map\Tile\Behavior\DrawOffsetTile.cs" />
+    <Compile Include="Map\Tile\Behavior\Foliage\BushTile.cs" />
+    <Compile Include="Map\Tile\Behavior\VariationsTile.cs" />
     <Compile Include="Map\Tile\Categories\DefaultTiles.cs" />
+    <Compile Include="Map\Tile\Categories\FoliageTiles.cs" />
+    <Compile Include="Map\Tile\Categories\GroundTiles.cs" />
     <Compile Include="Map\Tile\EarlyTileInitalizer.cs" />
     <Compile Include="Map\Events\PortalEvents.cs" />
     <Compile Include="Map\Events\TextBoxEvents.cs" />

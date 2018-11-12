@@ -45,6 +45,12 @@ namespace TeamStor.RPG
             base.Draw(game, mapPos, map, metadata, environment, color);
         }
 
+        public override void DrawAfterTransition(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
+        {
+            UpdateCurrentFrameWithGame(game);
+            base.DrawAfterTransition(game, mapPos, map, metadata, environment, color);
+        }
+
         public void UpdateCurrentFrameWithGame(Engine.Game game)
         {
             _currentSlot = (int)(game.Time * FPS) % TextureCount;
