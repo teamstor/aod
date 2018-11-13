@@ -20,12 +20,17 @@ namespace TeamStor.RPG.Editor.States
 	public class MapEditorTileEditState : MapEditorModeState
 	{
 		private EditTool _tool = EditTool.PaintOne;
-		private int _lastSelection = -1;
+		private Tile _lastSelection = null;
 
         /// <summary>
         /// The current selected layer.
         /// </summary>
         public Tile.MapLayer Layer { get; set; }
+
+        /// <summary>
+        /// The tile selection menu.
+        /// </summary>
+        public TileMenu Menu { get; private set; }
 
 		private float _radius = 4;
 
@@ -83,53 +88,17 @@ namespace TeamStor.RPG.Editor.States
 			get { return false; }
 		}
 
-        private bool LayerContainsValidTiles(Tile.MapLayer layer)
-        {
-            List<string> tiles = new List<string>();
-            foreach(Tile tile in Tile.Values(layer))
-            {
-                // TODO tiles.Add(SelectionMenu.SPACING);
-                tiles.Add(tile.ID);
-            }
-
-            return tiles.Count > 0;
-        }
-
-        private void UpdateSelectTileMenu(bool doTween = false)
-        {
-            if(BaseState.SelectionMenus.ContainsKey("select-tile-menu"))
-                BaseState.SelectionMenus.Remove("select-tile-menu");
-
-            List<string> tiles = new List<string>();
-            foreach(Tile tile in Tile.Values(Layer))
-            {
-                tiles.Add(tile.ID);
-            }
-
-            BaseState.SelectionMenus.Add("select-tile-menu", new SelectionMenu
-            {
-                Title = "Tiles",
-                Entries = tiles,
-                Rectangle = new TweenedRectangle(Game, new Rectangle(-250, 114, 210, 15 + 12)),
-	            SelectionChanged = (menu, selected) =>
-	            {
-		            BaseState.SelectionMenus["select-tile-menu"].Title = "Tiles [" + BaseState.SelectionMenus["select-tile-menu"].SelectedValue + "]";
-	            }
-            });
-
-            BaseState.SelectionMenus["select-tile-menu"].Rectangle.TweenTo(new Rectangle(48, 114, 210, 15 + 12), TweenEaseType.EaseOutQuad, doTween ? 0.65f : 0f);
-	        BaseState.SelectionMenus["select-tile-menu"].Title = "Tiles [" + BaseState.SelectionMenus["select-tile-menu"].SelectedValue + "]";
-        }
-
         public override void OnEnter(GameState previousState)
 		{
             // Generate all font sizes for zooming
             //for(double i = 1; i <= 4; i += 0.01)
-                //Game.DefaultFonts.MonoBold.Measure((uint)(8 * i), "");
+            //Game.DefaultFonts.MonoBold.Measure((uint)(8 * i), "");
 
-            UpdateSelectTileMenu(previousState == null);
-			
-			BaseState.Buttons.Add("tool-paintone", new Button
+            Menu = new TileMenu(BaseState.Map.Info.Environment, Game);
+            Menu.Rectangle.TweenTo(new Rectangle(-250, 114, Menu.Rectangle.TargetValue.Width, Menu.Rectangle.TargetValue.Height), TweenEaseType.Linear, 0);
+            Menu.Rectangle.TweenTo(new Rectangle(48, 114, Menu.Rectangle.TargetValue.Width, Menu.Rectangle.TargetValue.Height), TweenEaseType.EaseOutQuad, previousState == null ? 0.65f : 0f);
+
+            BaseState.Buttons.Add("tool-paintone", new Button
 			{
 				Text = "",
 				Icon = Assets.Get<Texture2D>("editor/tile/paintone.png"),
@@ -164,7 +133,6 @@ namespace TeamStor.RPG.Editor.States
 				Active = true,
 				Clicked = (btn) => {
 					Layer = Tile.MapLayer.Terrain;
-					UpdateSelectTileMenu();
 				},
 				Font = Game.DefaultFonts.Normal
 			});
@@ -178,10 +146,9 @@ namespace TeamStor.RPG.Editor.States
 				Position = new TweenedVector2(Game, new Vector2(-250, 119 + 31 + 32 * 3)),
 				
 				Active = false,
-                Disabled = !LayerContainsValidTiles(Tile.MapLayer.Decoration),
+                Disabled = false,
                 Clicked = (btn) => {
                     Layer = Tile.MapLayer.Decoration;
-                    UpdateSelectTileMenu();
 				},
 				Font = Game.DefaultFonts.Normal
 			});
@@ -195,10 +162,9 @@ namespace TeamStor.RPG.Editor.States
 				Position = new TweenedVector2(Game, new Vector2(-250, 119 + 31 + 32 * 4)),
 				
 				Active = false,
-                Disabled = !LayerContainsValidTiles(Tile.MapLayer.NPC),
+                Disabled = false,
                 Clicked = (btn) => { 					
 					Layer = Tile.MapLayer.NPC;
-					UpdateSelectTileMenu();
 				},
 				Font = Game.DefaultFonts.Normal
 			});
@@ -212,10 +178,8 @@ namespace TeamStor.RPG.Editor.States
 				Position = new TweenedVector2(Game, new Vector2(-250, 119 + 31 + 32 * 5)),
 				
 				Active = false,
-                Disabled = !LayerContainsValidTiles(Tile.MapLayer.Control),
                 Clicked = (btn) => { 					
 					Layer = Tile.MapLayer.Control;
-					UpdateSelectTileMenu();
 				},
 				Font = Game.DefaultFonts.Normal
 			});
@@ -225,9 +189,7 @@ namespace TeamStor.RPG.Editor.States
         }
 
         public override void OnLeave(GameState nextState)
-		{
-            BaseState.SelectionMenus.Remove("select-tile-menu");
-			
+		{			
 			BaseState.Buttons.Remove("tool-paintone");
 			BaseState.Buttons.Remove("tool-rectangle");
 			
@@ -239,17 +201,17 @@ namespace TeamStor.RPG.Editor.States
 
         public override void Update(double deltaTime, double totalTime, long count)
         {
-	        if(Game.Input.KeyPressed(Keys.E))
+	        /* TODO if(Game.Input.KeyPressed(Keys.E))
 	        {
-		        _lastSelection = BaseState.SelectionMenus["select-tile-menu"].Selected;
-		        BaseState.SelectionMenus["select-tile-menu"].Selected = 0;
+		        _lastSelection = Menu.Selected;
+		        Menu.Selected = 0;
 	        }
 
 	        if(Game.Input.KeyReleased(Keys.E))
 	        {
-		        BaseState.SelectionMenus["select-tile-menu"].Selected = _lastSelection;
+		        Menu.Selected = _lastSelection;
 		        _lastSelection = -1;
-	        }
+	        } */
 
 	        if(Game.Input.KeyPressed(Keys.T))
 	        {
@@ -259,57 +221,6 @@ namespace TeamStor.RPG.Editor.States
 
 		        return;
 	        }
-
-            if(!Game.Input.Key(Keys.LeftShift) && !Game.Input.Key(Keys.RightShift))
-            {
-                int last = BaseState.SelectionMenus["select-tile-menu"].Selected;
-	            int lastLayer = (int)Layer;
-	            int layer = lastLayer;
-
-	            if(Game.Input.KeyPressed(Keys.Up))
-	            {
-		            if(Game.Input.Key(Keys.LeftControl) || Game.Input.Key(Keys.RightControl))
-			            layer--;
-		            else
-			            BaseState.SelectionMenus["select-tile-menu"].Selected--;
-	            }
-
-	            if(Game.Input.KeyPressed(Keys.Down))
-				{
-					if(Game.Input.Key(Keys.LeftControl) || Game.Input.Key(Keys.RightControl))
-						layer++;
-					else
-						BaseState.SelectionMenus["select-tile-menu"].Selected++;
-				}
-
-	            if(lastLayer != layer)
-	            {
-		            if(layer < 0)
-			            layer = (int)Tile.MapLayer.Control; // TODO change this if more layers are added
-		            else if(layer > (int)Tile.MapLayer.Control)
-			            layer = (int)Tile.MapLayer.Terrain;
-
-		            Layer = (Tile.MapLayer)layer;
-		            UpdateSelectTileMenu();
-	            }
-
-				int dir = BaseState.SelectionMenus["select-tile-menu"].Selected - last;
-
-                if(BaseState.SelectionMenus["select-tile-menu"].Selected < 0)
-                    BaseState.SelectionMenus["select-tile-menu"].Selected = BaseState.SelectionMenus["select-tile-menu"].Entries.Count - 1;
-                if(BaseState.SelectionMenus["select-tile-menu"].Selected >= BaseState.SelectionMenus["select-tile-menu"].Entries.Count)
-                    BaseState.SelectionMenus["select-tile-menu"].Selected = 0;
-
-                while(BaseState.SelectionMenus["select-tile-menu"].SelectedValue == SelectionMenu.SPACING)
-                    BaseState.SelectionMenus["select-tile-menu"].Selected += dir;
-
-                if(BaseState.SelectionMenus["select-tile-menu"].Selected < 0)
-                    BaseState.SelectionMenus["select-tile-menu"].Selected = BaseState.SelectionMenus["select-tile-menu"].Entries.Count - 1;
-                if(BaseState.SelectionMenus["select-tile-menu"].Selected >= BaseState.SelectionMenus["select-tile-menu"].Entries.Count)
-                    BaseState.SelectionMenus["select-tile-menu"].Selected = 0;
-
-                BaseState.SelectionMenus["select-tile-menu"].Title = "Tiles [" + BaseState.SelectionMenus["select-tile-menu"].SelectedValue + "]";
-            }
 
 	        BaseState.Buttons["tool-paintone"].Active = _tool == EditTool.PaintOne;
 	        BaseState.Buttons["tool-rectangle"].Active = _tool == EditTool.PaintRectangle;
@@ -322,27 +233,27 @@ namespace TeamStor.RPG.Editor.States
 	        if(BaseState.Buttons["tool-paintone"].Position.IsComplete)
 	        {
 		        BaseState.Buttons["tool-paintone"].Position.TweenTo(new Vector2(48,
-			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Y +
-			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Height + 4), TweenEaseType.Linear, 0);
+			        Menu.Rectangle.Value.Y +
+                    Menu.Rectangle.Value.Height + 4), TweenEaseType.Linear, 0);
 		        BaseState.Buttons["tool-rectangle"].Position.TweenTo(new Vector2(48,
-			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Y +
-			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Height + 4 + 32), TweenEaseType.Linear, 0);
+                    Menu.Rectangle.Value.Y +
+                    Menu.Rectangle.Value.Height + 4 + 32), TweenEaseType.Linear, 0);
 		        
 		        BaseState.Buttons["layer-terrain"].Position.TweenTo(new Vector2(48,
-			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Y +
-			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Height + 4 + 32 + 5 + 32), TweenEaseType.Linear, 0);
+			        Menu.Rectangle.Value.Y +
+			        Menu.Rectangle.Value.Height + 4 + 32 + 5 + 32), TweenEaseType.Linear, 0);
 		        BaseState.Buttons["layer-decoration"].Position.TweenTo(new Vector2(48,
-			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Y +
-			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Height + 4 + 32 + 5 + 32 * 2), TweenEaseType.Linear, 0);
+			        Menu.Rectangle.Value.Y +
+			        Menu.Rectangle.Value.Height + 4 + 32 + 5 + 32 * 2), TweenEaseType.Linear, 0);
 		        BaseState.Buttons["layer-npc"].Position.TweenTo(new Vector2(48,
-			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Y +
-			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Height + 4 + 32 + 5 + 32 * 3), TweenEaseType.Linear, 0);
+			        Menu.Rectangle.Value.Y +
+			        Menu.Rectangle.Value.Height + 4 + 32 + 5 + 32 * 3), TweenEaseType.Linear, 0);
 		        BaseState.Buttons["layer-control"].Position.TweenTo(new Vector2(48,
-			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Y +
-			        BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Height + 4 + 32 + 5 + 32 * 4), TweenEaseType.Linear, 0);
+			        Menu.Rectangle.Value.Y +
+			        Menu.Rectangle.Value.Height + 4 + 32 + 5 + 32 * 4), TweenEaseType.Linear, 0);
 
 		        float alpha = 1.0f;
-		        if(BaseState.SelectionMenus["select-tile-menu"].Rectangle.Value.Contains(Input.MousePosition))
+		        if(Menu.Rectangle.Value.Contains(Input.MousePosition))
 			        alpha = 0.0f;
 
 		        BaseState.Buttons["tool-paintone"].Alpha = MathHelper.Lerp(BaseState.Buttons["tool-paintone"].Alpha, alpha, (float)deltaTime * 25f);
@@ -359,8 +270,8 @@ namespace TeamStor.RPG.Editor.States
 		        switch(_tool)
 		        {
 			        case EditTool.PaintOne:
-				        if(Input.Mouse(MouseButton.Left))
-							BaseState.Map[Layer, SelectedTile.X, SelectedTile.Y] = Tile.Find(BaseState.SelectionMenus["select-tile-menu"].SelectedValue, Layer);
+                        if(Input.Mouse(MouseButton.Left))
+                            BaseState.Map[Menu.SelectedTile.Layer, SelectedTile.X, SelectedTile.Y] = Menu.SelectedTile;
 				        break;
 				        
 			        case EditTool.PaintRectangle:
@@ -371,7 +282,7 @@ namespace TeamStor.RPG.Editor.States
 					        for(int x = _rectangleToolRect.X; x <= _rectangleToolRect.X + _rectangleToolRect.Width; x++)
 					        {
 						        for(int y = _rectangleToolRect.Y; y <= _rectangleToolRect.Y + _rectangleToolRect.Height; y++)
-                                    BaseState.Map[Layer, x, y] = Tile.Find(BaseState.SelectionMenus["select-tile-menu"].SelectedValue, Layer);
+                                    BaseState.Map[Menu.SelectedTile.Layer, x, y] = Menu.SelectedTile;
                             }
 
                             _startingTile = new Point(-1, -1);
@@ -411,6 +322,8 @@ namespace TeamStor.RPG.Editor.States
 		public override void Draw(SpriteBatch batch, Vector2 screenSize)
 		{
 			batch.SamplerState = SamplerState.PointWrap;
+
+            Menu.Draw(Game);
 			
 			if(!BaseState.IsPointObscured(Input.MousePosition))
 			{
@@ -430,10 +343,10 @@ namespace TeamStor.RPG.Editor.States
 
 					if(Input.Mouse(MouseButton.Left) && _tool == EditTool.PaintRectangle)
 						batch.Outline(new Rectangle(_rectangleToolRect.X * 16, _rectangleToolRect.Y * 16, _rectangleToolRect.Width * 16 + 16, _rectangleToolRect.Height * 16 + 16),
-							Layer == Tile.MapLayer.Terrain || BaseState.SelectionMenus["select-tile-menu"].Selected != 0 ? Color.White * alpha : Color.DarkRed * alpha, 1, false);
+							Layer == Tile.MapLayer.Terrain || Menu.SelectedTile.ID != "" ? Color.White * alpha : Color.DarkRed * alpha, 1, false);
 					else
 						batch.Outline(new Rectangle(SelectedTile.X * 16, SelectedTile.Y * 16, 16, 16),
-							Layer == Tile.MapLayer.Terrain || BaseState.SelectionMenus["select-tile-menu"].Selected != 0 || !Input.Mouse(MouseButton.Left) ? Color.White * alpha : Color.DarkRed * alpha, 1, false);
+							Layer == Tile.MapLayer.Terrain || Menu.SelectedTile.ID != "" || !Input.Mouse(MouseButton.Left) ? Color.White * alpha : Color.DarkRed * alpha, 1, false);
 
                     batch.Reset();
 

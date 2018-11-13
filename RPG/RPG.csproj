@@ -70,6 +70,7 @@
     <Compile Include="Editor\States\MapEditorTileEditState.cs" />
     <Compile Include="Editor\ChoiceField.cs" />
     <Compile Include="Editor\TextField.cs" />
+    <Compile Include="Editor\TileMenu.cs" />
     <Compile Include="Gameplay\Direction.cs" />
     <Compile Include="Gameplay\NPCs.cs" />
     <Compile Include="Gameplay\NPCTemplate.cs" />

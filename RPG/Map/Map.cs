@@ -665,7 +665,7 @@ namespace TeamStor.RPG
         /// <summary>
         /// The tile atlas cache.
         /// </summary>
-        public static TileAtlas Atlas { get; private set; }
+        public static TileAtlas Atlas { get; set; }
 
         /// <summary>
         /// The tile transition cache.
