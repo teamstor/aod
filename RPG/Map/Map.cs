@@ -775,8 +775,8 @@ namespace TeamStor.RPG
                                tile.UseTransition(
                                    new Point(x, y),
                                    point,
-                                   this, 
-                                   tile, 
+                                   this,
+                                   this[layer, point.X, point.Y], 
                                    GetMetadata(layer, x, y), 
                                    GetMetadata(layer, point.X, point.Y)))
                             {
