@@ -64,10 +64,20 @@ namespace TeamStor.RPG.Gameplay
             get; private set;
         }
 
+        /// <summary>
+        /// This NPC as a tile template.
+        /// </summary>
+        public RPG.Tile TileTemplate
+        {
+            get; private set;
+        }
+
         public NPCTemplate(string name, string id)
         {
             Name = name;
             ID = id;
+
+            TileTemplate = new Tile(ID, this);
 
             foreach(Direction direction in Enum.GetValues(typeof(Direction)))
             {
@@ -127,16 +137,6 @@ namespace TeamStor.RPG.Gameplay
             }
 
             return game.Assets.Get<Texture2D>(textureTemplate.Replace("{name}", ID).Replace("{i}", (frame % _frameCounts[direction]).ToString()));
-        }
-
-        /// <summary>
-        /// Creates a tile on the NPC layer from this template.
-        /// You can access this template with the function FromTile.
-        /// </summary>
-        /// <returns>The newly created tile.</returns>
-        public RPG.Tile AsTile()
-        {
-            return new Tile(ID, this);
         }
 
         /// <summary>

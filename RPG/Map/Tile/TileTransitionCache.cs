@@ -97,9 +97,11 @@ namespace TeamStor.RPG
 			}
 
 			_cachedTransitions.Add(tile.UniqueIdentity(metadata, environment), transition);
-		}
-		
-		public Game Game
+
+            Console.WriteLine("Generated transition for " + tile.Name(metadata, environment) + " in environment " + environment + " (metadata: \"" + metadata + "\")");
+        }
+
+        public Game Game
 		{
 			get;
 			private set;

@@ -654,8 +654,8 @@ namespace TeamStor.RPG
             if(point.X < 0 || point.Y < 0 || point.X >= Width || point.Y >= Height)
                 return true;
 
-            /* TODO if(this[Tile.MapLayer.Control, point.X, point.Y] == Tiles.Control.InvertedBarrier)
-                return false; */
+            if(this[Tile.MapLayer.Control, point.X, point.Y] == ControlTiles.InvertedBarrier)
+                return false;
 
             return this[Tile.MapLayer.Terrain, point.X, point.Y].Solid(GetMetadata(Tile.MapLayer.Terrain, point.X, point.Y)) ||
                 this[Tile.MapLayer.Decoration, point.X, point.Y].Solid(GetMetadata(Tile.MapLayer.Decoration, point.X, point.Y)) ||

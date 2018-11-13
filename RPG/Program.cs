@@ -9,6 +9,7 @@ using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 using Microsoft.Xna.Framework.Input;
 using TeamStor.Engine.Coroutine;
 using TeamStor.RPG.Editor;
+using TeamStor.RPG.Gameplay;
 
 namespace TeamStor.RPG
 {
@@ -29,7 +30,8 @@ namespace TeamStor.RPG
             Game game = Game.Run(new Menu.MenuState(), "data", false);
 
             EarlyTileInitalizer.Initialize();
-                
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(NPCs).TypeHandle);
+
             game.OnUpdateAfterState += OnUpdate;
 
             if(System.Diagnostics.Debugger.IsAttached)

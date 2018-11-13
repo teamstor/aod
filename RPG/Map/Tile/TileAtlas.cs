@@ -96,6 +96,8 @@ namespace TeamStor.RPG
 
                     _atlases.Last().SetData(0, region.Rectangle, tileData, 0, t.Width * t.Height);
 
+                    Console.WriteLine("Added " + texture + " to atlas " + _atlases.Count + " @ " + region.Rectangle);
+
                     _minHeightThisRow = Math.Max(_minHeightThisRow, t.Height);
                     _currentPoint.X += t.Width;
 
@@ -120,6 +122,9 @@ namespace TeamStor.RPG
 
             _atlases.Clear();
             _atlases.Add(new Texture2D(Game.GraphicsDevice, ATLAS_SIZE, ATLAS_SIZE));
+
+            _currentPoint = new Point(0, 0);
+            _minHeightThisRow = 0;
         }
 
         public void Dispose()

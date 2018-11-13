@@ -43,25 +43,23 @@ namespace TeamStor.RPG.Legacy
                 {
                     for(y = 0; y < height; y++)
                     {
-                        /*TODO Tile terrainTile = Tiles.Terrain.Water;
+                        Tile terrainTile = WaterTiles.DeepWaterOrVoid;
                         MapConverterIDMap.TerrainMap.TryGetValue(reader.ReadInt32() & 0xff, out terrainTile);
                         map[Tile.MapLayer.Terrain, x, y] = terrainTile;
 
-                        Tile decorationTile = Tiles.Decoration.Empty;
+                        Tile decorationTile = DefaultTiles.EmptyDecoration;
                         MapConverterIDMap.DecorationMap.TryGetValue(reader.ReadInt32() & 0xff, out decorationTile);
                         map[Tile.MapLayer.Decoration, x, y] = decorationTile;
 
-                        Tile npcTile = Tiles.NPC.Empty;
+                        Tile npcTile = DefaultTiles.EmptyNPC;
                         MapConverterIDMap.NPCMap.TryGetValue(reader.ReadInt32() & 0xff, out npcTile);
                         map[Tile.MapLayer.NPC, x, y] = npcTile;
 
-                        Tile controlTile = Tiles.Control.Empty;
+                        Tile controlTile = DefaultTiles.EmptyControl;
                         MapConverterIDMap.ControlMap.TryGetValue(reader.ReadInt32() & 0xff, out controlTile);
-                        map[Tile.MapLayer.Control, x, y] = controlTile;*/
+                        map[Tile.MapLayer.Control, x, y] = controlTile;
                     }
                 }
-
-                // metadata not read
 
                 return map;
             }

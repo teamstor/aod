@@ -1,18 +1,16 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
 using TeamStor.Engine;
 
 namespace TeamStor.RPG
 {
     public class WaterwheelTile : Tile
     {
-        private Point _slotOverride = new Point(-1, -1);
-
-        public WaterwheelTile(string id, MapLayer layer, string name, Point textureSlot, bool solid = false, int transitionPriority = 1000) : base(id, layer, name, textureSlot, solid, transitionPriority)
+        public WaterwheelTile(string id, MapLayer layer, string name, string textureName, bool solid = false, int transitionPriority = 1000, bool createGlobally = true) : base(id, layer, name, textureName, solid, transitionPriority, createGlobally)
         {
         }
 
@@ -34,25 +32,26 @@ namespace TeamStor.RPG
 
         public override void Draw(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
         {
+            TileAtlas.Region region = Map.Atlas.MissingRegion;
+
             for(int x = 0; x < 3; x++)
             {
                 for(int y = 0; y < 4; y++)
                 {
                     if(ScanArea(new Rectangle(mapPos.X - x, mapPos.Y - y, 3, 4), map))
-                        _slotOverride = new Point(x, 5 + y);
+                    {
+                        region = Map.Atlas[TextureName(metadata, environment)];
+                        region.Rectangle = new Rectangle(region.Rectangle.X + x * 16, region.Rectangle.Y + y * 16, 16, 16);
+                    }
                 }
             }
 
-            base.Draw(game, mapPos, map, metadata, environment, color);
-
-            _slotOverride = new Point(-1, -1);
-        }
-
-        public override Point TextureSlot(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
-        {
-            if(_slotOverride != new Point(-1, -1))
-                return _slotOverride;
-            return base.TextureSlot(metadata, environment);
+            game.Batch.Texture(
+                new Vector2(mapPos.X * 16, mapPos.Y * 16),
+                region.Texture,
+                color.HasValue ? color.Value : Color.White,
+                Vector2.One,
+                region.Rectangle);
         }
     }
 }

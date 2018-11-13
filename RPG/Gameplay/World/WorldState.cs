@@ -218,7 +218,7 @@ namespace TeamStor.RPG.Gameplay.World
                 SortedDictionary<string, string> metadata = Map.GetMetadata(layer, position.X, position.Y);
                 str += layer + " - " + 
                        "\"" + Map[layer, position.X, position.Y].Name(metadata, Map.Info.Environment) + "\" " + 
-                       "(id " + Map[layer, position.X, position.Y] + ") " +
+                       "(id '" + Map[layer, position.X, position.Y].ID + "') " +
                        " metadata: ";
 
                 if(metadata == null || metadata.Count == 0)

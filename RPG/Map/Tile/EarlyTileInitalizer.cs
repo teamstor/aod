@@ -18,6 +18,8 @@ namespace TeamStor.RPG
             System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(GroundTiles).TypeHandle);
             System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(FoliageTiles).TypeHandle);
             System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(ControlTiles).TypeHandle);
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(InsideTiles).TypeHandle);
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(CityTiles).TypeHandle);
         }
     }
 }

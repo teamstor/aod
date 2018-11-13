@@ -89,7 +89,7 @@ namespace TeamStor.RPG.Editor.States
             foreach(Tile tile in Tile.Values(layer))
             {
                 // TODO tiles.Add(SelectionMenu.SPACING);
-                tiles.Add(tile.Name(null, BaseState.Map.Info.Environment));
+                tiles.Add(tile.ID);
             }
 
             return tiles.Count > 0;
@@ -103,7 +103,7 @@ namespace TeamStor.RPG.Editor.States
             List<string> tiles = new List<string>();
             foreach(Tile tile in Tile.Values(Layer))
             {
-                tiles.Add(tile.Name(null, BaseState.Map.Info.Environment));
+                tiles.Add(tile.ID);
             }
 
             BaseState.SelectionMenus.Add("select-tile-menu", new SelectionMenu
@@ -360,7 +360,7 @@ namespace TeamStor.RPG.Editor.States
 		        {
 			        case EditTool.PaintOne:
 				        if(Input.Mouse(MouseButton.Left))
-							BaseState.Map[Layer, SelectedTile.X, SelectedTile.Y] = Tile.FindByName(BaseState.SelectionMenus["select-tile-menu"].SelectedValue, Layer, BaseState.Map.Info.Environment);
+							BaseState.Map[Layer, SelectedTile.X, SelectedTile.Y] = Tile.Find(BaseState.SelectionMenus["select-tile-menu"].SelectedValue, Layer);
 				        break;
 				        
 			        case EditTool.PaintRectangle:
@@ -371,7 +371,7 @@ namespace TeamStor.RPG.Editor.States
 					        for(int x = _rectangleToolRect.X; x <= _rectangleToolRect.X + _rectangleToolRect.Width; x++)
 					        {
 						        for(int y = _rectangleToolRect.Y; y <= _rectangleToolRect.Y + _rectangleToolRect.Height; y++)
-                                    BaseState.Map[Layer, x, y] = Tile.FindByName(BaseState.SelectionMenus["select-tile-menu"].SelectedValue, Layer, BaseState.Map.Info.Environment);
+                                    BaseState.Map[Layer, x, y] = Tile.Find(BaseState.SelectionMenus["select-tile-menu"].SelectedValue, Layer);
                             }
 
                             _startingTile = new Point(-1, -1);

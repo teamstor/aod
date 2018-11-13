@@ -14,6 +14,11 @@ namespace TeamStor.RPG
     /// </summary>
     public class VariationsTile : Tile
     {
+        public delegate string VariationOverrideDelegate(string defaultValue, Map map, Point mapPos, int randomValue);
+
+        private VariationOverrideDelegate _vFunc;
+        public VariationsTile AttributeChooseVariation(VariationOverrideDelegate d) { _vFunc = d; return this; }
+
         private static int[] _randomValues = new int[100 * 100];
         private static bool _hasValues = false;
 
@@ -55,8 +60,11 @@ namespace TeamStor.RPG
                 _hasValues = true;
             }
 
-            int slot = _randomValues[((Math.Abs(mapPos.Y) * map.Width) + Math.Abs(mapPos.X)) % _randomValues.Length] % Variations.Length;
-            _currentVariation = Variations[slot];
+            int slot = _randomValues[((Math.Abs(mapPos.Y) * map.Width) + Math.Abs(mapPos.X)) % _randomValues.Length];
+            _currentVariation = Variations[slot % Variations.Length];
+
+            if(_vFunc != null)
+                _currentVariation = _vFunc(_currentVariation, map, mapPos, slot);
 
             base.Draw(game, mapPos, map, metadata, environment, color);
         }
@@ -72,8 +80,11 @@ namespace TeamStor.RPG
                 _hasValues = true;
             }
 
-            int slot = _randomValues[((Math.Abs(mapPos.Y) * map.Width) + Math.Abs(mapPos.X)) % _randomValues.Length] % Variations.Length;
-            _currentVariation = Variations[slot];
+            int slot = _randomValues[((Math.Abs(mapPos.Y) * map.Width) + Math.Abs(mapPos.X)) % _randomValues.Length];
+            _currentVariation = Variations[slot % Variations.Length];
+
+            if(_vFunc != null)
+                _currentVariation = _vFunc(_currentVariation, map, mapPos, slot);
 
             base.DrawAfterTransition(game, mapPos, map, metadata, environment, color);
         }

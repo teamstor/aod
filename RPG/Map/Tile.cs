@@ -44,7 +44,7 @@ namespace TeamStor.RPG
         public Tile AttributeTransitionTexture(TransitionTextureOverrideDelegate d) { _tTextureFunc = d; return this; }
 
         private AttributeEditorsOverrideDelegate _attribEditorsFunc;
-        public Tile AttributeTileAttributeEditors(AttributeEditorsOverrideDelegate d) { _attribEditorsFunc = d; return this; }
+        public Tile AttributeEditableAttributes(AttributeEditorsOverrideDelegate d) { _attribEditorsFunc = d; return this; }
 
         public static Tile.MapLayer[] CachedAllMapLayers = Enum.GetValues(typeof(Tile.MapLayer)).Cast<Tile.MapLayer>().ToArray();
 
@@ -347,6 +347,11 @@ namespace TeamStor.RPG
         public static IEnumerable<Tile> Values(MapLayer layer)
         {
             return LayerToDictionary(layer).Values;
+        }
+
+        public override int GetHashCode()
+        {
+            return ID.GetHashCode();
         }
     }
 }
