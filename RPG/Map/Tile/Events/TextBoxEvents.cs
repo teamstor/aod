@@ -16,35 +16,35 @@ namespace TeamStor.RPG
 		{
 		}
 
-		private void DoTextBox(SortedDictionary<string, string> metadata, WorldState world, Point mapPos)
+		private void DoTextBox(TileMetadata metadata, WorldState world, Point mapPos)
 		{
-            string text = metadata != null && metadata.ContainsKey("value") ? metadata["value"] :
+            string text = metadata != null && metadata.IsKeySet("value") ? metadata["value"] :
                 "ERROR!!! VA FAN DET ÄR ERROR!!! FÖR HELVETE ERROR!!!\n(du måste sätta värdet av textboxen i map editorn)";
 
             TextBox.Show(world, new TextBoxContent
             {
-                Speaker = metadata != null && metadata.ContainsKey("speaker") ? metadata["speaker"] : "Unknown",
+                Speaker = metadata != null && metadata.IsKeySet("speaker") ? metadata["speaker"] : "Unknown",
                 Text = text
             });
         }
 
-        public override void OnInteract(SortedDictionary<string, string> metadata, WorldState world, Point mapPos)
+        public override void OnInteract(TileMetadata metadata, WorldState world, Point mapPos)
 		{
-			if(metadata == null || !metadata.ContainsKey("needs-user-interaction") || metadata["needs-user-interaction"] == "True")
+			if(metadata == null || !metadata.IsKeySet("needs-user-interaction") || metadata["needs-user-interaction"] == "True")
 				DoTextBox(metadata, world, mapPos);
 		}
 		
-		public override void OnWalkEnter(SortedDictionary<string, string> metadata, WorldState world, Point mapPos)
+		public override void OnWalkEnter(TileMetadata metadata, WorldState world, Point mapPos)
 		{
-			if(metadata != null && metadata.ContainsKey("needs-user-interaction") && metadata["needs-user-interaction"] == "False")
+			if(metadata != null && metadata["needs-user-interaction"] == "False")
 				DoTextBox(metadata, world, mapPos);
 		}
 
-		public override void OnStandingOn(SortedDictionary<string, string> metadata, WorldState world, Point mapPos, long tickCount)
+		public override void OnStandingOn(TileMetadata metadata, WorldState world, Point mapPos, long tickCount)
 		{
 		}
 
-		public override void OnWalkLeave(SortedDictionary<string, string> metadata, WorldState world, Point mapPos)
+		public override void OnWalkLeave(TileMetadata metadata, WorldState world, Point mapPos)
 		{
 		}
 	}

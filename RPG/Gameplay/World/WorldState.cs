@@ -215,7 +215,7 @@ namespace TeamStor.RPG.Gameplay.World
 
             foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
             {
-                SortedDictionary<string, string> metadata = Map.GetMetadata(layer, position.X, position.Y);
+                TileMetadata metadata = Map.GetMetadata(layer, position.X, position.Y);
                 str += layer + " - " + 
                        "\"" + Map[layer, position.X, position.Y].Name(metadata, Map.Info.Environment) + "\" " + 
                        "(id '" + Map[layer, position.X, position.Y].ID + "') " +

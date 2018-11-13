@@ -15,9 +15,9 @@ namespace TeamStor.RPG
         {
         }
 
-        public override void Draw(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
+        public override void Draw(Engine.Game game, Point mapPos, Map map, TileMetadata metadata, Map.Environment environment, Color? color = null)
         {
-            if(mapPos.Y - 1 > 0)
+            if(mapPos.Y - 1 > 0 && map[Layer, mapPos.X, mapPos.Y - 1] != this)
                 map[Layer, mapPos.X, mapPos.Y - 1].Draw(game, mapPos, map, map.GetMetadata(Layer, mapPos.X, mapPos.Y - 1), environment);
 
             base.Draw(game, mapPos, map, metadata, environment, color);

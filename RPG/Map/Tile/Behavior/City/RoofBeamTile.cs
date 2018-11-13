@@ -15,7 +15,7 @@ namespace TeamStor.RPG
         {
         }
 
-        public override void Draw(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
+        public override void Draw(Engine.Game game, Point mapPos, Map map, TileMetadata metadata, Map.Environment environment, Color? color = null)
         {
             bool faceLeft = mapPos.X - 1 > 0 && map[Layer, mapPos.X - 1, mapPos.Y].ID.StartsWith("city/roof");
 
@@ -30,7 +30,7 @@ namespace TeamStor.RPG
                 faceLeft ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
         }
 
-        public override void DrawAfterTransition(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
+        public override void DrawAfterTransition(Engine.Game game, Point mapPos, Map map, TileMetadata metadata, Map.Environment environment, Color? color = null)
         {
             bool faceLeft = mapPos.X - 1 > 0 && map[Layer, mapPos.X - 1, mapPos.Y].ID.StartsWith("city/roof");
 

@@ -17,12 +17,12 @@ namespace TeamStor.RPG
     {
         public const string TRANSTION_GENERIC = "tiles/transitions/generic.png";
 
-        public delegate string NameOverrideDelegate(string defaultValue, SortedDictionary<string, string> metadata, Map.Environment environment);
-        public delegate string TextureNameOverrideDelegate(string defaultValue, SortedDictionary<string, string> metadata, Map.Environment environment);
-        public delegate bool SolidOverrideDelegate(bool defaultValue, SortedDictionary<string, string> metadata);
-        public delegate int TransitionPriorityOverrideDelegate(int defaultValue, SortedDictionary<string, string> metadata);
-        public delegate bool UseTransitionOverrideDelegate(bool defaultValue, Point from, Point to, Map map, Tile other, SortedDictionary<string, string> metadata);
-        public delegate string TransitionTextureOverrideDelegate(string defaultValue, SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest);
+        public delegate string NameOverrideDelegate(string defaultValue, TileMetadata metadata, Map.Environment environment);
+        public delegate string TextureNameOverrideDelegate(string defaultValue, TileMetadata metadata, Map.Environment environment);
+        public delegate bool SolidOverrideDelegate(bool defaultValue, TileMetadata metadata);
+        public delegate int TransitionPriorityOverrideDelegate(int defaultValue, TileMetadata metadata);
+        public delegate bool UseTransitionOverrideDelegate(bool defaultValue, Point from, Point to, Map map, Tile other, TileMetadata metadata);
+        public delegate string TransitionTextureOverrideDelegate(string defaultValue, TileMetadata metadata = null, Map.Environment environment = Map.Environment.Forest);
         public delegate TileAttributeEditor[] AttributeEditorsOverrideDelegate(MapEditorState state, ref int currentY);
 
         private NameOverrideDelegate _nameFunc;
@@ -89,7 +89,7 @@ namespace TeamStor.RPG
         /// <returns>
         /// The name of the tile used in the map editor.
         /// </returns>
-        public virtual string Name(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
+        public virtual string Name(TileMetadata metadata = null, Map.Environment environment = Map.Environment.Forest)
         {
             if(_nameFunc != null)
                 return _nameFunc(_name, metadata, environment);
@@ -102,7 +102,7 @@ namespace TeamStor.RPG
         /// <returns>
         /// The texture to use when drawing the tile.
         /// </returns>
-        public virtual string TextureName(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
+        public virtual string TextureName(TileMetadata metadata = null, Map.Environment environment = Map.Environment.Forest)
         {
             if(_tnameFunc != null)
                 return _tnameFunc(_textureName, metadata, environment);
@@ -115,7 +115,7 @@ namespace TeamStor.RPG
         /// <returns>
         /// If this tile is solid or not (if the player can walk through it).
         /// </returns>
-        public virtual bool Solid(SortedDictionary<string, string> metadata = null)
+        public virtual bool Solid(TileMetadata metadata = null)
         {
             if(_sFunc != null)
                 return _sFunc(_solid, metadata);
@@ -129,7 +129,7 @@ namespace TeamStor.RPG
         /// The transition priority for the tile. Higher = will get transition.
         /// -1 = never use transition with this tile.
         /// </returns>
-        public virtual int TransitionPriority(SortedDictionary<string, string> metadata = null)
+        public virtual int TransitionPriority(TileMetadata metadata = null)
         {
             if(_tpriorityFunc != null)
                 return _tpriorityFunc(_transitionPriority, metadata);
@@ -152,7 +152,7 @@ namespace TeamStor.RPG
         /// OR
         /// * The tile is on the terrain layer and has a higher transition priority (and the other tile doesn't have -1).
         /// </returns>
-        public virtual bool UseTransition(Point from, Point to, Map map, Tile other, SortedDictionary<string, string> metadata = null, SortedDictionary<string, string> otherMetadata = null)
+        public virtual bool UseTransition(Point from, Point to, Map map, Tile other, TileMetadata metadata = null, TileMetadata otherMetadata = null)
         {
             bool result = false;
 
@@ -173,7 +173,7 @@ namespace TeamStor.RPG
         /// <param name="metadata">Metadata for the tile being accessed.</param>
         /// <param name="environment">The environment the tile is in.</param>
         /// <returns>The transition texture to use when making a transition with other tiles.</returns>
-        public virtual string TransitionTexture(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
+        public virtual string TransitionTexture(TileMetadata metadata = null, Map.Environment environment = Map.Environment.Forest)
         {
             if(_tTextureFunc != null)
                 return _tTextureFunc(TRANSTION_GENERIC, metadata, environment);
@@ -188,7 +188,7 @@ namespace TeamStor.RPG
         /// <param name="map">The map the tile is in.</param>
         /// <param name="metadata">Metadata associated with this position.</param>
         /// <param name="environment">The environment the map is in.</param>
-        public virtual void Draw(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
+        public virtual void Draw(Engine.Game game, Point mapPos, Map map, TileMetadata metadata, Map.Environment environment, Color? color = null)
         {
             TileAtlas.Region region = Map.Atlas[TextureName(metadata, environment)];
 
@@ -208,7 +208,7 @@ namespace TeamStor.RPG
         /// <param name="map">The map the tile is in.</param>
         /// <param name="metadata">Metadata associated with this position.</param>
         /// <param name="environment">The environment the map is in.</param>
-        public virtual void DrawAfterTransition(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
+        public virtual void DrawAfterTransition(Engine.Game game, Point mapPos, Map map, TileMetadata metadata, Map.Environment environment, Color? color = null)
         {
         }
 
@@ -287,18 +287,9 @@ namespace TeamStor.RPG
         /// <param name="metadata">Metadata for the tile being accessed.</param>
         /// <param name="environment">The environment the tile is in.</param>
         /// <returns>A unique identifier.</returns>
-        public long UniqueIdentity(SortedDictionary<string, string> metadata, Map.Environment environment)
+        public long UniqueIdentity(TileMetadata metadata, Map.Environment environment)
         {
-            int dhash = 0;
-            if(metadata == null)
-                dhash = "".GetHashCode();
-            else
-            {
-                foreach(KeyValuePair<string, string> pair in metadata)
-                    dhash ^= pair.Key.GetHashCode() ^ pair.Value.GetHashCode();
-            }
-
-            long id = dhash & 0xFFFF;
+            long id = metadata != null ? metadata.GetHashCode() & 0xFFFF : 0;
             id |= (long)ID.GetHashCode() << 16;
             id |= (long)environment << 48;
             id |= (long)Layer << 56;

@@ -16,14 +16,14 @@ namespace TeamStor.RPG
         {
         }
 
-        private void DoTeleport(SortedDictionary<string, string> metadata, WorldState world, Point mapPos)
+        private void DoTeleport(TileMetadata metadata, WorldState world, Point mapPos)
         {
-            if(!metadata.ContainsKey("map-file"))
+            if(!metadata.IsKeySet("map-file"))
                 return;
 
             WorldState.SpawnArgs args = new WorldState.SpawnArgs(new Point(-1, -1), Gameplay.Direction.Down);
 
-            if(metadata.ContainsKey("custom-spawn-position"))
+            if(metadata.IsKeySet("custom-spawn-position"))
             {
                 string[] vec = metadata["custom-spawn-position"].Split(',');
 
@@ -36,35 +36,35 @@ namespace TeamStor.RPG
                 args.Position = new Point(x, y);
             }
 
-            if(metadata.ContainsKey("spawn-direction"))
+            if(metadata.IsKeySet("spawn-direction"))
                 Enum.TryParse<Direction>(metadata["spawn-direction"], out args.Direction);
 
             world.TransitionToMap("data/maps/" + metadata["map-file"], 
-                !(metadata.ContainsKey("transition") && metadata["transition"] == "False"), 
+                metadata["transition"] != "False", 
                 args);
         }
 
-        public override void OnInteract(SortedDictionary<string, string> metadata, WorldState world, Point mapPos)
+        public override void OnInteract(TileMetadata metadata, WorldState world, Point mapPos)
         {
             if(metadata == null)
                 return;
-            if(!metadata.ContainsKey("needs-user-interaction") || metadata["needs-user-interaction"] == "True")
+            if(!metadata.IsKeySet("needs-user-interaction") || metadata["needs-user-interaction"] == "True")
                 DoTeleport(metadata, world, mapPos);
         }
 
-        public override void OnWalkEnter(SortedDictionary<string, string> metadata, WorldState world, Point mapPos)
+        public override void OnWalkEnter(TileMetadata metadata, WorldState world, Point mapPos)
         {
             if(metadata == null)
                 return;
-            if(metadata.ContainsKey("needs-user-interaction") && metadata["needs-user-interaction"] == "False")
+            if(metadata["needs-user-interaction"] == "False")
                 DoTeleport(metadata, world, mapPos);
         }
         
-        public override void OnStandingOn(SortedDictionary<string, string> metadata, WorldState world, Point mapPos, long tickCount)
+        public override void OnStandingOn(TileMetadata metadata, WorldState world, Point mapPos, long tickCount)
         {
         }
 
-        public override void OnWalkLeave(SortedDictionary<string, string> metadata, WorldState world, Point mapPos)
+        public override void OnWalkLeave(TileMetadata metadata, WorldState world, Point mapPos)
         {
         }
     }

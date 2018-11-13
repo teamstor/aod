@@ -14,7 +14,7 @@ namespace TeamStor.RPG
         {
         }
 
-        public override void DrawAfterTransition(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
+        public override void DrawAfterTransition(Engine.Game game, Point mapPos, Map map, TileMetadata metadata, Map.Environment environment, Color? color = null)
         {
             TileAtlas.Region region = Map.Atlas["tiles/city/road_corner.png"];
             Rectangle mapRect = new Rectangle(0, 0, map.Width, map.Height);
@@ -66,7 +66,7 @@ namespace TeamStor.RPG
             }
         }
 
-        public override string TransitionTexture(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
+        public override string TransitionTexture(TileMetadata metadata = null, Map.Environment environment = Map.Environment.Forest)
         {
             return "tiles/transitions/road_color.png";
         }

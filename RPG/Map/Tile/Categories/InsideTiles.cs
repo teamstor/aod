@@ -14,6 +14,6 @@ namespace TeamStor.RPG
         public static Tile Wall = new Tile("inside/wall", Tile.MapLayer.Decoration, "Wall", "tiles/inside/wall.png", true);
 
         public static Tile Door = new DrawOffsetTile("inside/door", Tile.MapLayer.Decoration, "Door", "tiles/inside/door.png", new Point(0, -1), true);
-        public static Tile Doormat = new DoormatTile("inside/doormat", Tile.MapLayer.Terrain, "Doormat", "tiles/inside/doormat.png", false);
+        public static Tile Doormat = new DoormatTile("inside/doormat", Tile.MapLayer.Terrain, "Doormat", "tiles/inside/doormat.png", false, -1);
     }
 }

@@ -153,16 +153,13 @@ namespace TeamStor.RPG.Editor.States
 
         private void FinalizeEdit()
         {
-            SortedDictionary<string, string> newAttribs = new SortedDictionary<string, string>();
+            TileMetadata newAttribs = new TileMetadata();
             foreach(TileAttributeEditor editor in _editors)
             {
                 if(!editor.IsDefaultValue)
-                    newAttribs.Add(editor.Name, editor.ValueAsString);
+                    newAttribs[editor.Name] = editor.ValueAsString;
                 editor.Dispose();
             }
-
-            if(newAttribs.Count == 0)
-                newAttribs = null;
             
             BaseState.Map.SetMetadata(Layer, SelectedTile.X, SelectedTile.Y, newAttribs);
             
@@ -201,7 +198,7 @@ namespace TeamStor.RPG.Editor.States
                 if(canCurrentTileHaveMetadata)
                 {
                     SelectedTile = HoveredTile;
-                    SortedDictionary<string, string> attribs = BaseState.Map.GetMetadata(Layer, SelectedTile.X, SelectedTile.Y);
+                    TileMetadata attribs = BaseState.Map.GetMetadata(Layer, SelectedTile.X, SelectedTile.Y);
 
                     int currentY = Game.GraphicsDevice.Viewport.Bounds.Height / 2 - 300 / 2 + 30;
                     _editors = BaseState.Map[Layer, SelectedTile.X, SelectedTile.Y].AttributeEditors(BaseState, ref currentY);
@@ -210,7 +207,7 @@ namespace TeamStor.RPG.Editor.States
                     {
                         foreach(TileAttributeEditor editor in _editors)
                         {
-                            if(attribs.ContainsKey(editor.Name))
+                            if(attribs.IsKeySet(editor.Name))
                                 editor.ValueFromExistingTile(attribs[editor.Name]);
                         }
                     }
@@ -294,7 +291,7 @@ namespace TeamStor.RPG.Editor.States
                 batch.Transform = BaseState.Camera.Transform;
 
                 bool canCurrentTileHaveMetadata = BaseState.Map[Layer, HoveredTile.X, HoveredTile.Y].HasEditableAttributes;
-                SortedDictionary<string, string> attribs = BaseState.Map.GetMetadata(Layer, HoveredTile.X, HoveredTile.Y);
+                TileMetadata attribs = BaseState.Map.GetMetadata(Layer, HoveredTile.X, HoveredTile.Y);
                 batch.Outline(new Rectangle(HoveredTile.X * 16, HoveredTile.Y * 16, 16, 16),
                     canCurrentTileHaveMetadata ? Color.White * 0.6f : Color.DarkRed * 0.6f, 1, false);
 

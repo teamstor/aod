@@ -33,7 +33,7 @@ namespace TeamStor.RPG
         /// <param name="metadata">Metadata for this tile.</param>
         /// <param name="world">The world this tile is in.</param>
         /// <param name="mapPos">The position on the map of this tile.</param>
-        public abstract void OnWalkEnter(SortedDictionary<string, string> metadata, WorldState world, Point mapPos);
+        public abstract void OnWalkEnter(TileMetadata metadata, WorldState world, Point mapPos);
 
         /// <summary>
         /// Called every fixed tick that the player stands on this tile.
@@ -42,7 +42,7 @@ namespace TeamStor.RPG
         /// <param name="world">The world this tile is in.</param>
         /// <param name="mapPos">The position on the map of this tile.</param>
         /// <param name="tickCount">The current tick.</param>
-        public abstract void OnStandingOn(SortedDictionary<string, string> metadata, WorldState world, Point mapPos, long tickCount);
+        public abstract void OnStandingOn(TileMetadata metadata, WorldState world, Point mapPos, long tickCount);
 
         /// <summary>
         /// Called once when the player walks off this tile.
@@ -50,7 +50,7 @@ namespace TeamStor.RPG
         /// <param name="metadata">Metadata for this tile.</param>
         /// <param name="world">The world this tile is in.</param>
         /// <param name="mapPos">The position on the map of this tile.</param>
-        public abstract void OnWalkLeave(SortedDictionary<string, string> metadata, WorldState world, Point mapPos);
+        public abstract void OnWalkLeave(TileMetadata metadata, WorldState world, Point mapPos);
 
         /// <summary>
         /// Called when the player is facing this tile and presses the interact button.
@@ -58,6 +58,6 @@ namespace TeamStor.RPG
         /// <param name="metadata">Metadata for this tile.</param>
         /// <param name="world">The world this tile is in.</param>
         /// <param name="mapPos">The position on the map of this tile.</param>
-        public abstract void OnInteract(SortedDictionary<string, string> metadata, WorldState world, Point mapPos);
+        public abstract void OnInteract(TileMetadata metadata, WorldState world, Point mapPos);
     }
 }

@@ -214,7 +214,7 @@ namespace TeamStor.RPG.Editor
 				{
 					SaveFileDialog dialog = new SaveFileDialog();
 					
-					dialog.Filter = "Map files (*.map)|*.map|All files (*.*)|*.*";
+					dialog.Filter = "Map files (*.json)|*.json|All files (*.*)|*.*";
                     if(dialog.ShowDialog() == DialogResult.OK)
                     {
                         _dataOperation = DataOperation.Saving;
@@ -537,9 +537,9 @@ namespace TeamStor.RPG.Editor
                     {
                         for(y = 0; y < Map.Height; y++)
                         {
-                            SortedDictionary<string, string> meta = Map.GetMetadata(layer, x, y);
+                            TileMetadata meta = Map.GetMetadata(layer, x, y);
 
-                            if(meta != null && meta.Count > 0)
+                            if(meta != null && meta.HasValuesSet)
                             {
                                 foreach(KeyValuePair<string, string> pair in meta)
                                     size += (pair.Key.Length + pair.Value.Length) * 2;

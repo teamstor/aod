@@ -24,7 +24,7 @@ namespace TeamStor.RPG
         {
         }
 
-        public override void Draw(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
+        public override void Draw(Engine.Game game, Point mapPos, Map map, TileMetadata metadata, Map.Environment environment, Color? color = null)
         {
             if(!_hasValues)
             {
@@ -47,7 +47,7 @@ namespace TeamStor.RPG
             base.Draw(game, mapPos, map, metadata, environment, color);
         }
 
-        public override string TextureName(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
+        public override string TextureName(TileMetadata metadata = null, Map.Environment environment = Map.Environment.Forest)
         {
             string connection = "normal";
             string var = "var" + (_variation + 1);

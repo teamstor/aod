@@ -24,12 +24,12 @@ namespace TeamStor.RPG
             Offset = offset;
         }
 
-        public override void Draw(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
+        public override void Draw(Engine.Game game, Point mapPos, Map map, TileMetadata metadata, Map.Environment environment, Color? color = null)
         {
             base.Draw(game, mapPos + Offset, map, metadata, environment, color);
         }
 
-        public override void DrawAfterTransition(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
+        public override void DrawAfterTransition(Engine.Game game, Point mapPos, Map map, TileMetadata metadata, Map.Environment environment, Color? color = null)
         {
             base.DrawAfterTransition(game, mapPos + Offset, map, metadata, environment, color);
         }

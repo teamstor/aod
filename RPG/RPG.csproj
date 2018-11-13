@@ -109,6 +109,7 @@
     <Compile Include="Map\Tile\TileEventBase.cs" />
     <Compile Include="Map\Tile\Behavior\AnimatedTile.cs" />
     <Compile Include="Map\Tile\Categories\WaterTiles.cs" />
+    <Compile Include="Map\Tile\TileMetadata.cs" />
     <Compile Include="Map\Tile\TileTransitionCache.cs" />
     <Compile Include="Menu\MenuButton.cs" />
     <Compile Include="Menu\MenuController.cs" />

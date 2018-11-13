@@ -78,7 +78,7 @@ namespace TeamStor.RPG
         // (ID 16 bit) | (Metadata 16 bit)
         private uint[] _layerTerrain, _layerDecoration, _layerNPC, _layerControl;
         private Tile[] _idmapTerrain, _idmapDecoration, _idmapNPC, _idmapControl;
-        private List<SortedDictionary<string, string>> _metadataTerrain, _metadataDecoration, _metadataNPC, _metadataControl;
+        private List<TileMetadata> _metadataTerrain, _metadataDecoration, _metadataNPC, _metadataControl;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private uint[] LayerToTileArray(Tile.MapLayer layer)
@@ -123,7 +123,7 @@ namespace TeamStor.RPG
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private List<SortedDictionary<string, string>> LayerToMetadataArray(Tile.MapLayer layer)
+        private List<TileMetadata> LayerToMetadataArray(Tile.MapLayer layer)
         {
             switch(layer)
             {
@@ -186,10 +186,10 @@ namespace TeamStor.RPG
             foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
                 LayerToIDMap(layer)[0] = Tile.Find("", layer);
 
-            _metadataTerrain = new List<SortedDictionary<string, string>>();
-            _metadataDecoration = new List<SortedDictionary<string, string>>();
-            _metadataNPC = new List<SortedDictionary<string, string>>();
-            _metadataControl = new List<SortedDictionary<string, string>>();
+            _metadataTerrain = new List<TileMetadata>();
+            _metadataDecoration = new List<TileMetadata>();
+            _metadataNPC = new List<TileMetadata>();
+            _metadataControl = new List<TileMetadata>();
         }
 
         public Tile this[Tile.MapLayer layer, int x, int y]
@@ -277,7 +277,7 @@ namespace TeamStor.RPG
         /// <param name="x">The X position of the tile.</param>
         /// <param name="y">The Y position of the tile.</param>
         /// <returns>The metadata or null.</returns>
-        public SortedDictionary<string, string> GetMetadata(Tile.MapLayer layer, int x, int y)
+        public TileMetadata GetMetadata(Tile.MapLayer layer, int x, int y)
         {
             // TODO: MetadataAccess class helper
             if(HasMetadata(layer, x, y))
@@ -297,7 +297,7 @@ namespace TeamStor.RPG
         /// <param name="x">The X position of the tile.</param>
         /// <param name="y">The Y position of the tile.</param>
         /// <param name="metadata">The metadata string, or null.</param>
-        public void SetMetadata(Tile.MapLayer layer, int x, int y, SortedDictionary<string, string> metadata)
+        public void SetMetadata(Tile.MapLayer layer, int x, int y, TileMetadata metadata)
         {
             if(HasMetadata(layer, x, y))
             {
@@ -317,7 +317,7 @@ namespace TeamStor.RPG
                 }
             }
 
-            if(metadata != null)
+            if(metadata != null && metadata.HasValuesSet)
             {
                 LayerToMetadataArray(layer).Add(metadata);
                 LayerToTileArray(layer)[(y * Width) + x] = (uint)((LayerToTileArray(layer)[(y * Width) + x] & 0xFFFF) | ((LayerToMetadataArray(layer).Count) << 16));
@@ -411,7 +411,7 @@ namespace TeamStor.RPG
         private static void ReadJSONComplexTileObject(JsonReader reader, Map map, Tile.MapLayer layer, int x, int y)
         {
             string id = "";
-            SortedDictionary<string, string> metadata = new SortedDictionary<string, string>();
+            TileMetadata metadata = new TileMetadata();
 
             while(reader.Read())
             {
@@ -427,7 +427,7 @@ namespace TeamStor.RPG
                             while(reader.Read())
                             {
                                 if(reader.TokenType == JsonToken.PropertyName)
-                                    metadata.Add((string)reader.Value, reader.ReadAsString());
+                                    metadata[(string)reader.Value] = reader.ReadAsString();
                                 else if(reader.TokenType == JsonToken.EndObject)
                                     return;
                             }
@@ -611,9 +611,9 @@ namespace TeamStor.RPG
                         {
                             for(y = 0; y < Height; y++)
                             {
-                                SortedDictionary<string, string> metadata = GetMetadata(layer, x, y);
+                                TileMetadata metadata = GetMetadata(layer, x, y);
 
-                                if(metadata != null && metadata.Count > 0)
+                                if(metadata != null && metadata.HasValuesSet)
                                 {
                                     writer.WriteStartObject();
                                     writer.WritePropertyName("id");

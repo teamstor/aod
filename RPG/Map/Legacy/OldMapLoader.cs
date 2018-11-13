@@ -88,7 +88,7 @@ namespace TeamStor.RPG.Legacy
                 }
 
                 writer.Write(_metadataTerrain.Count);
-                foreach(SortedDictionary<string, string> s in _metadataTerrain)
+                foreach(TileMetadata s in _metadataTerrain)
                 {
                     writer.Write(s.Count);
                     foreach(KeyValuePair<string, string> pair in s)
@@ -99,7 +99,7 @@ namespace TeamStor.RPG.Legacy
                 }
 
                 writer.Write(_metadataDecoration.Count);
-                foreach(SortedDictionary<string, string> s in _metadataDecoration)
+                foreach(TileMetadata s in _metadataDecoration)
                 {
                     writer.Write(s.Count);
                     foreach(KeyValuePair<string, string> pair in s)
@@ -110,7 +110,7 @@ namespace TeamStor.RPG.Legacy
                 }
 
                 writer.Write(_metadataNPC.Count);
-                foreach(SortedDictionary<string, string> s in _metadataNPC)
+                foreach(TileMetadata s in _metadataNPC)
                 {
                     writer.Write(s.Count);
                     foreach(KeyValuePair<string, string> pair in s)
@@ -121,7 +121,7 @@ namespace TeamStor.RPG.Legacy
                 }
 
                 writer.Write(_metadataControl.Count);
-                foreach(SortedDictionary<string, string> s in _metadataControl)
+                foreach(TileMetadata s in _metadataControl)
                 {
                     writer.Write(s.Count);
                     foreach(KeyValuePair<string, string> pair in s)

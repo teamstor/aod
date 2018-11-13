@@ -39,13 +39,13 @@ namespace TeamStor.RPG
             FPS = fps;
         }
 
-        public override void Draw(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
+        public override void Draw(Engine.Game game, Point mapPos, Map map, TileMetadata metadata, Map.Environment environment, Color? color = null)
         {
             UpdateCurrentFrameWithGame(game);
             base.Draw(game, mapPos, map, metadata, environment, color);
         }
 
-        public override void DrawAfterTransition(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
+        public override void DrawAfterTransition(Engine.Game game, Point mapPos, Map map, TileMetadata metadata, Map.Environment environment, Color? color = null)
         {
             UpdateCurrentFrameWithGame(game);
             base.DrawAfterTransition(game, mapPos, map, metadata, environment, color);
@@ -56,7 +56,7 @@ namespace TeamStor.RPG
             _currentSlot = (int)(game.Time * FPS) % TextureCount;
         }
 
-        public override string TextureName(SortedDictionary<string, string> metadata = null, Map.Environment environment = Map.Environment.Forest)
+        public override string TextureName(TileMetadata metadata = null, Map.Environment environment = Map.Environment.Forest)
         {
             return base.TextureName(metadata, environment).Replace("{frame}", _currentSlot.ToString());
         }

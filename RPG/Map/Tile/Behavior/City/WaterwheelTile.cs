@@ -30,7 +30,7 @@ namespace TeamStor.RPG
             return true;
         }
 
-        public override void Draw(Engine.Game game, Point mapPos, Map map, SortedDictionary<string, string> metadata, Map.Environment environment, Color? color = null)
+        public override void Draw(Engine.Game game, Point mapPos, Map map, TileMetadata metadata, Map.Environment environment, Color? color = null)
         {
             TileAtlas.Region region = Map.Atlas.MissingRegion;
 
