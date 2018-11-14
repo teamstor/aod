@@ -1,12 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TeamStor.Engine.Graphics;
 using TeamStor.Engine.Tween;
 
 using Game = TeamStor.Engine.Game;
+using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 
 namespace TeamStor.RPG.Editor
 {
@@ -15,8 +19,21 @@ namespace TeamStor.RPG.Editor
     /// </summary>
     public class TileMenu
     {
+        private bool _isScrolling = false;
+        private bool _quitQueued = false;
         private Map.Environment _environment;
+        private TweenedDouble _screenFade;
+        private float _scrollTarget = -1;
+
         public Game Game;
+
+        public bool IsHovered
+        {
+            get
+            {
+                return Rectangle.Value.Contains(Game.Input.MousePosition) || _isScrolling;
+            }
+        }
 
         /// <summary>
         /// Special separator object for categories.
@@ -74,6 +91,23 @@ namespace TeamStor.RPG.Editor
         /// Total area this tile menu could cover.
         /// </summary>
         public Vector2 TotalArea;
+
+        /// <summary>
+        /// Amount the user can scroll the menu.
+        /// </summary>
+        public int ScrollableAmount
+        {
+            get
+            {
+                return Math.Max(0, (int)TotalArea.Y - MaxHeight);
+            }
+        }
+
+        /// <summary>
+        /// Amount the user has scrolled.
+        /// This can go over or under the minimum/maximum.
+        /// </summary>
+        public float Scroll;
 
         /// <summary>
         /// The currently selected tile.
@@ -141,14 +175,14 @@ namespace TeamStor.RPG.Editor
             Categories.Last().Objects.Add(CityTiles.Waterwheel);
 
             Categories.Add(new Category("Inside", "editor/tilemenu/inside.png"));
-            windows.Objects.Add(InsideTiles.Floor);
-            windows.Objects.Add(InsideTiles.Wall);
-            windows.Objects.Add(InsideTiles.Panel);
+            Categories.Last().Objects.Add(InsideTiles.Floor);
+            Categories.Last().Objects.Add(InsideTiles.Wall);
+            Categories.Last().Objects.Add(InsideTiles.Panel);
 
-            windows.Objects.Add(Separator);
+            Categories.Last().Objects.Add(Separator);
 
-            windows.Objects.Add(InsideTiles.Door);
-            windows.Objects.Add(InsideTiles.Doormat);
+            Categories.Last().Objects.Add(InsideTiles.Door);
+            Categories.Last().Objects.Add(InsideTiles.Doormat);
 
             Categories.Add(new Category("Control", "editor/tilemenu/control.png"));
             Categories.Last().Objects.Add(ControlTiles.Spawnpoint);
@@ -171,15 +205,19 @@ namespace TeamStor.RPG.Editor
                 TotalArea.Y += measure.Y;
             }
 
-            TotalArea.X += 8;
-            TotalArea.Y += 8;
+            TotalArea.X += 16;
+            TotalArea.Y += 16;
 
-            Rectangle = new TweenedRectangle(game, new Rectangle(0, 0, (int)TotalArea.X, 24));
+            if(TotalArea.X < 400)
+                TotalArea.X = 400;
+
+            Rectangle = new TweenedRectangle(game, new Rectangle(0, 0, (int)TotalArea.X, 28));
+            _screenFade = new TweenedDouble(game, 0);
         }
 
         private Point CalculateCategorySize(Category category, bool first)
         {
-            Point size = new Point(0, (first ? 24 : 20) + 10);
+            Point size = new Point(0, 12 + 10);
 
             for(int i = 0; i < category.Objects.Count; i++)
             {
@@ -208,11 +246,174 @@ namespace TeamStor.RPG.Editor
             return size;
         }
 
+        public void Update(Game game)
+        {
+            if(Rectangle.Value.Contains(game.Input.MousePosition) && !Rectangle.Value.Contains(game.Input.PreviousMousePosition))
+            {
+                Rectangle.TweenTo(new Rectangle(Rectangle.TargetValue.X, Rectangle.TargetValue.Y, (int)TotalArea.X, Math.Min((int)TotalArea.Y, MaxHeight)), TweenEaseType.EaseOutQuad, 0.1f);
+                _screenFade.TweenTo(1, TweenEaseType.EaseOutQuad, 0.1f);
+            }
+            else if(_quitQueued || (!Rectangle.Value.Contains(game.Input.MousePosition) && Rectangle.Value.Contains(game.Input.PreviousMousePosition)))
+            {
+                if(_isScrolling)
+                    _quitQueued = true;
+                else
+                {
+                    if(!Rectangle.Value.Contains(game.Input.MousePosition))
+                    {
+                        Rectangle.TweenTo(new Rectangle(Rectangle.TargetValue.X, Rectangle.TargetValue.Y, (int)TotalArea.X, 28), TweenEaseType.EaseOutQuad, 0.1f);
+                        _screenFade.TweenTo(0, TweenEaseType.EaseOutQuad, 0.1f);
+                    }
+
+                    _quitQueued = false;
+                }
+            }
+
+            if(_scrollTarget != -1)
+            {
+                Scroll = MathHelper.LerpPrecise(Scroll, _scrollTarget, (float)Game.DeltaTime * 8f);
+                if(Math.Abs(Scroll - _scrollTarget) <= 0.75f)
+                    _scrollTarget = -1;
+            }
+            else if(Rectangle.Value.Contains(game.Input.MousePosition))
+            {
+                if((game.Input.MouseScroll < 0 && Scroll < ScrollableAmount) ||
+                    (game.Input.MouseScroll > 0 && Scroll > 0))
+                    Scroll -= game.Input.MouseScroll / 6f;
+
+                if(game.Input.Key(Keys.Up) && Scroll > 0)
+                    Scroll = Math.Max(0, Scroll - ((float)game.DeltaTime * 140f));
+                if(game.Input.Key(Keys.Down) && Scroll < ScrollableAmount)
+                    Scroll = Math.Min(ScrollableAmount, Scroll + ((float)game.DeltaTime * 140f));
+            }
+
+            if(_isScrolling)
+            {
+                float at = game.Input.MousePosition.Y - (Rectangle.Value.Top + 8);
+                float percentage = at / (Rectangle.Value.Height - 16);
+                Scroll = percentage * ScrollableAmount;
+
+                if(game.Input.MouseReleased(Engine.MouseButton.Left))
+                    _isScrolling = false;
+            }
+
+            Scroll = MathHelper.Clamp(Scroll, 0, ScrollableAmount);
+        }
+
+        private void DrawCategory(Engine.Game game, Category category, bool first, ref int y)
+        {
+            game.Batch.Text(first ? SpriteBatch.FontStyle.Bold : SpriteBatch.FontStyle.ItalicBold, 16, category.Title, new Vector2(0, y), Color.White * _screenFade);
+            y += 16 + 10;
+
+            for(int i = 0; i < category.Objects.Count; i++)
+            {
+                if(i != 0)
+                    y += 4;
+
+                if(category.Objects[i] is Category)
+                    DrawCategory(game, category.Objects[i] as Category, false, ref y);
+                else if((category.Objects[i] as string) == Separator)
+                {
+                    game.Batch.Rectangle(new Rectangle(0, y + 4, Rectangle.Value.Width - 52, 2), Color.White * 0.4f * _screenFade);
+                    y += 8;
+                }
+                else
+                {
+                    Vector2 measure = Game.DefaultFonts.Bold.Measure(16, (category.Objects[i] as Tile).Name(null, _environment));
+                    TileAtlas.Region region = Map.Atlas[(category.Objects[i] as Tile).TextureName(null, _environment)];
+
+                    bool isTextBigger = measure.Y > region.Rectangle.Height;
+                    int textureY = isTextBigger ? y + (int)(measure.Y / 2 - region.Rectangle.Height / 2) : y;
+                    int textY = isTextBigger ? y : y + (int)(region.Rectangle.Height / 2 - measure.Y / 2);
+
+                    game.Batch.Texture(
+                        new Rectangle(0, textureY, region.Rectangle.Width * 2, region.Rectangle.Height * 2),
+                        region.Texture,
+                        Color.White * _screenFade, region.Rectangle);
+
+                    y += Math.Max((int)measure.Y, region.Rectangle.Height * 2);
+                }
+            }
+        }
+
         public void Draw(Engine.Game game)
         {
             game.Batch.Scissor = Rectangle;
 
             game.Batch.Rectangle(Rectangle, Color.Black * 0.85f);
+
+            if(_screenFade != 1.0f)
+            {
+                game.Batch.Text(SpriteBatch.FontStyle.Bold, 15, SelectedTile.Name(), new Vector2(Rectangle.Value.X + 8, Rectangle.Value.Y + 4),
+                    Color.White * (1.0f - _screenFade) * 0.6f);
+            }
+            if(_screenFade != 0.0f)
+            {
+                Matrix oldTransform = game.Batch.Transform;
+                game.Batch.Transform = Matrix.CreateTranslation(
+                    Rectangle.Value.X + 8 + 18 + 10, 
+                    (int)-Scroll + Rectangle.Value.Y + 6, 
+                    0);
+
+                int y = 0;
+
+                foreach(Category category in Categories)
+                    DrawCategory(game, category, true, ref y);
+
+                game.Batch.Transform = oldTransform;
+
+                int cY = 8;
+                int categoryTop = 8 - (int)Scroll;
+                foreach(Category category in Categories)
+                {
+                    Rectangle rect = new Rectangle(
+                        Rectangle.Value.X + 8, 
+                        Rectangle.Value.Y + cY - (categoryTop < cY ? cY - categoryTop : 0), 
+                        18, 
+                        18);
+                    bool hover = rect.Contains(game.Input.MousePosition);
+
+                    game.Batch.Texture(rect, game.Assets.Get<Texture2D>(category.Icon), Color.White * _screenFade * (hover ? 1.0f : 0.6f));
+
+                    if(game.Input.MousePressed(Engine.MouseButton.Left) && hover)
+                        _scrollTarget = categoryTop + (int)Scroll - 8;
+
+                    if(categoryTop < cY)
+                        cY -= Math.Min(cY - categoryTop, 24);
+
+                    cY += 24;
+                    categoryTop += CalculateCategorySize(category, true).Y;
+                }
+
+                if(ScrollableAmount > 0)
+                {
+                    float scrollBarHeight = 1000 / ScrollableAmount;
+                    if(scrollBarHeight > Rectangle.Value.Height - 16)
+                        scrollBarHeight = Rectangle.Value.Height - 16;
+                    if(scrollBarHeight < 20)
+                        scrollBarHeight = 20;
+
+                    Rectangle fullScrollRectangle = new Rectangle(Rectangle.Value.Right - 14, Rectangle.Value.Y + 8, 10, Rectangle.Value.Height - 16);
+
+                    if(fullScrollRectangle.Contains(game.Input.MousePosition) || _isScrolling)
+                    {
+                        fullScrollRectangle.X = Rectangle.Value.Right - 10;
+                        fullScrollRectangle.Width = 2;
+
+                        game.Batch.Rectangle(fullScrollRectangle, Color.White * 0.4f * _screenFade);
+
+                        if(game.Input.MousePressed(Engine.MouseButton.Left) && !_isScrolling)
+                            _isScrolling = true;
+                    }
+
+                    game.Batch.Rectangle(new Rectangle(
+                        Rectangle.Value.Right - 10,
+                        (int)(MathHelper.Lerp(Rectangle.Value.Y + 8, Rectangle.Value.Bottom - 8 - scrollBarHeight, Scroll / ScrollableAmount)),
+                        2,
+                        (int)scrollBarHeight),
+                        Color.White * 0.5f * _screenFade);
+                }
+            }
 
             game.Batch.Scissor = null;
         }

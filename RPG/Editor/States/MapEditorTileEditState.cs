@@ -291,6 +291,9 @@ namespace TeamStor.RPG.Editor.States
 				        break;
 		        }
 	        }
+
+            Menu.MaxHeight = Game.GraphicsDevice.Viewport.Bounds.Height / 2;
+            Menu.Update(Game);
         }
 
         public override void FixedUpdate(long count)
@@ -325,7 +328,7 @@ namespace TeamStor.RPG.Editor.States
 
             Menu.Draw(Game);
 			
-			if(!BaseState.IsPointObscured(Input.MousePosition))
+			if(!BaseState.IsPointObscured(Input.MousePosition) && !Menu.IsHovered)
 			{
 				batch.Transform = BaseState.Camera.Transform;
 
