@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TeamStor.Engine.Graphics;
 using TeamStor.Engine.Tween;
-
+using TeamStor.RPG.Gameplay;
 using Game = TeamStor.Engine.Game;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 
@@ -209,6 +209,13 @@ namespace TeamStor.RPG.Editor
             Categories.Last().Objects.Add(Separator);
             Categories.Last().Objects.Add(ControlTiles.Barrier);
             Categories.Last().Objects.Add(ControlTiles.InvertedBarrier);
+
+            Categories.Add(new Category("NPCs", "editor/tilemenu/npcs.png"));
+
+            Category animals = new Category("Animals", "");
+            animals.Objects.Add(NPCs.GreenPig.TileTemplate);
+
+            Categories.Last().Objects.Add(animals);
 
             SelectedTile = WaterTiles.DeepWaterOrVoid;
 

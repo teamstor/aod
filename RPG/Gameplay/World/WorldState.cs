@@ -97,6 +97,7 @@ namespace TeamStor.RPG.Gameplay.World
         {
             NPC npc = new NPC(this, template);
             npc.MoveInstantly(position);
+            _npcs.Add(npc);
             return npc;
         }
 
@@ -133,6 +134,15 @@ namespace TeamStor.RPG.Gameplay.World
                 Player.MoveInstantly(_spawnArgs.Position);
 
             Player.Heading = _spawnArgs.Direction;
+
+            for(int x = 0; x < Map.Width; x++)
+            {
+                for(int y = 0; y < Map.Height; y++)
+                {
+                    if(Map[Tile.MapLayer.NPC, x, y] != DefaultTiles.EmptyNPC)
+                        SpawnNPC(NPCTemplate.FromTile(Map[Tile.MapLayer.NPC, x, y]), new Point(x, y));
+                }
+            }
 
             if(_useTransiton)
             {
@@ -176,6 +186,9 @@ namespace TeamStor.RPG.Gameplay.World
                 Point lastPlayerPos = Player.Position;
                 Player.Update(deltaTime, totalTime, count);
                 Camera.Update(deltaTime);
+
+                foreach(NPC npc in NPCs)
+                    npc.Update(deltaTime, totalTime, count);
 
                 foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
                 {
@@ -233,6 +246,17 @@ namespace TeamStor.RPG.Gameplay.World
             }
 
             return str;
+        }
+
+        public bool IsPointBlocked(Point point)
+        {
+            foreach(NPC npc in NPCs)
+            {
+                if(npc.Position == point)
+                    return true;
+            }
+
+            return Map.IsPointBlocked(point) || Player.Position == point;
         }
 
         public override void Draw(SpriteBatch batch, Vector2 screenSize)

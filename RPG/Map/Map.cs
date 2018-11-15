@@ -429,7 +429,7 @@ namespace TeamStor.RPG
                                 if(reader.TokenType == JsonToken.PropertyName)
                                     metadata[(string)reader.Value] = reader.ReadAsString();
                                 else if(reader.TokenType == JsonToken.EndObject)
-                                    return;
+                                    break;
                             }
                             break;
                     }
@@ -437,6 +437,9 @@ namespace TeamStor.RPG
                 else if(reader.TokenType == JsonToken.EndObject)
                     break;
             }
+
+            map[layer, x, y] = Tile.Find(id, layer);
+            map.SetMetadata(layer, x, y, metadata);
         }
 
         private static void ReadJSONLayer(JsonReader reader, Map map, Tile.MapLayer layer)
@@ -457,7 +460,10 @@ namespace TeamStor.RPG
                     pos++;
                 }
                 else if(reader.TokenType == JsonToken.StartObject)
+                {
                     ReadJSONComplexTileObject(reader, map, layer, x, y);
+                    pos++;
+                }
                 else if(reader.TokenType == JsonToken.EndArray)
                     return;
             }

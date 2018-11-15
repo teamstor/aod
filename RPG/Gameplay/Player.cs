@@ -90,7 +90,7 @@ namespace TeamStor.RPG.Gameplay
 
                 if(_keyHeld >= 0.1)
                 {
-                    if(!World.Map.IsPointBlocked(Position + Heading.ToPoint()))
+                    if(!World.IsPointBlocked(Position + Heading.ToPoint()))
                         MoveTo(Position + Heading.ToPoint());
                 }
 
