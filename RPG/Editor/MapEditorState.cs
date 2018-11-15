@@ -342,7 +342,7 @@ namespace TeamStor.RPG.Editor
             Buttons["edit-info-mode"].Active = CurrentState is MapEditorEditInfoState;
 			Buttons["keybinds-help-mode"].Active = CurrentState is MapEditorShowKeybindsState;
 
-            if(_dataOperation == DataOperation.None)
+            if(_dataOperation == DataOperation.None && !CurrentState.IsPointObscured(Game.Input.MousePosition))
             {
                 foreach(Button button in Buttons.Values.ToArray())
                     button.Update(Game);
@@ -458,7 +458,7 @@ namespace TeamStor.RPG.Editor
                     return true;
             }
 
-            return false;
+            return CurrentState.IsPointObscured(point);
 		}
 
         public override void FixedUpdate(long count)

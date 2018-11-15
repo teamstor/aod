@@ -1,4 +1,5 @@
-﻿using TeamStor.Engine;
+﻿using Microsoft.Xna.Framework;
+using TeamStor.Engine;
 
 namespace TeamStor.RPG.Editor.States
 {
@@ -25,5 +26,11 @@ namespace TeamStor.RPG.Editor.States
         /// Base map editor state.
         /// </summary>
         public MapEditorState BaseState;
-	}
+
+        public virtual bool IsPointObscured(Vector2 point)
+        {
+            return false;
+        }
+
+    }
 }

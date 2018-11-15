@@ -43,9 +43,11 @@ namespace TeamStor.RPG.Editor
         public bool Active;
         public bool Disabled = false;
 
+        public bool CanClickActive = false;
+
         public void Update(Game game)
         {
-            bool hovered = !Active && Rectangle.Contains(game.Input.MousePosition) && !Disabled;
+            bool hovered = (!Active || CanClickActive) && Rectangle.Contains(game.Input.MousePosition) && !Disabled;
 
             if(hovered && game.Input.MousePressed(MouseButton.Left) && Clicked != null)
                 Clicked(this);

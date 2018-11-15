@@ -31,9 +31,14 @@ namespace TeamStor.RPG.Editor
         {
             get
             {
-                return Rectangle.Value.Contains(Game.Input.MousePosition) || _isScrolling;
+                return !Disabled && (Rectangle.Value.Contains(Game.Input.MousePosition) || _isScrolling);
             }
         }
+
+        /// <summary>
+        /// If this menu is disabled.
+        /// </summary>
+        public bool Disabled = false;
 
         /// <summary>
         /// Special separator object for categories.
@@ -117,13 +122,25 @@ namespace TeamStor.RPG.Editor
             get; private set;
         }
 
+        public delegate void OnSelectionChanged(TileMenu menu, Tile newSelected);
+        public OnSelectionChanged SelectionChanged;
+
         public TileMenu(Map.Environment environment, Engine.Game game)
         {
             _environment = environment;
             Game = game;
 
-            Categories.Add(new Category(environment == Map.Environment.Inside ? "General" : "Water",
-                environment == Map.Environment.Inside ? "editor/tilemenu/general.png" : "editor/tilemenu/water.png"));
+            Rectangle = new TweenedRectangle(game, new Rectangle(0, 0, (int)TotalArea.X, 28));
+            _screenFade = new TweenedDouble(game, 0);
+
+            Recreate();
+        }
+
+        private void Recreate()
+        {
+            Categories.Clear();
+            Categories.Add(new Category(_environment == Map.Environment.Inside ? "General" : "Water",
+                 _environment == Map.Environment.Inside ? "editor/tilemenu/general.png" : "editor/tilemenu/water.png"));
             Categories.Last().Objects.Add(WaterTiles.DeepWaterOrVoid);
             Categories.Last().Objects.Add(WaterTiles.ShallowWater);
 
@@ -195,29 +212,27 @@ namespace TeamStor.RPG.Editor
 
             SelectedTile = WaterTiles.DeepWaterOrVoid;
 
+            TotalArea = new Vector2(0, 0);
+
             // icons
             TotalArea.X += 18 + 10;
 
             foreach(Category category in Categories)
             {
                 Point measure = CalculateCategorySize(category, true);
-                TotalArea.X = Math.Max(18 + 10 + measure.X, TotalArea.X);
+                TotalArea.X = Math.Max(18 + 10 + measure.X + 40, TotalArea.X);
                 TotalArea.Y += measure.Y;
             }
 
             TotalArea.X += 16;
             TotalArea.Y += 16;
 
-            if(TotalArea.X < 400)
-                TotalArea.X = 400;
-
-            Rectangle = new TweenedRectangle(game, new Rectangle(0, 0, (int)TotalArea.X, 28));
-            _screenFade = new TweenedDouble(game, 0);
+            Rectangle.TweenTo(new Rectangle(Rectangle.TargetValue.X, Rectangle.TargetValue.Y, (int)TotalArea.X, Rectangle.TargetValue.Height), TweenEaseType.Linear, 0);
         }
 
         private Point CalculateCategorySize(Category category, bool first)
         {
-            Point size = new Point(0, 12 + 10);
+            Point size = new Point(0, (first ? 16 : 14) + 10);
 
             for(int i = 0; i < category.Objects.Count; i++)
             {
@@ -237,18 +252,20 @@ namespace TeamStor.RPG.Editor
                     if(Map.Atlas == null)
                         Map.Atlas = new TileAtlas(Game);
 
-                    Vector2 measure = Game.DefaultFonts.Bold.Measure(16, (category.Objects[i] as Tile).Name(null, _environment));
+                    string layer = (category.Objects[i] as Tile).Layer.ToString();
+                    Vector2 measure = Game.DefaultFonts.Bold.Measure(16, (category.Objects[i] as Tile).Name(null, _environment) + "\n" + layer);
                     size.X = Math.Max(size.X, Map.Atlas[(category.Objects[i] as Tile).TextureName(null, _environment)].Rectangle.Width * 2 + 4 + (int)measure.X);
                     size.Y += Math.Max((int)measure.Y, Map.Atlas[(category.Objects[i] as Tile).TextureName(null, _environment)].Rectangle.Height * 2);
                 }
             }
 
+            size.Y += 10;
             return size;
         }
 
         public void Update(Game game)
         {
-            if(Rectangle.Value.Contains(game.Input.MousePosition) && !Rectangle.Value.Contains(game.Input.PreviousMousePosition))
+            if(Rectangle.Value.Contains(game.Input.MousePosition) && !Disabled && !Rectangle.Value.Contains(game.Input.PreviousMousePosition))
             {
                 Rectangle.TweenTo(new Rectangle(Rectangle.TargetValue.X, Rectangle.TargetValue.Y, (int)TotalArea.X, Math.Min((int)TotalArea.Y, MaxHeight)), TweenEaseType.EaseOutQuad, 0.1f);
                 _screenFade.TweenTo(1, TweenEaseType.EaseOutQuad, 0.1f);
@@ -302,8 +319,8 @@ namespace TeamStor.RPG.Editor
 
         private void DrawCategory(Engine.Game game, Category category, bool first, ref int y)
         {
-            game.Batch.Text(first ? SpriteBatch.FontStyle.Bold : SpriteBatch.FontStyle.ItalicBold, 16, category.Title, new Vector2(0, y), Color.White * _screenFade);
-            y += 16 + 10;
+            game.Batch.Text(SpriteBatch.FontStyle.Bold, (first ? (uint)16 : 14), category.Title, new Vector2(0, y), Color.White * _screenFade);
+            y += (first ? 16 : 14) + 10;
 
             for(int i = 0; i < category.Objects.Count; i++)
             {
@@ -313,27 +330,54 @@ namespace TeamStor.RPG.Editor
                 if(category.Objects[i] is Category)
                     DrawCategory(game, category.Objects[i] as Category, false, ref y);
                 else if((category.Objects[i] as string) == Separator)
-                {
-                    game.Batch.Rectangle(new Rectangle(0, y + 4, Rectangle.Value.Width - 52, 2), Color.White * 0.4f * _screenFade);
                     y += 8;
-                }
                 else
                 {
-                    Vector2 measure = Game.DefaultFonts.Bold.Measure(16, (category.Objects[i] as Tile).Name(null, _environment));
+                    string layer = (category.Objects[i] as Tile).Layer.ToString();
+                    Vector2 measure = Game.DefaultFonts.Bold.Measure(16, (category.Objects[i] as Tile).Name(null, _environment) + "\n" + layer);
                     TileAtlas.Region region = Map.Atlas[(category.Objects[i] as Tile).TextureName(null, _environment)];
 
-                    bool isTextBigger = measure.Y > region.Rectangle.Height;
-                    int textureY = isTextBigger ? y + (int)(measure.Y / 2 - region.Rectangle.Height / 2) : y;
-                    int textY = isTextBigger ? y : y + (int)(region.Rectangle.Height / 2 - measure.Y / 2);
+                    bool isTextBigger = measure.Y > region.Rectangle.Height * 2;
+                    int textureY = isTextBigger ? y + (int)(measure.Y / 2 - region.Rectangle.Height) : y;
+                    int textY = isTextBigger ? y : y + (int)(region.Rectangle.Height - measure.Y / 2);
+
+                    Rectangle fullRectangle = new Rectangle(
+                        Rectangle.Value.X + 8 + 28,
+                        (int)-Scroll + Rectangle.Value.Y + 6 + y,
+                        Rectangle.Value.Width - 8 - 48,
+                        Math.Max((int)measure.Y, region.Rectangle.Height * 2));
+
+                    if(fullRectangle.Contains(game.Input.MousePosition) ||
+                        SelectedTile == (category.Objects[i] as Tile))
+                        game.Batch.Rectangle(
+                            new Rectangle(-4, y - 2, fullRectangle.Width + 4, fullRectangle.Height + 4), 
+                            Color.White * (SelectedTile == (category.Objects[i] as Tile) ? 0.15f : 0.1f));
+
+                    if(fullRectangle.Contains(game.Input.MousePosition) &&
+                        SelectedTile != (category.Objects[i] as Tile) &&
+                        game.Input.MousePressed(Engine.MouseButton.Left))
+                    {
+                        SelectedTile = (category.Objects[i] as Tile);
+
+                        if(SelectionChanged != null)
+                            SelectionChanged(this, SelectedTile);
+                    }
 
                     game.Batch.Texture(
                         new Rectangle(0, textureY, region.Rectangle.Width * 2, region.Rectangle.Height * 2),
                         region.Texture,
                         Color.White * _screenFade, region.Rectangle);
 
+                    game.Batch.Text(SpriteBatch.FontStyle.Bold, 14, (category.Objects[i] as Tile).Name(null, _environment), new Vector2(
+                        region.Rectangle.Width * 2 + 12, textY), Color.White * 0.6f * _screenFade);
+                    game.Batch.Text(SpriteBatch.FontStyle.Bold, 14, layer, new Vector2(
+                        region.Rectangle.Width * 2 + 12, textY + 16), Color.White * 0.3f * _screenFade);
+
                     y += Math.Max((int)measure.Y, region.Rectangle.Height * 2);
                 }
             }
+
+            y += 10;
         }
 
         public void Draw(Engine.Game game)
@@ -345,7 +389,7 @@ namespace TeamStor.RPG.Editor
             if(_screenFade != 1.0f)
             {
                 game.Batch.Text(SpriteBatch.FontStyle.Bold, 15, SelectedTile.Name(), new Vector2(Rectangle.Value.X + 8, Rectangle.Value.Y + 4),
-                    Color.White * (1.0f - _screenFade) * 0.6f);
+                    Color.White * (1.0f - _screenFade) * (Disabled ? 0.3f : 0.6f));
             }
             if(_screenFade != 0.0f)
             {
@@ -368,7 +412,7 @@ namespace TeamStor.RPG.Editor
                 {
                     Rectangle rect = new Rectangle(
                         Rectangle.Value.X + 8, 
-                        Rectangle.Value.Y + cY - (categoryTop < cY ? cY - categoryTop : 0), 
+                        Rectangle.Value.Y + cY /* - (categoryTop < cY ? cY - categoryTop : 0) */, 
                         18, 
                         18);
                     bool hover = rect.Contains(game.Input.MousePosition);
@@ -376,10 +420,10 @@ namespace TeamStor.RPG.Editor
                     game.Batch.Texture(rect, game.Assets.Get<Texture2D>(category.Icon), Color.White * _screenFade * (hover ? 1.0f : 0.6f));
 
                     if(game.Input.MousePressed(Engine.MouseButton.Left) && hover)
-                        _scrollTarget = categoryTop + (int)Scroll - 8;
+                        _scrollTarget = Math.Min(ScrollableAmount, categoryTop + (int)Scroll - 8);
 
-                    if(categoryTop < cY)
-                        cY -= Math.Min(cY - categoryTop, 24);
+                    /*if(categoryTop < cY)
+                        cY -= Math.Min(cY - categoryTop, 24); */
 
                     cY += 24;
                     categoryTop += CalculateCategorySize(category, true).Y;
@@ -393,11 +437,11 @@ namespace TeamStor.RPG.Editor
                     if(scrollBarHeight < 20)
                         scrollBarHeight = 20;
 
-                    Rectangle fullScrollRectangle = new Rectangle(Rectangle.Value.Right - 14, Rectangle.Value.Y + 8, 10, Rectangle.Value.Height - 16);
+                    Rectangle fullScrollRectangle = new Rectangle(Rectangle.TargetValue.Right - 18, Rectangle.TargetValue.Y + 8, 20, Rectangle.TargetValue.Height - 16);
 
                     if(fullScrollRectangle.Contains(game.Input.MousePosition) || _isScrolling)
                     {
-                        fullScrollRectangle.X = Rectangle.Value.Right - 10;
+                        fullScrollRectangle.X = Rectangle.TargetValue.Right - 10;
                         fullScrollRectangle.Width = 2;
 
                         game.Batch.Rectangle(fullScrollRectangle, Color.White * 0.4f * _screenFade);
@@ -407,8 +451,8 @@ namespace TeamStor.RPG.Editor
                     }
 
                     game.Batch.Rectangle(new Rectangle(
-                        Rectangle.Value.Right - 10,
-                        (int)(MathHelper.Lerp(Rectangle.Value.Y + 8, Rectangle.Value.Bottom - 8 - scrollBarHeight, Scroll / ScrollableAmount)),
+                        Rectangle.TargetValue.Right - 10,
+                        (int)(MathHelper.Lerp(Rectangle.TargetValue.Y + 8, Rectangle.TargetValue.Bottom - 8 - scrollBarHeight, Scroll / ScrollableAmount)),
                         2,
                         (int)scrollBarHeight),
                         Color.White * 0.5f * _screenFade);

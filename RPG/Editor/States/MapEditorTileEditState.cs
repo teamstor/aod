@@ -20,7 +20,7 @@ namespace TeamStor.RPG.Editor.States
 	public class MapEditorTileEditState : MapEditorModeState
 	{
 		private EditTool _tool = EditTool.PaintOne;
-		private Tile _lastSelection = null;
+        private bool _eraseMode = false;
 
         /// <summary>
         /// The current selected layer.
@@ -95,6 +95,12 @@ namespace TeamStor.RPG.Editor.States
             //Game.DefaultFonts.MonoBold.Measure((uint)(8 * i), "");
 
             Menu = new TileMenu(BaseState.Map.Info.Environment, Game);
+
+            Menu.SelectionChanged = (t, s) =>
+            {
+                Layer = s.Layer;
+            };
+
             Menu.Rectangle.TweenTo(new Rectangle(-250, 114, Menu.Rectangle.TargetValue.Width, Menu.Rectangle.TargetValue.Height), TweenEaseType.Linear, 0);
             Menu.Rectangle.TweenTo(new Rectangle(48, 114, Menu.Rectangle.TargetValue.Width, Menu.Rectangle.TargetValue.Height), TweenEaseType.EaseOutQuad, previousState == null ? 0.65f : 0f);
 
@@ -123,12 +129,26 @@ namespace TeamStor.RPG.Editor.States
 			});
 			
 			BaseState.Buttons["tool-rectangle"].Position.TweenTo(new Vector2(48, 114 + 31 + 32), TweenEaseType.EaseOutQuad, previousState == null ? 0.65f : 0f);
-			
-			BaseState.Buttons.Add("layer-terrain", new Button
+
+            BaseState.Buttons.Add("eraser", new Button
+            {
+                Text = "",
+                Icon = Assets.Get<Texture2D>("editor/tile/eraser.png"),
+                Position = new TweenedVector2(Game, new Vector2(-250, 114 + 31 + 32 * 2)),
+
+                Active = false,
+                CanClickActive = true,
+                Clicked = (btn) => { _eraseMode = !_eraseMode; },
+                Font = Game.DefaultFonts.Normal
+            });
+
+            BaseState.Buttons["eraser"].Position.TweenTo(new Vector2(48, 114 + 31 + 32 * 2), TweenEaseType.EaseOutQuad, previousState == null ? 0.65f : 0f);
+
+            BaseState.Buttons.Add("layer-terrain", new Button
 			{
 				Text = "",
 				Icon = Assets.Get<Texture2D>("editor/tile/terrain.png"),
-				Position = new TweenedVector2(Game, new Vector2(-250, 119 + 31 + 32 * 2)),
+				Position = new TweenedVector2(Game, new Vector2(-250, 119 + 31 + 32 * 3)),
 				
 				Active = true,
 				Clicked = (btn) => {
@@ -137,13 +157,13 @@ namespace TeamStor.RPG.Editor.States
 				Font = Game.DefaultFonts.Normal
 			});
 			
-			BaseState.Buttons["layer-terrain"].Position.TweenTo(new Vector2(48, 119 + 31 + 32 * 2), TweenEaseType.EaseOutQuad, previousState == null ? 0.65f : 0f);
+			BaseState.Buttons["layer-terrain"].Position.TweenTo(new Vector2(48, 119 + 31 + 32 * 3), TweenEaseType.EaseOutQuad, previousState == null ? 0.65f : 0f);
 			
 			BaseState.Buttons.Add("layer-decoration", new Button
 			{
 				Text = "",
 				Icon = Assets.Get<Texture2D>("editor/tile/decoration.png"),
-				Position = new TweenedVector2(Game, new Vector2(-250, 119 + 31 + 32 * 3)),
+				Position = new TweenedVector2(Game, new Vector2(-250, 119 + 31 + 32 * 4)),
 				
 				Active = false,
                 Disabled = false,
@@ -153,13 +173,13 @@ namespace TeamStor.RPG.Editor.States
 				Font = Game.DefaultFonts.Normal
 			});
 			
-			BaseState.Buttons["layer-decoration"].Position.TweenTo(new Vector2(48, 119 + 31 + 32 * 3), TweenEaseType.EaseOutQuad, previousState == null ? 0.65f : 0f);
+			BaseState.Buttons["layer-decoration"].Position.TweenTo(new Vector2(48, 119 + 31 + 32 * 4), TweenEaseType.EaseOutQuad, previousState == null ? 0.65f : 0f);
 
 			BaseState.Buttons.Add("layer-npc", new Button
 			{
 				Text = "",
 				Icon = Assets.Get<Texture2D>("editor/tile/npc.png"),
-				Position = new TweenedVector2(Game, new Vector2(-250, 119 + 31 + 32 * 4)),
+				Position = new TweenedVector2(Game, new Vector2(-250, 119 + 31 + 32 * 5)),
 				
 				Active = false,
                 Disabled = false,
@@ -169,13 +189,13 @@ namespace TeamStor.RPG.Editor.States
 				Font = Game.DefaultFonts.Normal
 			});
 			
-			BaseState.Buttons["layer-npc"].Position.TweenTo(new Vector2(48, 119 + 31 + 32 * 4), TweenEaseType.EaseOutQuad, previousState == null ? 0.65f : 0f);
+			BaseState.Buttons["layer-npc"].Position.TweenTo(new Vector2(48, 119 + 31 + 32 * 5), TweenEaseType.EaseOutQuad, previousState == null ? 0.65f : 0f);
 			
 			BaseState.Buttons.Add("layer-control", new Button
 			{
 				Text = "",
 				Icon = Assets.Get<Texture2D>("editor/tile/control.png"),
-				Position = new TweenedVector2(Game, new Vector2(-250, 119 + 31 + 32 * 5)),
+				Position = new TweenedVector2(Game, new Vector2(-250, 119 + 31 + 32 * 6)),
 				
 				Active = false,
                 Clicked = (btn) => { 					
@@ -184,7 +204,7 @@ namespace TeamStor.RPG.Editor.States
 				Font = Game.DefaultFonts.Normal
 			});
 			
-			BaseState.Buttons["layer-control"].Position.TweenTo(new Vector2(48, 119 + 31 + 32 * 5), TweenEaseType.EaseOutQuad, previousState == null ? 0.65f : 0f);
+			BaseState.Buttons["layer-control"].Position.TweenTo(new Vector2(48, 119 + 31 + 32 * 6), TweenEaseType.EaseOutQuad, previousState == null ? 0.65f : 0f);
 
         }
 
@@ -192,8 +212,9 @@ namespace TeamStor.RPG.Editor.States
 		{			
 			BaseState.Buttons.Remove("tool-paintone");
 			BaseState.Buttons.Remove("tool-rectangle");
-			
-			BaseState.Buttons.Remove("layer-terrain");
+            BaseState.Buttons.Remove("eraser");
+
+            BaseState.Buttons.Remove("layer-terrain");
 			BaseState.Buttons.Remove("layer-decoration");
 			BaseState.Buttons.Remove("layer-npc");
 			BaseState.Buttons.Remove("layer-control");
@@ -222,44 +243,29 @@ namespace TeamStor.RPG.Editor.States
 		        return;
 	        }
 
+            Menu.Disabled = _eraseMode || Game.Input.Key(Keys.E);
+
 	        BaseState.Buttons["tool-paintone"].Active = _tool == EditTool.PaintOne;
 	        BaseState.Buttons["tool-rectangle"].Active = _tool == EditTool.PaintRectangle;
-	        
-	        BaseState.Buttons["layer-terrain"].Active = Layer == Tile.MapLayer.Terrain;
+
+            BaseState.Buttons["eraser"].Active = _eraseMode || Game.Input.Key(Keys.E);
+
+            BaseState.Buttons["layer-terrain"].Active = Layer == Tile.MapLayer.Terrain;
 	        BaseState.Buttons["layer-decoration"].Active = Layer == Tile.MapLayer.Decoration;
 	        BaseState.Buttons["layer-npc"].Active = Layer == Tile.MapLayer.NPC;
 	        BaseState.Buttons["layer-control"].Active = Layer == Tile.MapLayer.Control;
 
 	        if(BaseState.Buttons["tool-paintone"].Position.IsComplete)
 	        {
-		        BaseState.Buttons["tool-paintone"].Position.TweenTo(new Vector2(48,
-			        Menu.Rectangle.Value.Y +
-                    Menu.Rectangle.Value.Height + 4), TweenEaseType.Linear, 0);
-		        BaseState.Buttons["tool-rectangle"].Position.TweenTo(new Vector2(48,
-                    Menu.Rectangle.Value.Y +
-                    Menu.Rectangle.Value.Height + 4 + 32), TweenEaseType.Linear, 0);
-		        
-		        BaseState.Buttons["layer-terrain"].Position.TweenTo(new Vector2(48,
-			        Menu.Rectangle.Value.Y +
-			        Menu.Rectangle.Value.Height + 4 + 32 + 5 + 32), TweenEaseType.Linear, 0);
-		        BaseState.Buttons["layer-decoration"].Position.TweenTo(new Vector2(48,
-			        Menu.Rectangle.Value.Y +
-			        Menu.Rectangle.Value.Height + 4 + 32 + 5 + 32 * 2), TweenEaseType.Linear, 0);
-		        BaseState.Buttons["layer-npc"].Position.TweenTo(new Vector2(48,
-			        Menu.Rectangle.Value.Y +
-			        Menu.Rectangle.Value.Height + 4 + 32 + 5 + 32 * 3), TweenEaseType.Linear, 0);
-		        BaseState.Buttons["layer-control"].Position.TweenTo(new Vector2(48,
-			        Menu.Rectangle.Value.Y +
-			        Menu.Rectangle.Value.Height + 4 + 32 + 5 + 32 * 4), TweenEaseType.Linear, 0);
-
 		        float alpha = 1.0f;
-		        if(Menu.Rectangle.Value.Contains(Input.MousePosition))
+		        if(Menu.IsHovered)
 			        alpha = 0.0f;
 
 		        BaseState.Buttons["tool-paintone"].Alpha = MathHelper.Lerp(BaseState.Buttons["tool-paintone"].Alpha, alpha, (float)deltaTime * 25f);
 		        BaseState.Buttons["tool-rectangle"].Alpha = MathHelper.Lerp(BaseState.Buttons["tool-rectangle"].Alpha, alpha, (float)deltaTime * 25f);
+                BaseState.Buttons["eraser"].Alpha = MathHelper.Lerp(BaseState.Buttons["eraser"].Alpha, alpha, (float)deltaTime * 25f);
 
-		        BaseState.Buttons["layer-terrain"].Alpha = MathHelper.Lerp(BaseState.Buttons["layer-terrain"].Alpha, alpha, (float)deltaTime * 25f);
+                BaseState.Buttons["layer-terrain"].Alpha = MathHelper.Lerp(BaseState.Buttons["layer-terrain"].Alpha, alpha, (float)deltaTime * 25f);
 		        BaseState.Buttons["layer-decoration"].Alpha = MathHelper.Lerp(BaseState.Buttons["layer-decoration"].Alpha, alpha, (float)deltaTime * 25f);
 		        BaseState.Buttons["layer-npc"].Alpha = MathHelper.Lerp(BaseState.Buttons["layer-npc"].Alpha, alpha, (float)deltaTime * 25f);
 		        BaseState.Buttons["layer-control"].Alpha = MathHelper.Lerp(BaseState.Buttons["layer-control"].Alpha, alpha, (float)deltaTime * 25f);
@@ -271,7 +277,8 @@ namespace TeamStor.RPG.Editor.States
 		        {
 			        case EditTool.PaintOne:
                         if(Input.Mouse(MouseButton.Left))
-                            BaseState.Map[Menu.SelectedTile.Layer, SelectedTile.X, SelectedTile.Y] = Menu.SelectedTile;
+                            BaseState.Map[_eraseMode || Game.Input.Key(Keys.E) ? Layer : Menu.SelectedTile.Layer, SelectedTile.X, SelectedTile.Y] =
+                                _eraseMode || Game.Input.Key(Keys.E) ? Tile.Find("", Layer) : Menu.SelectedTile;
 				        break;
 				        
 			        case EditTool.PaintRectangle:
@@ -282,7 +289,8 @@ namespace TeamStor.RPG.Editor.States
 					        for(int x = _rectangleToolRect.X; x <= _rectangleToolRect.X + _rectangleToolRect.Width; x++)
 					        {
 						        for(int y = _rectangleToolRect.Y; y <= _rectangleToolRect.Y + _rectangleToolRect.Height; y++)
-                                    BaseState.Map[Menu.SelectedTile.Layer, x, y] = Menu.SelectedTile;
+                                    BaseState.Map[_eraseMode || Game.Input.Key(Keys.E) ? Layer : Menu.SelectedTile.Layer, x, y] = 
+                                        _eraseMode || Game.Input.Key(Keys.E) ? Tile.Find("", Layer) : Menu.SelectedTile;
                             }
 
                             _startingTile = new Point(-1, -1);
@@ -308,8 +316,10 @@ namespace TeamStor.RPG.Editor.States
 					return "Place tiles";
 				if(!BaseState.Buttons["tool-rectangle"].Active && BaseState.Buttons["tool-rectangle"].Rectangle.Contains(Input.MousePosition))
 					return "Place in rectangle";
-				
-				if(!BaseState.Buttons["layer-terrain"].Active && BaseState.Buttons["layer-terrain"].Rectangle.Contains(Input.MousePosition))
+                if(BaseState.Buttons["eraser"].Rectangle.Contains(Input.MousePosition))
+                    return "Toggle erase mode";
+
+                if(!BaseState.Buttons["layer-terrain"].Active && BaseState.Buttons["layer-terrain"].Rectangle.Contains(Input.MousePosition))
 					return "Select the terrain layer";
 				if(!BaseState.Buttons["layer-decoration"].Active && BaseState.Buttons["layer-decoration"].Rectangle.Contains(Input.MousePosition))
 					return "Select the decoration layer";
@@ -322,13 +332,16 @@ namespace TeamStor.RPG.Editor.States
 			}
 		}
 
-		public override void Draw(SpriteBatch batch, Vector2 screenSize)
+        public override bool IsPointObscured(Vector2 point)
+        {
+            return Menu.IsHovered;
+        }
+
+        public override void Draw(SpriteBatch batch, Vector2 screenSize)
 		{
 			batch.SamplerState = SamplerState.PointWrap;
-
-            Menu.Draw(Game);
 			
-			if(!BaseState.IsPointObscured(Input.MousePosition) && !Menu.IsHovered)
+			if(!BaseState.IsPointObscured(Input.MousePosition))
 			{
 				batch.Transform = BaseState.Camera.Transform;
 
@@ -346,10 +359,10 @@ namespace TeamStor.RPG.Editor.States
 
 					if(Input.Mouse(MouseButton.Left) && _tool == EditTool.PaintRectangle)
 						batch.Outline(new Rectangle(_rectangleToolRect.X * 16, _rectangleToolRect.Y * 16, _rectangleToolRect.Width * 16 + 16, _rectangleToolRect.Height * 16 + 16),
-							Layer == Tile.MapLayer.Terrain || Menu.SelectedTile.ID != "" ? Color.White * alpha : Color.DarkRed * alpha, 1, false);
+							!_eraseMode && !Game.Input.Key(Keys.E) ? Color.White * alpha : Color.DarkRed * alpha, 1, false);
 					else
 						batch.Outline(new Rectangle(SelectedTile.X * 16, SelectedTile.Y * 16, 16, 16),
-							Layer == Tile.MapLayer.Terrain || Menu.SelectedTile.ID != "" || !Input.Mouse(MouseButton.Left) ? Color.White * alpha : Color.DarkRed * alpha, 1, false);
+                            !_eraseMode && !Game.Input.Key(Keys.E) ? Color.White * alpha : Color.DarkRed * alpha, 1, false);
 
                     batch.Reset();
 
@@ -420,6 +433,11 @@ namespace TeamStor.RPG.Editor.States
                     }
                 }
 			}
-		}
-	}
+
+            batch.Reset();
+            batch.SamplerState = SamplerState.PointWrap;
+
+            Menu.Draw(Game);
+        }
+    }
 }
