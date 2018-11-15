@@ -39,25 +39,25 @@ namespace TeamStor.RPG.Legacy
 
                 Map map = new Map(width, height, info);
                 int x, y;
-                for(x = 0; x < width; x++)
+                for(y = 0; y < height; y++)
                 {
-                    for(y = 0; y < height; y++)
+                    for(x = 0; x < width; x++)
                     {
                         Tile terrainTile = WaterTiles.DeepWaterOrVoid;
-                        MapConverterIDMap.TerrainMap.TryGetValue(reader.ReadInt32() & 0xff, out terrainTile);
-                        map[Tile.MapLayer.Terrain, x, y] = terrainTile;
+                        if(MapConverterIDMap.TerrainMap.TryGetValue(reader.ReadInt32() & 0xff, out terrainTile))
+                            map[Tile.MapLayer.Terrain, x, y] = terrainTile;
 
                         Tile decorationTile = DefaultTiles.EmptyDecoration;
-                        MapConverterIDMap.DecorationMap.TryGetValue(reader.ReadInt32() & 0xff, out decorationTile);
-                        map[Tile.MapLayer.Decoration, x, y] = decorationTile;
+                        if(MapConverterIDMap.DecorationMap.TryGetValue(reader.ReadInt32() & 0xff, out decorationTile))
+                            map[Tile.MapLayer.Decoration, x, y] = decorationTile;
 
                         Tile npcTile = DefaultTiles.EmptyNPC;
-                        MapConverterIDMap.NPCMap.TryGetValue(reader.ReadInt32() & 0xff, out npcTile);
-                        map[Tile.MapLayer.NPC, x, y] = npcTile;
+                        if(MapConverterIDMap.NPCMap.TryGetValue(reader.ReadInt32() & 0xff, out npcTile))
+                            map[Tile.MapLayer.NPC, x, y] = npcTile;
 
                         Tile controlTile = DefaultTiles.EmptyControl;
-                        MapConverterIDMap.ControlMap.TryGetValue(reader.ReadInt32() & 0xff, out controlTile);
-                        map[Tile.MapLayer.Control, x, y] = controlTile;
+                        if(MapConverterIDMap.ControlMap.TryGetValue(reader.ReadInt32() & 0xff, out controlTile))
+                            map[Tile.MapLayer.Control, x, y] = controlTile;
                     }
                 }
 

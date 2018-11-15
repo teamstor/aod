@@ -20,7 +20,7 @@ namespace TeamStor.RPG
 
         public static Tile Road = new RoadTile("city/road", Tile.MapLayer.Terrain, "Road", "tiles/city/road.png", false, 2000);
 
-        public static Tile Sign = new Tile("city/sign", Tile.MapLayer.Decoration, "Sign", "tiles/decoration/sign.png");
+        public static Tile Sign = new Tile("city/sign", Tile.MapLayer.Decoration, "Sign", "tiles/decoration/sign.png", true);
 
         public static Tile RoofBlue = new Tile("city/roof-blue", Tile.MapLayer.Decoration, "Blue Roof", "tiles/city/roof/blue.png", true);
         public static Tile RoofOrange = new Tile("city/roof-orange", Tile.MapLayer.Decoration, "Orange Roof", "tiles/city/roof/orange.png", true);
