@@ -54,6 +54,7 @@ namespace TeamStor.RPG.Editor
 		public Dictionary<string, Button> Buttons = new Dictionary<string, Button>();
 		public Dictionary<string, SelectionMenu> SelectionMenus = new Dictionary<string, SelectionMenu>();
 		public Dictionary<string, TextField> TextFields = new Dictionary<string, TextField>();
+		public Dictionary<string, ScrollableTextField> ScrollableTextFields = new Dictionary<string, ScrollableTextField>();
         public Dictionary<string, ChoiceField> ChoiceFields = new Dictionary<string, ChoiceField>();
 
         public Camera Camera { get; private set; }
@@ -352,6 +353,9 @@ namespace TeamStor.RPG.Editor
 
                 foreach(TextField field in TextFields.Values.ToArray())
                     field.Update(Game);
+	            
+	            foreach(ScrollableTextField field in ScrollableTextFields.Values.ToArray())
+		            field.Update(Game);
 
                 foreach(ChoiceField field in ChoiceFields.Values.ToArray())
                     field.Update(Game);
@@ -449,6 +453,12 @@ namespace TeamStor.RPG.Editor
 			foreach(TextField field in TextFields.Values)
 			{
 				if(field.Rectangle.Contains(point))
+					return true;
+			}
+			
+			foreach(ScrollableTextField field in ScrollableTextFields.Values)
+			{
+				if(field.Area.Value.Contains(point))
 					return true;
 			}
 
@@ -561,6 +571,9 @@ namespace TeamStor.RPG.Editor
 
                 foreach(TextField field in TextFields.Values)
                     field.Draw(Game);
+	            
+	            foreach(ScrollableTextField field in ScrollableTextFields.Values)
+		            field.Draw(Game);
 
                 foreach(ChoiceField field in ChoiceFields.Values)
                     field.Draw(Game);

@@ -244,15 +244,25 @@ namespace TeamStor.RPG.Editor.States
             {
                 if(pair.Key.StartsWith("editor-"))
                     pair.Value.Rectangle.TweenTo(new Rectangle(
-                    pair.Value.Rectangle.Value.X + (int)offset.X,
-                    pair.Value.Rectangle.Value.Y + (int)offset.Y, 
-                    0, 0), TweenEaseType.Linear, 0);
+                        pair.Value.Rectangle.Value.X + (int)offset.X,
+                        pair.Value.Rectangle.Value.Y + (int)offset.Y, 
+                        0, 0), TweenEaseType.Linear, 0);
             }
 
             foreach(KeyValuePair<string, TextField> pair in BaseState.TextFields)
             {
                 if(pair.Key.StartsWith("editor-"))
                     pair.Value.Position.TweenTo(pair.Value.Position + offset, TweenEaseType.Linear, 0);
+            }
+            
+            foreach(KeyValuePair<string, ScrollableTextField> pair in BaseState.ScrollableTextFields)
+            {
+                if(pair.Key.StartsWith("editor-"))
+                    pair.Value.Area.TweenTo(new Rectangle(
+                        pair.Value.Area.Value.X + (int)offset.X, 
+                        pair.Value.Area.Value.Y + (int)offset.Y, 
+                        pair.Value.Area.Value.Width, 
+                        pair.Value.Area.Value.Height), TweenEaseType.Linear, 0);
             }
 
             foreach(KeyValuePair<string, ChoiceField> pair in BaseState.ChoiceFields)

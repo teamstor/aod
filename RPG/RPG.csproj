@@ -62,6 +62,7 @@
     <Compile Include="Editor\Button.cs" />
     <Compile Include="Editor\Camera.cs" />
     <Compile Include="Editor\MapEditorState.cs" />
+    <Compile Include="Editor\ScrollableTextField.cs" />
     <Compile Include="Editor\SelectionMenu.cs" />
     <Compile Include="Editor\States\MapEditorEditAttributesState.cs" />
     <Compile Include="Editor\States\MapEditorEditInfoState.cs" />

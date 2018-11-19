@@ -32,7 +32,7 @@ namespace TeamStor.RPG
                 return new TileAttributeEditor[]
                 {
                     new TextAttributeEditor("speaker", s, 1, true, ref y),
-                    new TextAttributeEditor("value", s, 8, true, ref y),
+                    new TextAttributeEditor("value", s, true, true, ref y),
                     new BoolAttributeEditor("needs-user-interaction", s, true, ref y)
                 };
             });
