@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -12,7 +13,11 @@ namespace TeamStor.RPG.Editor
 {
 	public class ScrollableTextField
 	{
-		public string Label, Text;
+        private bool _isScrollingX = false;
+        private bool _isScrollingY = false;
+        private bool _defocusQueued = false;
+
+        public string Label, Text;
 		
 		public Texture2D Icon;
 		public TweenedRectangle Area;
@@ -53,16 +58,58 @@ namespace TeamStor.RPG.Editor
 				RecalculateTotalArea();
 			}
 
-			if(game.Input.MousePressed(MouseButton.Left))
+			if(game.Input.MousePressed(MouseButton.Left) || _defocusQueued)
 			{
-				bool oldFocused = Focused;
-				Focused = Area.Value.Contains(game.Input.MousePosition);
-				
-				if(Focused != oldFocused && FocusChanged != null)
-					FocusChanged(this, Focused);
+                if(_isScrollingX || _isScrollingY)
+                {
+                    if(!_defocusQueued)
+                        _defocusQueued = true;
+                }
+                else
+                {
+                    _defocusQueued = false;
+                    bool oldFocused = Focused;
+                    Focused = Area.Value.Contains(game.Input.MousePosition);
+
+                    if(Focused != oldFocused && FocusChanged != null)
+                        FocusChanged(this, Focused);
+                }
 			}
-			
-			Scroll = Vector2.Clamp(Scroll, Vector2.Zero, ScrollableAmount);
+
+            if(Area.Value.Contains(game.Input.MousePosition))
+            {
+                if((game.Input.MouseScroll < 0 && Scroll.Y < ScrollableAmount.Y) ||
+                    (game.Input.MouseScroll > 0 && Scroll.Y > 0))
+                    Scroll.Y -= game.Input.MouseScroll / 4f;
+
+                if(game.Input.Key(Keys.Up) && Scroll.Y > 0)
+                    Scroll.Y = Math.Max(0, Scroll.Y - ((float)game.DeltaTime * 140f));
+                if(game.Input.Key(Keys.Down) && Scroll.Y < ScrollableAmount.Y)
+                    Scroll.Y = Math.Min(ScrollableAmount.Y, Scroll.Y + ((float)game.DeltaTime * 140f));
+            }
+
+            if(_isScrollingX)
+            {
+                float at = game.Input.MousePosition.X - (Area.Value.Left + 8);
+                float percentage = at / (Area.Value.Width - 16);
+                Scroll.X = percentage * ScrollableAmount.X;
+
+                if(game.Input.MouseReleased(Engine.MouseButton.Left))
+                    _isScrollingX = false;
+            }
+
+
+            if(_isScrollingY)
+            {
+                float at = game.Input.MousePosition.Y - (Area.Value.Top + 8);
+                float percentage = at / (Area.Value.Height - 16);
+                Scroll.Y = percentage * ScrollableAmount.Y;
+
+                if(game.Input.MouseReleased(Engine.MouseButton.Left))
+                    _isScrollingY = false;
+            }
+
+            Scroll = Vector2.Clamp(Scroll, Vector2.Zero, ScrollableAmount);
 		}
 
 		private void RecalculateTotalArea()
@@ -72,11 +119,10 @@ namespace TeamStor.RPG.Editor
 			if(Icon != null)
 				TotalArea.X += Icon.Width + 8;
 
-			TotalArea.X += Font.Measure(15, Label + Text).X;
-			TotalArea.Y += Font.Measure(15, Label + Text).Y;
+            TotalArea += Font.Measure(15, Label + Text + "|");
 
-			TotalArea.X += 8;
-			TotalArea.Y += 8;
+            TotalArea.X += 24;
+			TotalArea.Y += 24;
 		}
 		
 		private void OnStateChange(object sender, Game.ChangeStateEventArgs e)
@@ -98,18 +144,24 @@ namespace TeamStor.RPG.Editor
 
 				Text = Text.TrimStart();
 
-				string[] split = Text.Split('\n');
-				int lineCount = split.Length;
-
 				if(e.Key == Keys.Enter)
 					Text += '\n';
 
-				if(Text != oldText && TextChanged != null)
+				if(Text != oldText)
 				{
-					TextChanged(this, Text);
+                    if(TextChanged != null)
+					    TextChanged(this, Text);
+
 					RecalculateTotalArea();
-				}
-			}
+
+                    string measureText = Text.Split('\n').Last();
+                    if(Text.Split('\n').Length == 1)
+                        measureText = Label + measureText;
+
+                    Scroll.X = Math.Max(0, Font.Measure(15, measureText).X + 24 - Area.TargetValue.Width);
+                    Scroll.Y = ScrollableAmount.Y;
+                }
+            }
 		}
 
 		public void Draw(Game game)
@@ -136,8 +188,37 @@ namespace TeamStor.RPG.Editor
 				TextColor * (Focused ? 1.0f : hovered ? 0.8f : 0.6f));
 
 			batch.Transform = oldTransform;
-			
-			if(ScrollableAmount.Y > 0)
+
+            if(ScrollableAmount.X > 0)
+            {
+                float scrollBarWidth = 1000 / ScrollableAmount.X;
+                if(scrollBarWidth > Area.Value.Width - 16)
+                    scrollBarWidth = Area.Value.Width - 16;
+                if(scrollBarWidth < 20)
+                    scrollBarWidth = 20;
+
+                Rectangle fullScrollRectangle = new Rectangle(Area.TargetValue.X + 8, Area.TargetValue.Bottom - 18, Area.TargetValue.Width - 16, 20);
+
+                if(fullScrollRectangle.Contains(game.Input.MousePosition) || _isScrollingX)
+                {
+                    fullScrollRectangle.Y = Area.TargetValue.Bottom - 10;
+                    fullScrollRectangle.Height = 2;
+
+                    game.Batch.Rectangle(fullScrollRectangle, Color.White * 0.4f);
+
+                    if(game.Input.MousePressed(Engine.MouseButton.Left) && !_isScrollingX)
+                        _isScrollingX = true;
+                }
+
+                game.Batch.Rectangle(new Rectangle(
+                    (int)(MathHelper.Lerp(Area.TargetValue.X + 8, Area.TargetValue.Right - 8 - scrollBarWidth, Scroll.X / ScrollableAmount.X)),
+                    Area.TargetValue.Bottom - 10,
+                    (int)scrollBarWidth,
+                    2),
+                    Color.White * 0.5f);
+            }
+
+            if(ScrollableAmount.Y > 0)
 			{
 				float scrollBarHeight = 1000 / ScrollableAmount.Y;
 				if(scrollBarHeight > Area.Value.Height - 16)
@@ -147,22 +228,24 @@ namespace TeamStor.RPG.Editor
 
 				Rectangle fullScrollRectangle = new Rectangle(Area.TargetValue.Right - 18, Area.TargetValue.Y + 8, 20, Area.TargetValue.Height - 16);
 
-				if(fullScrollRectangle.Contains(game.Input.MousePosition))
+				if(fullScrollRectangle.Contains(game.Input.MousePosition) || _isScrollingY)
 				{
-					fullScrollRectangle.X = Area.TargetValue.Right - 10;
+                    fullScrollRectangle.X = Area.TargetValue.Right - 10;
 					fullScrollRectangle.Width = 2;
 
 					game.Batch.Rectangle(fullScrollRectangle, Color.White * 0.4f);
-				}
 
-				game.Batch.Rectangle(new Rectangle(
+                    if(game.Input.MousePressed(Engine.MouseButton.Left) && !_isScrollingY)
+                        _isScrollingY = true;
+                }
+
+                game.Batch.Rectangle(new Rectangle(
 					Area.TargetValue.Right - 10,
 					(int)(MathHelper.Lerp(Area.TargetValue.Y + 8, Area.TargetValue.Bottom - 8 - scrollBarHeight, Scroll.Y / ScrollableAmount.Y)),
 					2,
 					(int)scrollBarHeight),
 					Color.White * 0.5f);
 			}
-
 
 			batch.Scissor = null;
 		}

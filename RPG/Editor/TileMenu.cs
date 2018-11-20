@@ -232,7 +232,6 @@ namespace TeamStor.RPG.Editor
             }
 
             TotalArea.X += 16;
-            TotalArea.Y += 16;
 
             Rectangle.TweenTo(new Rectangle(Rectangle.TargetValue.X, Rectangle.TargetValue.Y, (int)TotalArea.X, Rectangle.TargetValue.Height), TweenEaseType.Linear, 0);
         }
