@@ -158,7 +158,7 @@ namespace TeamStor.RPG.Editor
                     if(Text.Split('\n').Length == 1)
                         measureText = Label + measureText;
 
-                    Scroll.X = Math.Max(0, Font.Measure(15, measureText).X + 24 - Area.TargetValue.Width);
+                    Scroll.X = Math.Max(0, Font.Measure(15, measureText).X + 32 - Area.TargetValue.Width);
                     Scroll.Y = ScrollableAmount.Y;
                 }
             }
@@ -208,14 +208,14 @@ namespace TeamStor.RPG.Editor
 
                     if(game.Input.MousePressed(Engine.MouseButton.Left) && !_isScrollingX)
                         _isScrollingX = true;
-                }
 
-                game.Batch.Rectangle(new Rectangle(
-                    (int)(MathHelper.Lerp(Area.TargetValue.X + 8, Area.TargetValue.Right - 8 - scrollBarWidth, Scroll.X / ScrollableAmount.X)),
-                    Area.TargetValue.Bottom - 10,
-                    (int)scrollBarWidth,
-                    2),
-                    Color.White * 0.5f);
+                    game.Batch.Rectangle(new Rectangle(
+                        (int)(MathHelper.Lerp(Area.TargetValue.X + 8, Area.TargetValue.Right - 8 - scrollBarWidth, Scroll.X / ScrollableAmount.X)),
+                        Area.TargetValue.Bottom - 10,
+                        (int)scrollBarWidth,
+                        2),
+                        Color.White * 0.5f);
+                }
             }
 
             if(ScrollableAmount.Y > 0)

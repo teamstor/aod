@@ -53,7 +53,7 @@ namespace TeamStor.RPG.Attributes
 				{
 					Label = name + ": ",
 					Text = "",
-					Area = new TweenedRectangle(state.Game, new Rectangle(state.Game.GraphicsDevice.Viewport.Bounds.Width / 2 - 400 / 2, currentY, 400, 200)),
+					Area = new TweenedRectangle(state.Game, new Rectangle(state.Game.GraphicsDevice.Viewport.Bounds.Width / 2 - 400 / 2, currentY, 400, 140)),
 					Font = monospace ? state.Game.DefaultFonts.MonoBold : state.Game.DefaultFonts.Bold,
 				});
 				
