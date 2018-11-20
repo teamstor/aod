@@ -20,6 +20,10 @@ namespace TeamStor.RPG.Editor
     public class TileMenu
     {
         private bool _isScrolling = false;
+
+        private bool _isSearching = false;
+        private string _searchTerm = "";
+
         private bool _quitQueued = false;
         private Map.Environment _environment;
         private TweenedDouble _screenFade;
@@ -27,11 +31,19 @@ namespace TeamStor.RPG.Editor
 
         public Game Game;
 
+        public bool CanInteractWith
+        {
+            get
+            {
+                return !_isSearching;
+            }
+        }
+
         public bool IsHovered
         {
             get
             {
-                return !Disabled && (Rectangle.Value.Contains(Game.Input.MousePosition) || _isScrolling);
+                return !Disabled && (Rectangle.Value.Contains(Game.Input.MousePosition) || _isScrolling || _isSearching);
             }
         }
 
@@ -236,6 +248,22 @@ namespace TeamStor.RPG.Editor
             Rectangle.TweenTo(new Rectangle(Rectangle.TargetValue.X, Rectangle.TargetValue.Y, (int)TotalArea.X, Rectangle.TargetValue.Height), TweenEaseType.Linear, 0);
         }
 
+        private void OnSearchInput(object sender, TextInputEventArgs e)
+        {
+            if(e.Character == '\b' && _searchTerm.Length > 0)
+                _searchTerm = _searchTerm.Substring(0, _searchTerm.Length - 1);
+            else if(Char.IsLetterOrDigit(e.Character) || Char.IsPunctuation(e.Character) || e.Character == ' ')
+                _searchTerm += e.Character;
+
+            _searchTerm = _searchTerm.TrimStart();
+        }
+
+        private void RemoveSearchInput(object sender, Game.ChangeStateEventArgs e)
+        {
+            Game.Window.TextInput -= OnSearchInput;
+            Game.OnStateChange -= RemoveSearchInput;
+        }
+
         private Point CalculateCategorySize(Category category, bool first)
         {
             Point size = new Point(0, (first ? 16 : 14) + 10);
@@ -269,16 +297,52 @@ namespace TeamStor.RPG.Editor
             return size;
         }
 
+        private Tile Search(string s, Category c)
+        {
+            Tile tile = null;
+
+            foreach(object o in c.Objects)
+            {
+                if(o is Tile)
+                {
+                    if((o as Tile).Name(null, _environment).ToLowerInvariant().Trim().Replace(" ", "") == s)
+                        return (o as Tile);
+
+                    if((o as Tile).Name(null, _environment).ToLowerInvariant().Trim().Replace(" ", "").StartsWith(s) ||
+                        (o as Tile).Name(null, _environment).ToLowerInvariant().Trim().Replace(" ", "").EndsWith(s))
+                        tile = (o as Tile);
+                }
+
+                if(o is Category)
+                {
+                    Tile searched = Search(s, (o as Category));
+                    if(searched != null)
+                        tile = searched;
+                }
+            }
+
+            return tile;
+        }
+
         public void Update(Game game)
         {
-            if(Rectangle.Value.Contains(game.Input.MousePosition) && !Disabled && !Rectangle.Value.Contains(game.Input.PreviousMousePosition))
+            if(!Disabled && ((Rectangle.Value.Contains(game.Input.MousePosition) && !Rectangle.Value.Contains(game.Input.PreviousMousePosition)) || (Game.Input.KeyPressed(Keys.S) && !_isSearching)))
             {
                 Rectangle.TweenTo(new Rectangle(Rectangle.TargetValue.X, Rectangle.TargetValue.Y, (int)TotalArea.X, Math.Min((int)TotalArea.Y, MaxHeight)), TweenEaseType.EaseOutQuad, 0.1f);
                 _screenFade.TweenTo(1, TweenEaseType.EaseOutQuad, 0.1f);
+
+                if(Game.Input.KeyPressed(Keys.S))
+                {
+                    _isSearching = true;
+                    _quitQueued = true;
+
+                    game.Window.TextInput += OnSearchInput;
+                    game.OnStateChange += RemoveSearchInput;
+                }
             }
             else if(_quitQueued || (!Rectangle.Value.Contains(game.Input.MousePosition) && Rectangle.Value.Contains(game.Input.PreviousMousePosition)))
             {
-                if(_isScrolling)
+                if(_isScrolling || _isSearching)
                     _quitQueued = true;
                 else
                 {
@@ -292,7 +356,52 @@ namespace TeamStor.RPG.Editor
                 }
             }
 
-            if(IsHovered)
+            if(_isSearching && game.Input.KeyPressed(Keys.Tab))
+            {
+                string s = _searchTerm.ToLowerInvariant().Trim().Replace(" ", "");
+
+                foreach(Category category in Categories)
+                {
+                    Tile searched = Search(s, category);
+
+                    if(searched != null)
+                    {
+                        _searchTerm = searched.Name(null, _environment);
+                        break;
+                    }
+                }
+            }
+
+            if(_isSearching && game.Input.KeyPressed(Keys.Enter))
+            {
+                _searchTerm = _searchTerm.ToLowerInvariant().Trim().Replace(" ", "");
+
+                foreach(Category category in Categories)
+                {
+                    Tile searched = Search(_searchTerm, category);
+                    if(searched != null)
+                    {
+                        SelectedTile = searched;
+                        if(SelectionChanged != null)
+                            SelectionChanged(this, SelectedTile);
+                    }
+                }
+
+                _isSearching = false;
+                _searchTerm = "";
+
+                game.Window.TextInput -= OnSearchInput;
+                game.OnStateChange -= RemoveSearchInput;
+            }
+            else if(_isSearching && game.Input.KeyPressed(Keys.Escape))
+            {
+                _isSearching = false;
+                _searchTerm = "";
+                game.Window.TextInput -= OnSearchInput;
+                game.OnStateChange -= RemoveSearchInput;
+            }
+
+            if(IsHovered && CanInteractWith)
             {
                 float changed = _scrollTarget;
                 
@@ -316,35 +425,38 @@ namespace TeamStor.RPG.Editor
                 }
             }
 
-            if(_scrollTarget != -1)
+            if(CanInteractWith)
             {
-                Scroll = MathHelper.LerpPrecise(Scroll, _scrollTarget, (float)Game.DeltaTime * 14f);
-                if(Math.Abs(Scroll - _scrollTarget) <= 0.75f)
-                    _scrollTarget = -1;
+                if(_scrollTarget != -1)
+                {
+                    Scroll = MathHelper.LerpPrecise(Scroll, _scrollTarget, (float)Game.DeltaTime * 14f);
+                    if(Math.Abs(Scroll - _scrollTarget) <= 0.75f)
+                        _scrollTarget = -1;
+                }
+                else if(Rectangle.Value.Contains(game.Input.MousePosition))
+                {
+                    if((game.Input.MouseScroll < 0 && Scroll < ScrollableAmount) ||
+                        (game.Input.MouseScroll > 0 && Scroll > 0))
+                        Scroll -= game.Input.MouseScroll / 4f;
+
+                    if(game.Input.Key(Keys.Up) && Scroll > 0)
+                        Scroll = Math.Max(0, Scroll - ((float)game.DeltaTime * 140f));
+                    if(game.Input.Key(Keys.Down) && Scroll < ScrollableAmount)
+                        Scroll = Math.Min(ScrollableAmount, Scroll + ((float)game.DeltaTime * 140f));
+                }
+
+                if(_isScrolling)
+                {
+                    float at = game.Input.MousePosition.Y - (Rectangle.Value.Top + 8);
+                    float percentage = at / (Rectangle.Value.Height - 16);
+                    Scroll = percentage * ScrollableAmount;
+
+                    if(game.Input.MouseReleased(Engine.MouseButton.Left))
+                        _isScrolling = false;
+                }
+
+                Scroll = MathHelper.Clamp(Scroll, 0, ScrollableAmount);
             }
-            else if(Rectangle.Value.Contains(game.Input.MousePosition))
-            {
-                if((game.Input.MouseScroll < 0 && Scroll < ScrollableAmount) ||
-                    (game.Input.MouseScroll > 0 && Scroll > 0))
-                    Scroll -= game.Input.MouseScroll / 4f;
-
-                if(game.Input.Key(Keys.Up) && Scroll > 0)
-                    Scroll = Math.Max(0, Scroll - ((float)game.DeltaTime * 140f));
-                if(game.Input.Key(Keys.Down) && Scroll < ScrollableAmount)
-                    Scroll = Math.Min(ScrollableAmount, Scroll + ((float)game.DeltaTime * 140f));
-            }
-
-            if(_isScrolling)
-            {
-                float at = game.Input.MousePosition.Y - (Rectangle.Value.Top + 8);
-                float percentage = at / (Rectangle.Value.Height - 16);
-                Scroll = percentage * ScrollableAmount;
-
-                if(game.Input.MouseReleased(Engine.MouseButton.Left))
-                    _isScrolling = false;
-            }
-
-            Scroll = MathHelper.Clamp(Scroll, 0, ScrollableAmount);
         }
 
         private void DrawCategory(Engine.Game game, Category category, bool first, ref int y)
@@ -385,7 +497,8 @@ namespace TeamStor.RPG.Editor
 
                     if(fullRectangle.Contains(game.Input.MousePosition) &&
                         SelectedTile != (category.Objects[i] as Tile) &&
-                        game.Input.MousePressed(Engine.MouseButton.Left))
+                        game.Input.MousePressed(Engine.MouseButton.Left) &&
+                        CanInteractWith)
                     {
                         SelectedTile = (category.Objects[i] as Tile);
 
@@ -414,7 +527,8 @@ namespace TeamStor.RPG.Editor
         {
             game.Batch.Scissor = Rectangle;
 
-            game.Batch.Rectangle(Rectangle, Color.Black * 0.85f);
+            if(!_isSearching)
+                game.Batch.Rectangle(Rectangle, Color.Black * 0.85f);
 
             if(_screenFade != 1.0f)
             {
@@ -450,16 +564,16 @@ namespace TeamStor.RPG.Editor
                 int categoryTop = 8 - (int)Scroll;
                 foreach(Category category in Categories)
                 {
-                    Rectangle rect = new Rectangle(
+                    Rectangle rectC = new Rectangle(
                         Rectangle.Value.X + 8, 
                         Rectangle.Value.Y + cY /* - (categoryTop < cY ? cY - categoryTop : 0) */, 
                         18, 
                         18);
-                    bool hover = rect.Contains(game.Input.MousePosition);
+                    bool hoverC = rectC.Contains(game.Input.MousePosition);
 
-                    game.Batch.Texture(rect, game.Assets.Get<Texture2D>(category.Icon), Color.White * _screenFade * (hover ? 1.0f : 0.6f));
+                    game.Batch.Texture(rectC, game.Assets.Get<Texture2D>(category.Icon), Color.White * _screenFade * (hoverC ? 1.0f : 0.6f));
 
-                    if(game.Input.MousePressed(Engine.MouseButton.Left) && hover)
+                    if(game.Input.MousePressed(Engine.MouseButton.Left) && hoverC && CanInteractWith)
                         _scrollTarget = Math.Min(ScrollableAmount, categoryTop + (int)Scroll - 8);
 
                     /*if(categoryTop < cY)
@@ -479,14 +593,14 @@ namespace TeamStor.RPG.Editor
 
                     Rectangle fullScrollRectangle = new Rectangle(Rectangle.TargetValue.Right - 18, Rectangle.TargetValue.Y + 8, 20, Rectangle.TargetValue.Height - 16);
 
-                    if(fullScrollRectangle.Contains(game.Input.MousePosition) || _isScrolling)
+                    if((fullScrollRectangle.Contains(game.Input.MousePosition) || _isScrolling) && CanInteractWith)
                     {
                         fullScrollRectangle.X = Rectangle.TargetValue.Right - 10;
                         fullScrollRectangle.Width = 2;
 
                         game.Batch.Rectangle(fullScrollRectangle, Color.White * 0.4f * _screenFade);
 
-                        if(game.Input.MousePressed(Engine.MouseButton.Left) && !_isScrolling)
+                        if(game.Input.MousePressed(Engine.MouseButton.Left) && !_isScrolling && CanInteractWith)
                             _isScrolling = true;
                     }
 
@@ -497,6 +611,35 @@ namespace TeamStor.RPG.Editor
                         (int)scrollBarHeight),
                         Color.White * 0.5f * _screenFade);
                 }
+
+                Rectangle rect = new Rectangle(
+                    Rectangle.Value.X + 8,
+                    Rectangle.TargetValue.Bottom - 8 - 18,
+                    18,
+                    18);
+                bool hover = rect.Contains(game.Input.MousePosition);
+
+                game.Batch.Texture(rect, game.Assets.Get<Texture2D>("editor/tilemenu/search.png"), Color.White * _screenFade * (hover ? 1.0f : 0.6f));
+
+                if(game.Input.MousePressed(Engine.MouseButton.Left) && hover && CanInteractWith)
+                {
+                    _isSearching = true;
+                    _quitQueued = true;
+
+                    game.Window.TextInput += OnSearchInput;
+                    game.OnStateChange += RemoveSearchInput;
+                }
+            }
+
+            if(_isSearching)
+            {
+                game.Batch.Rectangle(Rectangle, Color.Black * 0.85f);
+
+                string text = _searchTerm;
+                Vector2 measure = game.DefaultFonts.MonoBold.Measure(14, text + "|");
+                text += ((int)((game.Time * 4) % 2) == 0 ? "|" : "");
+
+                game.Batch.Text(SpriteBatch.FontStyle.MonoBold, 14, text, Rectangle.Value.Center.ToVector2() - measure / 2, Color.White);
             }
 
             game.Batch.Scissor = null;

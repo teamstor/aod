@@ -234,7 +234,7 @@ namespace TeamStor.RPG.Editor.States
 		        _lastSelection = -1;
 	        } */
 
-	        if(Game.Input.KeyPressed(Keys.T))
+	        if(Game.Input.KeyPressed(Keys.T) && !Menu.IsHovered)
 	        {
 		        MapEditorEditAttributesState state = new MapEditorEditAttributesState();
 		        state.Layer = Layer;
@@ -243,7 +243,7 @@ namespace TeamStor.RPG.Editor.States
 		        return;
 	        }
 
-            Menu.Disabled = _eraseMode || Game.Input.Key(Keys.E);
+            Menu.Disabled = !Menu.IsHovered && (_eraseMode || Game.Input.Key(Keys.E));
 
 	        BaseState.Buttons["tool-paintone"].Active = _tool == EditTool.PaintOne;
 	        BaseState.Buttons["tool-rectangle"].Active = _tool == EditTool.PaintRectangle;
