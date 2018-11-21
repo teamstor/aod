@@ -87,6 +87,8 @@ namespace TeamStor.RPG.Gameplay.World
 
         private SpawnArgs _spawnArgs;
 
+        private Queue<NPC> _npcDespawnQueue = new Queue<NPC>();
+
         /// <summary>
         /// Spawns a new NPC in the world.
         /// </summary>
@@ -95,10 +97,25 @@ namespace TeamStor.RPG.Gameplay.World
         /// <returns>The newly spawned NPC.</returns>
         public NPC SpawnNPC(NPCTemplate template, Point position)
         {
-            NPC npc = new NPC(this, template);
-            npc.MoveInstantly(position);
+            NPC npc = new NPC(this, position, template);
             _npcs.Add(npc);
+
+            npc.MoveInstantly(position);
+            npc.Template.Behavior.OnSpawned(npc);
             return npc;
+        }
+
+        /// <summary>
+        /// Despawns the following NPC at the end of the world tick.
+        /// </summary>
+        /// <param name="npc">The NPC to despawn.</param>
+        public void DespawnNPC(NPC npc)
+        {
+            if(!_npcDespawnQueue.Contains(npc))
+            {
+                npc.Template.Behavior.OnDespawned(npc, false);
+                _npcDespawnQueue.Enqueue(npc);
+            }
         }
 
         /// <summary>
@@ -168,6 +185,10 @@ namespace TeamStor.RPG.Gameplay.World
 
         public override void OnLeave(GameState nextState)
         {
+            foreach(NPC npc in _npcs)
+                npc.Template.Behavior.OnDespawned(npc, true);
+
+            _npcs.Clear();
         }
 
         public override void Update(double deltaTime, double totalTime, long count)
@@ -185,7 +206,6 @@ namespace TeamStor.RPG.Gameplay.World
             {
                 Point lastPlayerPos = Player.Position;
                 Player.Update(deltaTime, totalTime, count);
-                Camera.Update(deltaTime);
 
                 foreach(NPC npc in NPCs)
                     npc.Update(deltaTime, totalTime, count);
@@ -201,6 +221,14 @@ namespace TeamStor.RPG.Gameplay.World
                         newEvents?.OnWalkEnter(Map.GetMetadata(layer, Player.Position.X, Player.Position.Y), this, Player.Position);
                     }
                 }
+            }
+
+            Camera.Update(deltaTime);
+
+            while(_npcDespawnQueue.Count > 0)
+            {
+                NPC npc = _npcDespawnQueue.Dequeue();
+                _npcs.Remove(npc);
             }
             
             if(UpdateHook != null)
@@ -252,11 +280,11 @@ namespace TeamStor.RPG.Gameplay.World
         {
             foreach(NPC npc in NPCs)
             {
-                if(npc.Position == point)
+                if(npc.Position == point || npc.NextPosition == point)
                     return true;
             }
 
-            return Map.IsPointBlocked(point) || Player.Position == point;
+            return Map.IsPointBlocked(point) || Player.Position == point || Player.NextPosition == point;
         }
 
         public override void Draw(SpriteBatch batch, Vector2 screenSize)

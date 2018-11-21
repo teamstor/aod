@@ -72,10 +72,16 @@
     <Compile Include="Editor\ChoiceField.cs" />
     <Compile Include="Editor\TextField.cs" />
     <Compile Include="Editor\TileMenu.cs" />
+    <Compile Include="Gameplay\Behavior\NPC\NullNPCBehavior.cs" />
+    <Compile Include="Gameplay\Behavior\NPC\PigNPCBehavior.cs" />
+    <Compile Include="Gameplay\Behavior\NPC\SimpleWalkBehavior.cs" />
+    <Compile Include="Gameplay\INPCBehavior.cs" />
     <Compile Include="Gameplay\Direction.cs" />
     <Compile Include="Gameplay\NPCs.cs" />
     <Compile Include="Gameplay\NPCTemplate.cs" />
     <Compile Include="Gameplay\Player.cs" />
+    <Compile Include="Gameplay\Save.cs" />
+    <Compile Include="Gameplay\Save\SaveRecord.cs" />
     <Compile Include="Gameplay\World\Camera.cs" />
     <Compile Include="Gameplay\World\NPC.cs" />
     <Compile Include="Gameplay\World\PositionedEntity.cs" />

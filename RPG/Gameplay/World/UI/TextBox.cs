@@ -46,6 +46,9 @@ namespace TeamStor.RPG.Gameplay.World.UI
 
         private TweenedDouble _offsetY;
 
+        private OnTextBoxCompleted _completedEvent;
+        public delegate void OnTextBoxCompleted();
+
         private TextBox(WorldState world, TextBoxContent content)
         {
             _world = world;
@@ -95,6 +98,9 @@ namespace TeamStor.RPG.Gameplay.World.UI
 
             _world.DrawHook -= DrawHook;
             _world.Paused = false;
+
+            if(_completedEvent != null)
+                _completedEvent();
         }
 
         private void DrawHook(object sender, WorldState.DrawEventArgs args)
@@ -125,9 +131,10 @@ namespace TeamStor.RPG.Gameplay.World.UI
         /// </summary>
         /// <param name="world">The world to pause and show the text box in.</param>
         /// <param name="textBoxContent">Content of the text box.</param>
-        public static IEnumerator<ICoroutineOperation> Show(WorldState world, TextBoxContent textBoxContent)
+        public static IEnumerator<ICoroutineOperation> Show(WorldState world, TextBoxContent textBoxContent, OnTextBoxCompleted completeEvent = null)
         {
             TextBox box = new TextBox(world, textBoxContent);
+            box._completedEvent = completeEvent;
             return world.Coroutine.Start(box.ShowCoroutine);
         }
     }

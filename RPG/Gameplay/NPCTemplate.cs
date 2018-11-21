@@ -8,6 +8,7 @@ using TeamStor.Engine;
 using System.IO;
 using TeamStor.RPG.Gameplay.World;
 using Microsoft.Xna.Framework.Graphics;
+using TeamStor.RPG.Gameplay.Behavior;
 
 namespace TeamStor.RPG.Gameplay
 {
@@ -72,12 +73,23 @@ namespace TeamStor.RPG.Gameplay
             get; private set;
         }
 
-        public NPCTemplate(string name, string id)
+        /// <summary>
+        /// NPC behavior.
+        /// Will be NullNPCBehavior if not overriden.
+        /// </summary>
+        public INPCBehavior Behavior
+        {
+            get; private set;
+        }
+
+        public NPCTemplate(string name, string id, INPCBehavior behavior)
         {
             Name = name;
             ID = id;
 
             TileTemplate = new Tile(ID, this);
+
+            Behavior = behavior != null ? behavior : new NullNPCBehavior();
 
             foreach(Direction direction in Enum.GetValues(typeof(Direction)))
             {

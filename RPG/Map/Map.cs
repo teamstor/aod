@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -141,6 +142,15 @@ namespace TeamStor.RPG
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// The file this map was loaded from.
+        /// Can be null.
+        /// </summary>
+        public string File
+        {
+            get; set;
         }
 
         /// <summary>
@@ -549,7 +559,15 @@ namespace TeamStor.RPG
 
                                     case "layers":
                                         if(map == null)
+                                        {
                                             map = new Map(w, h, info);
+
+                                            if(stream is FileStream)
+                                            {
+                                                FileStream fstream = stream as FileStream;
+                                                map.File = fstream.Name.Replace(Path.GetDirectoryName(Assembly.GetAssembly(typeof(Map)).Location), "");
+                                            }
+                                        }
 
                                         ReadJSONLayers(reader, map);
                                         break;

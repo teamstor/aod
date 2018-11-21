@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TeamStor.RPG.Gameplay.Behavior;
 
 namespace TeamStor.RPG.Gameplay
 {
@@ -14,6 +15,6 @@ namespace TeamStor.RPG.Gameplay
         /// <summary>
         /// A green test pig.
         /// </summary>
-        public static NPCTemplate GreenPig = new NPCTemplate("Green Pig", "green_pig");
+        public static NPCTemplate GreenPig = new NPCTemplate("Green Pig", "green_pig", new PigNPCBehavior());
     }
 }

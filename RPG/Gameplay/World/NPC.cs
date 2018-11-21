@@ -22,6 +22,16 @@ namespace TeamStor.RPG.Gameplay.World
         public const string RIGHT_TEXTURE = "npc/{name}/right{i}.png";
 
         /// <summary>
+        /// The origin tile of this NPC on the map. 
+        /// Since only one NPC can exist on a given position on the NPC layer,
+        /// this acts as a unique identifier of what NPC this is.
+        /// </summary>
+        public Point OriginTile
+        {
+            get; private set;
+        }
+
+        /// <summary>
         /// Template this NPC was created from.
         /// </summary>
         public NPCTemplate Template
@@ -29,13 +39,15 @@ namespace TeamStor.RPG.Gameplay.World
             get; private set;
         }
 
-        public NPC(WorldState world, NPCTemplate template) : base(world)
+        public NPC(WorldState world, Point originTile, NPCTemplate template) : base(world)
         {
+            OriginTile = originTile;
             Template = template;
         }
 
         public void Update(double deltaTime, double totalTime, long count)
         {
+            Template.Behavior.OnTick(this, deltaTime, totalTime, count);
         }
 
         public void Draw(SpriteBatch batch)

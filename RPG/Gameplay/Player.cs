@@ -105,6 +105,20 @@ namespace TeamStor.RPG.Gameplay
                         TileEventBase events = World.Map[layer, interactionPoint.X, interactionPoint.Y].Events;
                         events?.OnInteract(World.Map.GetMetadata(layer, interactionPoint.X, interactionPoint.Y), World, interactionPoint);
                     }
+
+                    foreach(NPC npc in World.NPCs)
+                    {
+                        if(npc.Position == interactionPoint)
+                        {
+                            bool isFacingPlayer =
+                                Heading == Direction.Left && npc.Heading == Direction.Right ||
+                                Heading == Direction.Right && npc.Heading == Direction.Left ||
+                                Heading == Direction.Up && npc.Heading == Direction.Down ||
+                                Heading == Direction.Down && npc.Heading == Direction.Up;
+
+                            npc.Template.Behavior.OnInteract(npc, this, isFacingPlayer);
+                        }
+                    }
                 }
             }
         }
