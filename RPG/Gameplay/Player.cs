@@ -20,10 +20,11 @@ namespace TeamStor.RPG.Gameplay
     {
         private double _landWhen = 0;
         private double _keyHeld;
+        private Keys _keyQueued = Keys.None;
 
         public Player(WorldState world) : base(world)
         {
-            Speed = 3;
+            Speed = 2.5;
             MoveInstantly(new Point(0, 0));
 
             for(int x = 0; x < world.Map.Width; x++)
@@ -42,6 +43,7 @@ namespace TeamStor.RPG.Gameplay
         {
             if(!IsWalking)
             {
+                Speed = World.Game.Input.Key(Keys.LeftShift) ? 3.5 : 2.5;
                 Direction _lastHeading = Heading;
 
                 if(World.Game.Input.Key(Keys.Up))
@@ -84,6 +86,21 @@ namespace TeamStor.RPG.Gameplay
                     _keyHeld -= deltaTime * 2;
 
                 _keyHeld = MathHelper.Clamp((float)_keyHeld, 0.0f, 0.1f);
+
+                if(_keyQueued != Keys.None)
+                {
+                    if(_keyQueued == Keys.Up)
+                        Heading = Direction.Up;
+                    if(_keyQueued == Keys.Down)
+                        Heading = Direction.Down;
+                    if(_keyQueued == Keys.Left)
+                        Heading = Direction.Left;
+                    if(_keyQueued == Keys.Right)
+                        Heading = Direction.Right;
+
+                    _keyHeld = 0.1f;
+                    _keyQueued = Keys.None;
+                }
 
                 if(_lastHeading != Heading && _keyHeld < 0.1)
                     _landWhen = World.Game.Time + 0.1;

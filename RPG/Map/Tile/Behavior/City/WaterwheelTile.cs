@@ -10,6 +10,8 @@ namespace TeamStor.RPG
 {
     public class WaterwheelTile : Tile
     {
+        public const int ANIMATION_FRAMES = 22;
+
         public WaterwheelTile(string id, MapLayer layer, string name, string textureName, bool solid = false, int transitionPriority = 1000, bool createGlobally = true) : base(id, layer, name, textureName, solid, transitionPriority, createGlobally)
         {
         }
@@ -34,13 +36,19 @@ namespace TeamStor.RPG
         {
             TileAtlas.Region region = Map.Atlas.MissingRegion;
 
+            for(int i = 1; i <= ANIMATION_FRAMES; i++)
+                // preload all frames
+                region = Map.Atlas["tiles/city/waterwheel/" + i + ".png"];
+
+            region = Map.Atlas.MissingRegion;
+
             for(int x = 0; x < 3; x++)
             {
                 for(int y = 0; y < 4; y++)
                 {
                     if(ScanArea(new Rectangle(mapPos.X - x, mapPos.Y - y, 3, 4), map))
                     {
-                        region = Map.Atlas[TextureName(metadata, environment)];
+                        region = Map.Atlas["tiles/city/waterwheel/" + (((int)(game.Time * 10) % ANIMATION_FRAMES) + 1) + ".png"];
                         region.Rectangle = new Rectangle(region.Rectangle.X + x * 16, region.Rectangle.Y + y * 16, 16, 16);
                     }
                 }

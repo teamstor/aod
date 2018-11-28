@@ -117,7 +117,7 @@ namespace TeamStor.RPG.Gameplay.World.UI
             batch.Texture(new Vector2(4, 270 - bg.Height - 4 + (bg.Height + 20) * (float)_offsetY.Value), bg, Color.White);
 
             Font font = _world.Assets.Get<Font>("fonts/bitcell.ttf");
-            
+
             batch.Text(font, 16, _content.Speaker, new Vector2(16, 270 - bg.Height + (bg.Height + 20) * (float)_offsetY.Value), Color.White, 0.8f);
             batch.Text(font, 16, _textWrittenYet, new Vector2(16, 270 - bg.Height + 12 + (bg.Height + 20) * (float)_offsetY.Value), Color.White * 0.8f, 0.8f);
 

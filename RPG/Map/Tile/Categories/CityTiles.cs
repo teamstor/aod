@@ -37,6 +37,6 @@ namespace TeamStor.RPG
         public static Tile RoofBeam = new RoofBeamTile("city/beam-roof", Tile.MapLayer.Decoration, "Roof Beam", "tiles/city/beam/side.png", true);
         public static Tile WallBeam = new BeamTile("city/beam-wall", Tile.MapLayer.Decoration, "Wall Beam", "tiles/city/beam/narrow.png", true);
 
-        public static Tile Waterwheel = new WaterwheelTile("city/waterwheel", Tile.MapLayer.Decoration, "Waterwheel", "tiles/city/waterwheel.png", true);
+        public static Tile Waterwheel = new WaterwheelTile("city/waterwheel", Tile.MapLayer.Decoration, "Waterwheel", "tiles/city/waterwheel/1.png", true);
     }
 }

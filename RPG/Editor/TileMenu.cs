@@ -308,8 +308,7 @@ namespace TeamStor.RPG.Editor
                     if((o as Tile).Name(null, _environment).ToLowerInvariant().Trim().Replace(" ", "") == s)
                         return (o as Tile);
 
-                    if((o as Tile).Name(null, _environment).ToLowerInvariant().Trim().Replace(" ", "").StartsWith(s) ||
-                        (o as Tile).Name(null, _environment).ToLowerInvariant().Trim().Replace(" ", "").EndsWith(s))
+                    if((o as Tile).Name(null, _environment).ToLowerInvariant().Trim().Replace(" ", "").StartsWith(s))
                         tile = (o as Tile);
                 }
 
