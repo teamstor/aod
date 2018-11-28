@@ -314,7 +314,7 @@ namespace TeamStor.RPG.Gameplay.World
 
             batch.Transform = oldTransform;
 
-            batch.Rectangle(new Rectangle(8, 8, 80 * (int)(80 * ((float)Player.Health / Player.MaxHealth)), 20), Color.DarkRed);
+            batch.Rectangle(new Rectangle(8, 8, (int)(80 * ((float)Player.Health / Player.MaxHealth)), 20), Color.DarkRed);
             batch.Outline(new Rectangle(8, 8, 80, 20), Color.White);
 
             batch.Rectangle(new Rectangle(480 - 8 - 80, 8, (int)(80 * ((float)Player.Magicka / Player.MaxMagicka)), 20), Color.DarkBlue);
