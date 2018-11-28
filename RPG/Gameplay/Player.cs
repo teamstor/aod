@@ -16,7 +16,7 @@ namespace TeamStor.RPG.Gameplay
     /// <summary>
     /// Player class for WorldState and CombatState.
     /// </summary>
-    public class Player : PositionedEntity
+    public class Player : LivingEntity
     {
         private double _landWhen = 0;
         private double _keyHeld;
@@ -24,6 +24,12 @@ namespace TeamStor.RPG.Gameplay
 
         public Player(WorldState world) : base(world)
         {
+            Vitality = 10;
+            Spirit = 10;
+
+            Health = 100;
+            Magicka = 100;
+
             Speed = 2.5;
             MoveInstantly(new Point(0, 0));
 

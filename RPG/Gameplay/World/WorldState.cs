@@ -314,6 +314,15 @@ namespace TeamStor.RPG.Gameplay.World
 
             batch.Transform = oldTransform;
 
+            batch.Rectangle(new Rectangle(8, 8, 80 * (int)(80 * ((float)Player.Health / Player.MaxHealth)), 20), Color.DarkRed);
+            batch.Outline(new Rectangle(8, 8, 80, 20), Color.White);
+
+            batch.Rectangle(new Rectangle(480 - 8 - 80, 8, (int)(80 * ((float)Player.Magicka / Player.MaxMagicka)), 20), Color.DarkBlue);
+            batch.Outline(new Rectangle(480 - 8 - 80, 8, 80, 20), Color.White);
+
+            batch.Text(Assets.Get<Font>("fonts/Alkhemikal.ttf"), 16, Player.Health.ToString(), new Vector2(14, 14 - 8), Color.White);
+            batch.Text(Assets.Get<Font>("fonts/Alkhemikal.ttf"), 16, Player.Magicka.ToString(), new Vector2(480 - 2 - 80, 14 - 8), Color.White);
+
             Rectangle transitionRectangle = Rectangle.Empty;
             if(Player.Heading == Direction.Up)
                 transitionRectangle = new Rectangle(0, 0, 480, (int)(270 * _transitionCover));

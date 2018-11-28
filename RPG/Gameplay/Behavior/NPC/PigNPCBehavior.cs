@@ -35,7 +35,9 @@ namespace TeamStor.RPG.Gameplay.Behavior
                         TextBox.Show(player.World, new TextBoxContent
                         {
                             Speaker = npc.Template.Name,
-                            Text = "Nöff nöff nöff nöff nöff nöff"
+                            Text = "Nöff nöff nöff nöff nöff nöff dö"
+                        }, () => {
+                            player.Health -= 10;
                         });
                     });
                 });

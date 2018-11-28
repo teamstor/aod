@@ -14,7 +14,7 @@ namespace TeamStor.RPG.Gameplay.World
     /// <summary>
     /// Non playable character in the world that can interact with the player.
     /// </summary>
-    public class NPC : PositionedEntity
+    public class NPC : LivingEntity
     {
         public const string UP_TEXTURE = "npc/{name}/back{i}.png";
         public const string DOWN_TEXTURE = "npc/{name}/front{i}.png";
