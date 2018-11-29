@@ -90,6 +90,7 @@
     <Compile Include="Gameplay\World\LivingEntity.cs" />
     <Compile Include="Gameplay\World\NPC.cs" />
     <Compile Include="Gameplay\World\PositionedEntity.cs" />
+    <Compile Include="Gameplay\World\UI\Inventory.cs" />
     <Compile Include="Gameplay\World\UI\TextBox.cs" />
     <Compile Include="Gameplay\World\WorldState.cs" />
     <Compile Include="Map\Tile\Attributes\BoolAttributeEditor.cs" />

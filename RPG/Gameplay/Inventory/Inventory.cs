@@ -129,29 +129,14 @@ namespace TeamStor.RPG.Gameplay
 
         /// <summary>
         /// Pushes/adds a new item to the inventory.
-        /// If the inventory is full this will return an empty reference.
         /// You can check if the item was added successfully by checking ItemSlotReference.IsEmptyReference
         /// </summary>
         /// <param name="item">The item to add to the inventory.</param>
         /// <returns>The reference to the slot the item was pushed to, or an empty reference.</returns>
         public ItemSlotReference Push(Item item)
         {
-            if(IsFull)
-                return this[EMPTY_SLOT];
-
             _slots.Add(item);
             return this[_slots.Count - 1];
-        }
-
-        /// <summary>
-        /// If the inventory is full.
-        /// </summary>
-        public bool IsFull
-        {
-            get
-            {
-                return _slots.Count == MAX_SLOTS;
-            }
         }
 
         /// <summary>
@@ -173,8 +158,6 @@ namespace TeamStor.RPG.Gameplay
         {
             if(slot == EMPTY_SLOT)
                 return true;
-            if(slot >= MAX_SLOTS)
-                return false;
             if(slot <= OccupiedSlots)
                 return false;
 

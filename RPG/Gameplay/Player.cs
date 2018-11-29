@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TeamStor.Engine.Graphics;
 using TeamStor.RPG.Gameplay.World;
+using TeamStor.RPG.Gameplay.World.UI;
 using static TeamStor.Engine.Graphics.SpriteBatch;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 
@@ -47,6 +48,12 @@ namespace TeamStor.RPG.Gameplay
 
         public void Update(double deltaTime, double totalTime, long count)
         {
+            if(World.Game.Input.KeyPressed(Keys.I))
+            {
+                InventoryUI.Show(World, this);
+                return;
+            }
+
             if(!IsWalking)
             {
                 Speed = World.Game.Input.Key(Keys.LeftShift) ? 3.5 : 2.5;
