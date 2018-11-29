@@ -144,7 +144,37 @@ namespace TeamStor.RPG.Gameplay.World
         /// </summary>
         public int PhysicalArmor
         {
-            get { return 0; /* TODO */ }
+            get
+            {
+                int physicalArmor = 0;
+
+                if(!Inventory[InventoryEquipSlot.Head].IsEmptyReference &&
+                    (Inventory[InventoryEquipSlot.Head].ReferencedItem is ArmorItem) &&
+                    (Inventory[InventoryEquipSlot.Head].ReferencedItem as ArmorItem).Protection == ArmorItem.ProtectionType.Physical)
+                    physicalArmor += (Inventory[InventoryEquipSlot.Head].ReferencedItem as ArmorItem).ArmorValue;
+
+                if(!Inventory[InventoryEquipSlot.Chest].IsEmptyReference &&
+                    (Inventory[InventoryEquipSlot.Chest].ReferencedItem is ArmorItem) &&
+                    (Inventory[InventoryEquipSlot.Chest].ReferencedItem as ArmorItem).Protection == ArmorItem.ProtectionType.Physical)
+                    physicalArmor += (Inventory[InventoryEquipSlot.Chest].ReferencedItem as ArmorItem).ArmorValue;
+
+                if(!Inventory[InventoryEquipSlot.Leggings].IsEmptyReference &&
+                    (Inventory[InventoryEquipSlot.Leggings].ReferencedItem is ArmorItem) &&
+                    (Inventory[InventoryEquipSlot.Leggings].ReferencedItem as ArmorItem).Protection == ArmorItem.ProtectionType.Physical)
+                    physicalArmor += (Inventory[InventoryEquipSlot.Leggings].ReferencedItem as ArmorItem).ArmorValue;
+
+                if(!Inventory[InventoryEquipSlot.Boots].IsEmptyReference &&
+                    (Inventory[InventoryEquipSlot.Boots].ReferencedItem is ArmorItem) &&
+                    (Inventory[InventoryEquipSlot.Boots].ReferencedItem as ArmorItem).Protection == ArmorItem.ProtectionType.Physical)
+                    physicalArmor += (Inventory[InventoryEquipSlot.Boots].ReferencedItem as ArmorItem).ArmorValue;
+
+                if(!Inventory[InventoryEquipSlot.Ring].IsEmptyReference &&
+                    (Inventory[InventoryEquipSlot.Ring].ReferencedItem is ArmorItem) &&
+                    (Inventory[InventoryEquipSlot.Ring].ReferencedItem as ArmorItem).Protection == ArmorItem.ProtectionType.Physical)
+                    physicalArmor += (Inventory[InventoryEquipSlot.Ring].ReferencedItem as ArmorItem).ArmorValue;
+
+                return physicalArmor;
+            }
         }
 
         /// <summary>
@@ -154,7 +184,37 @@ namespace TeamStor.RPG.Gameplay.World
         /// </summary>
         public int MagicArmor
         {
-            get { return 0; /* TODO */ }
+            get
+            {
+                int magicalArmor = 0;
+
+                if(!Inventory[InventoryEquipSlot.Head].IsEmptyReference &&
+                    (Inventory[InventoryEquipSlot.Head].ReferencedItem is ArmorItem) &&
+                    (Inventory[InventoryEquipSlot.Head].ReferencedItem as ArmorItem).Protection == ArmorItem.ProtectionType.Magical)
+                    magicalArmor += (Inventory[InventoryEquipSlot.Head].ReferencedItem as ArmorItem).ArmorValue;
+
+                if(!Inventory[InventoryEquipSlot.Chest].IsEmptyReference &&
+                    (Inventory[InventoryEquipSlot.Chest].ReferencedItem is ArmorItem) &&
+                    (Inventory[InventoryEquipSlot.Chest].ReferencedItem as ArmorItem).Protection == ArmorItem.ProtectionType.Magical)
+                    magicalArmor += (Inventory[InventoryEquipSlot.Chest].ReferencedItem as ArmorItem).ArmorValue;
+
+                if(!Inventory[InventoryEquipSlot.Leggings].IsEmptyReference &&
+                    (Inventory[InventoryEquipSlot.Leggings].ReferencedItem is ArmorItem) &&
+                    (Inventory[InventoryEquipSlot.Leggings].ReferencedItem as ArmorItem).Protection == ArmorItem.ProtectionType.Magical)
+                    magicalArmor += (Inventory[InventoryEquipSlot.Leggings].ReferencedItem as ArmorItem).ArmorValue;
+
+                if(!Inventory[InventoryEquipSlot.Boots].IsEmptyReference &&
+                    (Inventory[InventoryEquipSlot.Boots].ReferencedItem is ArmorItem) &&
+                    (Inventory[InventoryEquipSlot.Boots].ReferencedItem as ArmorItem).Protection == ArmorItem.ProtectionType.Magical)
+                    magicalArmor += (Inventory[InventoryEquipSlot.Boots].ReferencedItem as ArmorItem).ArmorValue;
+
+                if(!Inventory[InventoryEquipSlot.Ring].IsEmptyReference &&
+                    (Inventory[InventoryEquipSlot.Ring].ReferencedItem is ArmorItem) &&
+                    (Inventory[InventoryEquipSlot.Ring].ReferencedItem as ArmorItem).Protection == ArmorItem.ProtectionType.Magical)
+                    magicalArmor += (Inventory[InventoryEquipSlot.Ring].ReferencedItem as ArmorItem).ArmorValue;
+
+                return magicalArmor;
+            }
         }
 
         /// <summary>

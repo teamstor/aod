@@ -77,11 +77,14 @@
     <Compile Include="Gameplay\Behavior\NPC\SimpleWalkBehavior.cs" />
     <Compile Include="Gameplay\INPCBehavior.cs" />
     <Compile Include="Gameplay\Direction.cs" />
-    <Compile Include="Gameplay\Inventory.cs" />
+    <Compile Include="Gameplay\Inventory\Categories\ArmorItem.cs" />
+    <Compile Include="Gameplay\Inventory\InventoryEquipSlot.cs" />
+    <Compile Include="Gameplay\Inventory\Inventory.cs" />
+    <Compile Include="Gameplay\Inventory\Item.cs" />
     <Compile Include="Gameplay\NPCs.cs" />
     <Compile Include="Gameplay\NPCTemplate.cs" />
     <Compile Include="Gameplay\Player.cs" />
-    <Compile Include="Gameplay\Save.cs" />
+    <Compile Include="Gameplay\Save\Save.cs" />
     <Compile Include="Gameplay\Save\SaveRecord.cs" />
     <Compile Include="Gameplay\World\Camera.cs" />
     <Compile Include="Gameplay\World\LivingEntity.cs" />
