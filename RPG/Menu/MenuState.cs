@@ -56,6 +56,8 @@ namespace TeamStor.RPG.Menu
         {
             screenSize = Program.ScaleBatch(batch);
 
+            batch.Texture(new Vector2(0, 0), Assets.Get<Texture2D>("menu/bg.png"), Color.White);
+            batch.Rectangle(new Rectangle(0, 0, (int)screenSize.X, (int)screenSize.Y), Color.Black * 0.5f);
             batch.Texture(new Vector2(screenSize.X / 2 - 160 / 2, 20), Assets.Get<Texture2D>("ui/logo.png"), Color.White);
             
             _menuController.Draw(batch, new Vector2(
