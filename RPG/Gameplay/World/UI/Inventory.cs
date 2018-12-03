@@ -71,7 +71,7 @@ namespace TeamStor.RPG.Gameplay.World.UI
 
         private void UpdateHook(object sender, Game.UpdateEventArgs e)
         {
-            if(_world.Game.Input.KeyPressed(Keys.Escape))
+            if(InputMap.FindMapping(InputAction.Back).Held(_world.Input))
                 _closed = true;
         }
 

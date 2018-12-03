@@ -60,7 +60,9 @@ namespace TeamStor.RPG.Gameplay.World.UI
         {
             _world.Paused = true;
             _world.DrawHook += DrawHook;
-            
+
+            bool wasHeldAtStart = InputMap.FindMapping(InputAction.Action).Held(_world.Input);
+
             _offsetY.TweenTo(0.0, TweenEaseType.EaseOutQuad, 0.1);
             while(!_offsetY.IsComplete)
                 yield return null;
@@ -69,10 +71,10 @@ namespace TeamStor.RPG.Gameplay.World.UI
 
             while(true)
             {
-                if(_world.Game.Input.KeyPressed(Keys.Enter) && _textWrittenYet.Length == _content.Text.Length)
+                if(InputMap.FindMapping(InputAction.Action).Pressed(_world.Input) && _textWrittenYet.Length == _content.Text.Length)
                     break;
 
-                if(_world.Game.Input.Key(Keys.Enter))
+                if(InputMap.FindMapping(InputAction.Action).Held(_world.Input) && !wasHeldAtStart)
                 {
                     if(_textWrittenYet.Length < _content.Text.Length)
                     {
@@ -80,6 +82,9 @@ namespace TeamStor.RPG.Gameplay.World.UI
                         _completionTime = _world.Game.TotalFixedUpdates;
                     }
                 }
+
+                if(wasHeldAtStart && !InputMap.FindMapping(InputAction.Action).Held(_world.Input))
+                    wasHeldAtStart = false;
 
                 if(_textWrittenYet.Length < _content.Text.Length)
                 {

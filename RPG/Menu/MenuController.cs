@@ -118,8 +118,7 @@ namespace TeamStor.RPG.Menu
 
             if(currentBtn != null && !currentBtn.IsInClickAnimation)
             {
-                // TODO: byt ut med något keybind system som fungerar med controllers också.
-                if(Game.Input.KeyPressed(Keys.Up))
+                if(InputMap.FindMapping(InputAction.Up).Pressed(Game.Input))
                 {
                     SelectedIndex--;
                     
@@ -128,9 +127,11 @@ namespace TeamStor.RPG.Menu
                     
                     currentBtn.OnDeselected(_buttons[SelectedIndex]);
                     _buttons[SelectedIndex].OnSelected(currentBtn);
+
+                    currentBtn = _buttons[SelectedIndex];
                 }
                 
-                if(Game.Input.KeyPressed(Keys.Down))
+                if(InputMap.FindMapping(InputAction.Down).Pressed(Game.Input))
                 {
                     SelectedIndex++;
                     
@@ -139,9 +140,11 @@ namespace TeamStor.RPG.Menu
                     
                     currentBtn.OnDeselected(_buttons[SelectedIndex]);
                     _buttons[SelectedIndex].OnSelected(currentBtn);
+
+                    currentBtn = _buttons[SelectedIndex];
                 }
 
-                if(Game.Input.KeyPressed(Keys.Z))
+                if(InputMap.FindMapping(InputAction.Action).Pressed(Game.Input))
                     currentBtn.OnClicked();
             }
         }

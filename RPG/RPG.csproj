@@ -93,6 +93,8 @@
     <Compile Include="Gameplay\World\UI\Inventory.cs" />
     <Compile Include="Gameplay\World\UI\TextBox.cs" />
     <Compile Include="Gameplay\World\WorldState.cs" />
+    <Compile Include="Input\InputAction.cs" />
+    <Compile Include="Input\InputMap.cs" />
     <Compile Include="Map\Tile\Attributes\BoolAttributeEditor.cs" />
     <Compile Include="Map\Tile\Attributes\EnumAttributeEditor.cs" />
     <Compile Include="Map\Tile\Attributes\IntAttributeEditor.cs" />

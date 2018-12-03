@@ -160,8 +160,6 @@ namespace TeamStor.RPG.Menu
         {
         }
 
-        // TODO: NÄR MAN KLICKAR PÅ KNAPPEN SKA DEN BLINKA TILL TVÅ GGR INNAN NÅGOT HÄNDER
-
         public virtual void Draw(SpriteBatch batch, Vector2 pos)
         {
             Texture2D texture = Controller.Game.Assets.Get<Texture2D>("ui/button/normal.png");

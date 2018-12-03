@@ -48,7 +48,7 @@ namespace TeamStor.RPG.Gameplay
 
         public void Update(double deltaTime, double totalTime, long count)
         {
-            if(World.Game.Input.KeyPressed(Keys.I))
+            if(InputMap.FindMapping(InputAction.Inventory).Pressed(World.Input))
             {
                 InventoryUI.Show(World, this);
                 return;
@@ -56,10 +56,10 @@ namespace TeamStor.RPG.Gameplay
 
             if(!IsWalking)
             {
-                Speed = World.Game.Input.Key(Keys.LeftShift) ? 3.5 : 2.5;
+                Speed = InputMap.FindMapping(InputAction.Run).Held(World.Input) ? 3.5 : 2.5;
                 Direction _lastHeading = Heading;
 
-                if(World.Game.Input.Key(Keys.Up))
+                if(InputMap.FindMapping(InputAction.Up).Held(World.Input))
                 {
                     if(Heading != Direction.Up)
                         Heading = Direction.Up;
@@ -68,7 +68,7 @@ namespace TeamStor.RPG.Gameplay
 
                     _keyHeld += deltaTime;
                 }
-                else if(World.Game.Input.Key(Keys.Down))
+                else if(InputMap.FindMapping(InputAction.Down).Held(World.Input))
                 {
                     if(Heading != Direction.Down)
                         Heading = Direction.Down;
@@ -77,7 +77,7 @@ namespace TeamStor.RPG.Gameplay
 
                     _keyHeld += deltaTime;
                 }
-                else if(World.Game.Input.Key(Keys.Left))
+                else if(InputMap.FindMapping(InputAction.Left).Held(World.Input))
                 {
                     if(Heading != Direction.Left)
                         Heading = Direction.Left;
@@ -86,7 +86,7 @@ namespace TeamStor.RPG.Gameplay
 
                     _keyHeld += deltaTime;
                 }
-                else if(World.Game.Input.Key(Keys.Right))
+                else if(InputMap.FindMapping(InputAction.Right).Held(World.Input))
                 {
                     if(Heading != Direction.Right)
                         Heading = Direction.Right;
@@ -124,7 +124,7 @@ namespace TeamStor.RPG.Gameplay
                         MoveTo(Position + Heading.ToPoint());
                 }
 
-                if(World.Game.Input.KeyPressed(Keys.E))
+                if(InputMap.FindMapping(InputAction.Action).Pressed(World.Input))
                 {
                     Point interactionPoint = Position + Heading.ToPoint();
                     interactionPoint.X = MathHelper.Clamp(interactionPoint.X, 0, World.Map.Width - 1);
