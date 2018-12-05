@@ -107,12 +107,12 @@ namespace TeamStor.RPG.Gameplay
 
         public override void Draw(SpriteBatch batch, Vector2 screenSize)
         {
-            batch.Rectangle(new Rectangle(0, 0, (int)screenSize.X, (int)screenSize.Y), Color.Black);
             screenSize = Program.ScaleBatch(batch);
 
             string bg = "combat/plains.png";
 
             batch.Texture(new Vector2(0, -(float)_offset.Value), Assets.Get<Texture2D>(bg), Color.White);
+            batch.Texture(new Vector2(0, 270 - (float)_offset.Value * 2), Assets.Get<Texture2D>("combat/menu.png"), Color.White);
 
             Font font = Assets.Get<Font>("fonts/bitcell.ttf");
 
@@ -128,10 +128,12 @@ namespace TeamStor.RPG.Gameplay
 
             if(_showWarning)
             {
-                Vector2 measure = font.Measure(16, "OH SHIT!!! " + Enemy.Name + " ENCOUNTERED");
+                Vector2 measure = font.Measure(32, "OH SHIT!!! " + Enemy.Name + " ENCOUNTERED");
 
-                batch.Text(font, 16, "OH SHIT!!! " + Enemy.Name + " ENCOUNTERED", screenSize / 2 - measure / 2, Color.Red);
+                batch.Text(font, 32, "OH SHIT!!! " + Enemy.Name + " ENCOUNTERED", screenSize / 2 - measure / 2, Color.Red);
             }
+
+            Program.BlackBorders(batch);
         }
     }
 }
