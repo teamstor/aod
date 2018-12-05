@@ -24,7 +24,7 @@ namespace TeamStor.RPG.Gameplay.Behavior
                 TextBox.Show(player.World, new TextBoxContent
                 {
                     Speaker = npc.Template.Name,
-                    Text = "Hallo. Ich bin ein Schwein. Nöff nöff.\nIch liebe zu rulla runt i lera."
+                    Text = "Hej. Jag är en gris."
                 }, () =>
                 {
                     TextBox.Show(player.World, new TextBoxContent
@@ -35,9 +35,9 @@ namespace TeamStor.RPG.Gameplay.Behavior
                         TextBox.Show(player.World, new TextBoxContent
                         {
                             Speaker = npc.Template.Name,
-                            Text = "Nöff nöff nöff nöff nöff nöff dö"
+                            Text = "Dags att dö"
                         }, () => {
-                            player.Health -= 10;
+                            player.World.StartCombat(npc);
                         });
                     });
                 });

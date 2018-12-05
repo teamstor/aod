@@ -23,7 +23,7 @@ namespace TeamStor.RPG.Gameplay
         private double _keyHeld;
         private Keys _keyQueued = Keys.None;
 
-        public Player(WorldState world) : base(world)
+        public Player(WorldState world) : base(world, "Player")
         {
             Vitality = 10;
             Spirit = 10;

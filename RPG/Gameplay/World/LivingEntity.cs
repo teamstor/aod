@@ -14,6 +14,14 @@ namespace TeamStor.RPG.Gameplay.World
         private int _healthValue;
 
         /// <summary>
+        /// Name of this entity.
+        /// </summary>
+        public string Name
+        {
+            get; protected set;
+        }
+
+        /// <summary>
         /// Amount of health points the entity has.
         /// Is limited to the range 0-MaxHealth
         /// </summary>
@@ -225,9 +233,10 @@ namespace TeamStor.RPG.Gameplay.World
             get; private set;
         }
 
-        public LivingEntity(WorldState world) : base(world)
+        public LivingEntity(WorldState world, string name) : base(world)
         {
             Inventory = new Inventory(this);
+            Name = name;
         }
     }
 }

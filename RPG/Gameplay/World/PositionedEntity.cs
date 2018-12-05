@@ -36,8 +36,8 @@ namespace TeamStor.RPG.Gameplay.World
                     (Position * new Point(16, 16)).ToVector2(), 
                     (NextPosition * new Point(16, 16)).ToVector2(), 
                     (float)WalkCompletion);
-                vec.X = (int)vec.X;
-                vec.Y = (int)vec.Y;
+                //vec.X = (int)vec.X;
+                //vec.Y = (int)vec.Y;
 
                 return vec;
             }

@@ -39,7 +39,7 @@ namespace TeamStor.RPG.Gameplay.World
             get; private set;
         }
 
-        public NPC(WorldState world, Point originTile, NPCTemplate template) : base(world)
+        public NPC(WorldState world, Point originTile, NPCTemplate template) : base(world, template.Name)
         {
             OriginTile = originTile;
             Template = template;

@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace TeamStor.RPG
     public class TileAtlas : IDisposable
     {
         // Standard atlas size.
-        public const int ATLAS_SIZE = 1024;
+        public const int ATLAS_SIZE = 512;
 
         private Point _currentPoint;
         private int _minHeightThisRow;
@@ -38,6 +39,13 @@ namespace TeamStor.RPG
             get;
             private set;
         }
+
+        public int Count { get { return _atlases.Count;  } }
+        public int TileCount { get { return _tiles.Count; } }
+
+        public IReadOnlyList<Texture2D> Textures { get { return _atlases; } }
+
+        public float TotalGenerationTime = 0;
 
         public TileAtlas(Game game)
         {
@@ -64,6 +72,7 @@ namespace TeamStor.RPG
                 if(_tiles.TryGetValue(texture, out region))
                     return region;
 
+                Stopwatch timer = Stopwatch.StartNew();
                 Texture2D t;
                 if(Game.Assets.TryLoadAsset(texture, out t))
                 {
@@ -103,6 +112,8 @@ namespace TeamStor.RPG
 
                     Game.Assets.UnloadAsset(texture);
                     _tiles.Add(texture, region);
+                    TotalGenerationTime += (float)timer.Elapsed.TotalMilliseconds;
+
                     return region;
                 }
 
@@ -115,6 +126,7 @@ namespace TeamStor.RPG
         /// </summary>
         public void Clear()
         {
+            TotalGenerationTime = 0;
             _tiles.Clear();
 
             foreach(Texture2D t in _atlases)

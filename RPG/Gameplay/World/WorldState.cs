@@ -15,6 +15,7 @@ using Game = TeamStor.Engine.Game;
 using TeamStor.Engine.Tween;
 using System.IO;
 using System.Threading;
+using System.Reflection;
 
 namespace TeamStor.RPG.Gameplay.World
 {
@@ -295,7 +296,7 @@ namespace TeamStor.RPG.Gameplay.World
 
             batch.SamplerState = SamplerState.PointWrap;
             Matrix oldTransform = batch.Transform;
-            batch.Transform = Matrix.CreateTranslation(Camera.Offset.X, Camera.Offset.Y, 0) * batch.Transform;
+            batch.Transform = Matrix.CreateTranslation(batch.SmartRound(Camera.Offset).X, batch.SmartRound(Camera.Offset).Y, 0) * batch.Transform;
             
             Map.Draw(Tile.MapLayer.Terrain, Game, new Rectangle((int)-Camera.Offset.X, (int)-Camera.Offset.Y, (int)screenSize.X, (int)screenSize.Y));
 
@@ -388,6 +389,18 @@ namespace TeamStor.RPG.Gameplay.World
                 }
                 
                 batch.Text(SpriteBatch.FontStyle.MonoBold, 12, DebugTileString(Player.NextPosition + Player.Heading.ToPoint()), new Vector2(8, y), Color.Blue);
+
+                batch.Text(SpriteBatch.FontStyle.MonoBold, 16, "Atlases: " + Map.Atlas.Count + " (" + Map.Atlas.TileCount + ") " + Map.Atlas.TotalGenerationTime + " ms", new Vector2(rectangle.X + 8, rectangle.Bottom + 10), Color.White);
+
+                int x = rectangle.X + 8;
+
+                foreach(Texture2D texture in Map.Atlas.Textures)
+                {
+                    batch.Outline(new Rectangle(x, rectangle.Bottom + 40, 512, 512), Color.White, 2, false);
+                    batch.Texture(new Rectangle(x, rectangle.Bottom + 40, 512, 512), texture, Color.White);
+
+                    x += 512 + 8;
+                }
             }
         }
 
@@ -453,6 +466,33 @@ namespace TeamStor.RPG.Gameplay.World
             Paused = true;
 
             Task.Run(() => LoadMapAndTransition(newMap, transition, spawnArgs));
+        }
+
+        private IEnumerator<ICoroutineOperation> RunCombatCoroutine(object enemy)
+        {
+            Paused = true;
+
+            CombatState state = new CombatState(Player, enemy as LivingEntity);
+            state.Game = Game;
+
+            // do it manually so we don't call OnLeave in the other state
+            typeof(Game).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(Game, state);
+            state.OnEnter(this);
+
+            while(Game.CurrentState != this)
+                yield return null;
+
+            // combat complete at this point
+            Paused = false;
+        }
+
+        /// <summary>
+        /// Starts combat against the player with the specified enemy.
+        /// </summary>
+        /// <param name="enemy">The enemy the player should fight.</param>
+        public void StartCombat(LivingEntity enemy)
+        {
+            Coroutine.Start(RunCombatCoroutine, enemy);
         }
     }
 }
