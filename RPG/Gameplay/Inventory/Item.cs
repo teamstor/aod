@@ -11,15 +11,23 @@ namespace TeamStor.RPG.Gameplay
     /// </summary>
     public class Item
     {
-        private string _id;
-        private string _name;
+        /// <summary>
+        /// Item list.
+        /// </summary>
+        public static Dictionary<string, Item> Items
+        {
+            get; private set;
+        } = new Dictionary<string, Item>();
+
+        public static Item TestItem = new Item("test", "Test Item #1", "items/icons/test/8x8.png");
+        public static Item TestItem2 = new Item("test2", "Test Item #2", "items/icons/test/8x8.png");
 
         /// <summary>
         /// ID of the item.
         /// </summary>
         public virtual string ID
         {
-            get { return _id;  }
+            get; private set;
         }
 
         /// <summary>
@@ -27,7 +35,15 @@ namespace TeamStor.RPG.Gameplay
         /// </summary>
         public virtual string Name
         {
-            get { return _name; }
+            get; private set;
+        }
+
+        /// <summary>
+        /// 8x8 icon next to the name in the item list.
+        /// </summary>
+        public virtual string SmallIcon
+        {
+            get; private set;
         }
 
         /// <summary>
@@ -38,18 +54,11 @@ namespace TeamStor.RPG.Gameplay
             get;
         } = InventoryEquipSlot.None;
 
-        /// <summary>
-        /// Item list.
-        /// </summary>
-        public static Dictionary<string, Item> Items
+        public Item(string id, string name, string smallIcon, bool createGlobally = true)
         {
-            get; private set;
-        } = new Dictionary<string, Item>();
-
-        public Item(string id, string name, bool createGlobally = true)
-        {
-            _id = id;
-            _name = name;
+            ID = id;
+            Name = name;
+            SmallIcon = smallIcon;
 
             if(createGlobally)
                 Items.Add(id, this);

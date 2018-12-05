@@ -31,6 +31,13 @@ namespace TeamStor.RPG.Gameplay
             Health = 100;
             Magicka = 100;
 
+            for(int i = 0; i < 12; i++)
+            {
+                Inventory.Push(Item.TestItem);
+                Inventory.Push(Item.TestItem);
+                Inventory.Push(Item.TestItem2);
+            }
+
             Speed = 2.5;
             MoveInstantly(new Point(0, 0));
 
