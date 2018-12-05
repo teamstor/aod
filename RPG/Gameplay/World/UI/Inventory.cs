@@ -83,35 +83,37 @@ namespace TeamStor.RPG.Gameplay.World.UI
             float scrollStart = _scroll;
             float scrollTarget = -1;
 
-            if(itemsListBounds.Bottom < y + 15 - (int)_scroll)
+            if(itemsListBounds.Bottom <= y + 15 - (int)_scroll)
             {
                 scrollTarget = _scroll;
 
-                while(itemsListBounds.Bottom < y + 15 - (int)scrollTarget)
+                while(itemsListBounds.Bottom <= y + 15 - (int)scrollTarget)
                     scrollTarget++;
             }
-            if(itemsListBounds.Top >= y - (int)_scroll)
+            if(itemsListBounds.Top > y - (int)_scroll)
             {
                 scrollTarget = _scroll;
 
-                while(itemsListBounds.Top >= y - (int)scrollTarget)
+                while(itemsListBounds.Top > y - (int)scrollTarget)
                     scrollTarget--;
             }
 
             if(scrollTarget != -1)
                 scrollTarget = MathHelper.Clamp(scrollTarget, 0, height - itemsListBounds.Height - 6);
 
-            if(scrollTarget == -1)
+            if(scrollTarget == -1 || Math.Abs(scrollTarget - scrollStart) == 1)
                 yield return Wait.Seconds(_world.Game, 0.06);
             else
             {
                 double startTime = _world.Game.Time;
 
-                while(_world.Game.Time <= startTime + 0.15)
+                while(_world.Game.Time < startTime + 0.1)
                 {
-                    _scroll = MathHelper.Lerp(scrollStart, scrollTarget, (float)(_world.Game.Time - startTime) * (1f / 0.15f));
+                    _scroll = MathHelper.Lerp(scrollStart, scrollTarget, (float)(_world.Game.Time - startTime) * (1f / 0.1f));
                     yield return null;
                 }
+
+                _scroll = scrollTarget;
             }
                 
             _selectedSlot = selectedSlot;
@@ -128,12 +130,16 @@ namespace TeamStor.RPG.Gameplay.World.UI
                 {
                     if(_selectedSlot > 0)
                         _world.Coroutine.AddExisting(ChangeSelectedSlot(_selectedSlot - 1));
+                    else
+                        _world.Coroutine.AddExisting(ChangeSelectedSlot(_world.Player.Inventory.OccupiedSlots - 1));
                 }
 
                 if(InputMap.FindMapping(InputAction.Down).Pressed(_world.Input))
                 {
                     if(_selectedSlot < _world.Player.Inventory.OccupiedSlots - 1)
                         _world.Coroutine.AddExisting(ChangeSelectedSlot(_selectedSlot + 1));
+                    else
+                        _world.Coroutine.AddExisting(ChangeSelectedSlot(0));
                 }
             }
         }
@@ -186,13 +192,13 @@ namespace TeamStor.RPG.Gameplay.World.UI
                     batch.Texture(
                         new Vector2(itemsListRectangle.X + 6, y), 
                         _world.Assets.Get<Texture2D>(reference.ReferencedItem.SmallIcon), 
-                        Color.White * (selected ? 0.8f : 0.6f));
+                        Color.White * (selected ? 0.8f : 0.4f));
 
                     batch.Text(font, 
                         16, 
                         reference.ReferencedItem.Name, 
                         new Vector2(itemsListRectangle.X + 18, y - 8),
-                        Color.White * (selected ? 0.8f : 0.6f));
+                        Color.White * (selected ? 0.8f : 0.4f));
                 }
             }
 

@@ -470,8 +470,6 @@ namespace TeamStor.RPG.Gameplay.World
 
         private IEnumerator<ICoroutineOperation> RunCombatCoroutine(object enemy)
         {
-            Paused = true;
-
             CombatState state = new CombatState(Player, enemy as LivingEntity);
             state.Game = Game;
 
@@ -492,6 +490,7 @@ namespace TeamStor.RPG.Gameplay.World
         /// <param name="enemy">The enemy the player should fight.</param>
         public void StartCombat(LivingEntity enemy)
         {
+            Paused = true;
             Coroutine.Start(RunCombatCoroutine, enemy);
         }
     }
