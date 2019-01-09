@@ -107,15 +107,15 @@ namespace TeamStor.RPG.Gameplay.World.UI
             {
                 double startTime = _world.Game.Time;
 
-                while(_world.Game.Time < startTime + 0.1)
+                while(_world.Game.Time < startTime + (Math.Abs(scrollTarget - scrollStart) > 100 ? 0.5 : 0.1))
                 {
-                    _scroll = MathHelper.Lerp(scrollStart, scrollTarget, (float)(_world.Game.Time - startTime) * (1f / 0.1f));
+                    _scroll = MathHelper.Lerp(scrollStart, scrollTarget, (float)(_world.Game.Time - startTime) * (1f / (Math.Abs(scrollTarget - scrollStart) > 100 ? 0.5f : 0.1f)));
                     yield return null;
                 }
 
                 _scroll = scrollTarget;
             }
-                
+
             _selectedSlot = selectedSlot;
         }
 
@@ -162,19 +162,19 @@ namespace TeamStor.RPG.Gameplay.World.UI
             Vector2 transformLT = Vector2.Transform(itemsListRectangle.Location.ToVector2(), batch.Transform);
             Vector2 transformRB = Vector2.Transform(new Vector2(itemsListRectangle.Right, itemsListRectangle.Bottom), batch.Transform);
 
+            Vector3 scale, translation;
+            Quaternion rot;
+            batch.Transform.Decompose(out scale, out rot, out translation);
+            batch.Transform = batch.Transform * Matrix.CreateTranslation(0, (int)-_scroll * scale.X, 0);
+
             batch.Scissor = new Rectangle(
                 (int)transformLT.X,
-                (int)transformLT.Y,
+                (int)(transformLT.Y + (bg.Height + 20) * (float)_offsetY.Value * scale.X),
                 (int)(transformRB.X - transformLT.X),
                 (int)(transformRB.Y - transformLT.Y));
 
             itemsListRectangle.Y += 6;
             itemsListRectangle.Height -= 12;
-
-            Vector3 scale, translation;
-            Quaternion rot;
-            batch.Transform.Decompose(out scale, out rot, out translation);
-            batch.Transform = batch.Transform * Matrix.CreateTranslation(0, (int)-_scroll * scale.X, 0);
 
             if(_world.Player.Inventory.OccupiedSlots == 0)
             {
@@ -190,13 +190,13 @@ namespace TeamStor.RPG.Gameplay.World.UI
                     bool selected = _selectedSlot == i;
 
                     batch.Texture(
-                        new Vector2(itemsListRectangle.X + 6, y), 
-                        _world.Assets.Get<Texture2D>(reference.ReferencedItem.SmallIcon), 
+                        new Vector2(itemsListRectangle.X + 6, y),
+                        _world.Assets.Get<Texture2D>(reference.ReferencedItem.SmallIcon),
                         Color.White * (selected ? 0.8f : 0.4f));
 
-                    batch.Text(font, 
-                        16, 
-                        reference.ReferencedItem.Name, 
+                    batch.Text(font,
+                        16,
+                        reference.ReferencedItem.Name,
                         new Vector2(itemsListRectangle.X + 18, y - 8),
                         Color.White * (selected ? 0.8f : 0.4f));
                 }
@@ -204,6 +204,18 @@ namespace TeamStor.RPG.Gameplay.World.UI
 
             batch.Transform = batch.Transform * Matrix.CreateTranslation(0, (int)_scroll * scale.X, 0);
             batch.Scissor = null;
+
+            Rectangle infoRectangle = new Rectangle(itemsListRectangle.Right + 12, itemsListRectangle.Top - 6 + (int)((bg.Height + 20) * (float)_offsetY.Value), 261, 223);
+
+            if(_world.Player.Inventory.OccupiedSlots > 0 && _selectedSlot != -1)
+            {
+                Inventory.ItemSlotReference reference = _world.Player.Inventory[_selectedSlot];
+
+                batch.Texture(
+                    new Vector2(infoRectangle.X + infoRectangle.Width / 2 - 16, infoRectangle.Y),
+                    _world.Assets.Get<Texture2D>(reference.ReferencedItem.Icon),
+                    Color.White);
+            }
         }
 
         public static IEnumerator<ICoroutineOperation> Show(WorldState world, LivingEntity entity, OnInventoryUICompleted completeEvent = null)

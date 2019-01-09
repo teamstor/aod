@@ -26,7 +26,7 @@ namespace TeamStor.RPG.Menu
             MenuButton newGame = new MenuButton("New Game");
             newGame.Clicked = (btn) =>
             {
-                Game.CurrentState = new WorldState(Map.Load(File.OpenRead("data/maps/gameplay_test.map")));
+                Game.CurrentState = new WorldState(Map.Load(File.OpenRead("data/maps/mapt.json")));
             };
 
             _menuController.Add(newGame);

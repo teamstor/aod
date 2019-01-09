@@ -36,7 +36,7 @@ namespace TeamStor.RPG.Gameplay
             get; private set;
         }
 
-        public ArmorItem(string id, string name, string smallIcon, ProtectionType protectionType, int armorValue, bool createGlobally = true) : base(id, name, smallIcon, createGlobally)
+        public ArmorItem(string id, string name, string smallIcon, string icon, ProtectionType protectionType, int armorValue, bool createGlobally = true) : base(id, name, smallIcon, icon, createGlobally)
         {
             Protection = protectionType;
             ArmorValue = armorValue;

@@ -19,8 +19,8 @@ namespace TeamStor.RPG.Gameplay
             get; private set;
         } = new Dictionary<string, Item>();
 
-        public static Item TestItem = new Item("test", "Test Item #1", "items/icons/test/8x8.png");
-        public static Item TestItem2 = new Item("test2", "Test Item #2", "items/icons/test/8x8.png");
+        public static Item TestItem = new Item("test", "Test Item #1", "items/icons/test/8x8.png", "items/icons/test/32x32.png");
+        public static Item TestItem2 = new Item("test2", "Test Item #2", "items/icons/test/8x8.png", "items/icons/test/32x32.png");
 
         /// <summary>
         /// ID of the item.
@@ -47,6 +47,14 @@ namespace TeamStor.RPG.Gameplay
         }
 
         /// <summary>
+        /// 32x32 icon that shows up when the item is selected.
+        /// </summary>
+        public virtual string Icon
+        {
+            get; private set;
+        }
+
+        /// <summary>
         /// Slots this item is equippable in.
         /// </summary>
         public virtual InventoryEquipSlot EquippableIn
@@ -54,11 +62,12 @@ namespace TeamStor.RPG.Gameplay
             get;
         } = InventoryEquipSlot.None;
 
-        public Item(string id, string name, string smallIcon, bool createGlobally = true)
+        public Item(string id, string name, string smallIcon, string icon, bool createGlobally = true)
         {
             ID = id;
             Name = name;
             SmallIcon = smallIcon;
+            Icon = icon;
 
             if(createGlobally)
                 Items.Add(id, this);
