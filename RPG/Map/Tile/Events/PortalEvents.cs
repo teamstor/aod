@@ -54,6 +54,7 @@ namespace TeamStor.RPG
 
         public override void OnWalkEnter(TileMetadata metadata, WorldState world, Point mapPos)
         {
+            Console.WriteLine("OnWalkEnter");
             if(metadata == null)
                 return;
             if(metadata["needs-user-interaction"] == "False")

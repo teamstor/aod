@@ -135,6 +135,8 @@ namespace TeamStor.RPG.Gameplay.World
         private TweenedDouble _transitionCover;
         private bool _useTransiton = false;
 
+        private Point _lastPlayerPos;
+
         public WorldState(Map map, SpawnArgs spawnArgs, bool transition = false)
         {
             Map = map;
@@ -150,6 +152,8 @@ namespace TeamStor.RPG.Gameplay.World
 
             if(_spawnArgs.Position != new Point(-1, -1))
                 Player.MoveInstantly(_spawnArgs.Position);
+
+            _lastPlayerPos = Player.Position;
 
             Player.Heading = _spawnArgs.Direction;
 
@@ -205,7 +209,6 @@ namespace TeamStor.RPG.Gameplay.World
 
             if(!Paused)
             {
-                Point lastPlayerPos = Player.Position;
                 Player.Update(deltaTime, totalTime, count);
 
                 foreach(NPC npc in NPCs)
@@ -213,15 +216,17 @@ namespace TeamStor.RPG.Gameplay.World
 
                 foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
                 {
-                    TileEventBase oldEvents = Map[layer, lastPlayerPos.X, lastPlayerPos.Y].Events;
+                    TileEventBase oldEvents = Map[layer, _lastPlayerPos.X, _lastPlayerPos.Y].Events;
                     TileEventBase newEvents = Map[layer, Player.Position.X, Player.Position.Y].Events;
 
-                    if(Player.Position != lastPlayerPos)
+                    if(Player.Position != _lastPlayerPos)
                     {
-                        oldEvents?.OnWalkLeave(Map.GetMetadata(layer, lastPlayerPos.X, lastPlayerPos.Y), this, lastPlayerPos);
+                        oldEvents?.OnWalkLeave(Map.GetMetadata(layer, _lastPlayerPos.X, _lastPlayerPos.Y), this, _lastPlayerPos);
                         newEvents?.OnWalkEnter(Map.GetMetadata(layer, Player.Position.X, Player.Position.Y), this, Player.Position);
                     }
                 }
+
+                _lastPlayerPos = Player.Position;
             }
 
             Camera.Update(deltaTime);

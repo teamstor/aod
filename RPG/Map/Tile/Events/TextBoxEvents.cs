@@ -36,8 +36,8 @@ namespace TeamStor.RPG
 		
 		public override void OnWalkEnter(TileMetadata metadata, WorldState world, Point mapPos)
 		{
-			if(metadata != null && metadata["needs-user-interaction"] == "False")
-				DoTextBox(metadata, world, mapPos);
+            if(metadata != null && metadata["needs-user-interaction"] == "False")
+                DoTextBox(metadata, world, mapPos);
 		}
 
 		public override void OnStandingOn(TileMetadata metadata, WorldState world, Point mapPos, long tickCount)
