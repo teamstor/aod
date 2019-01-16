@@ -13,5 +13,7 @@ namespace TeamStor.RPG
             AttributeTextureName((d, m, e) => { return e == Map.Environment.SnowMountain ? "tiles/foliage/tree_snow.png" : d; });
 
         public static Tile Bush = new BushTile("foliage/bush", Tile.MapLayer.Decoration, "Bush", "tiles/foliage/bush/{connection}_{var}.png", true);
+        public static TallGrassTile TallGrass = new TallGrassTile("foliage/tall-grass", Tile.MapLayer.Decoration, "Tall Grass", "tiles/foliage/enemy_encounter_block.png", false);
+        public static Tile Rock = new RockTile("foliage/rock", Tile.MapLayer.Decoration, "Rock", "tiles/foliage/rock.png", true);
     }
 }

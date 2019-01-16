@@ -106,6 +106,8 @@
     <Compile Include="Map\Tile\Behavior\City\WaterwheelTile.cs" />
     <Compile Include="Map\Tile\Behavior\DrawOffsetTile.cs" />
     <Compile Include="Map\Tile\Behavior\Foliage\BushTile.cs" />
+    <Compile Include="Map\Tile\Behavior\Foliage\RockTile.cs" />
+    <Compile Include="Map\Tile\Behavior\Foliage\TallGrassTile.cs" />
     <Compile Include="Map\Tile\Behavior\Inside\DoormatTile.cs" />
     <Compile Include="Map\Tile\Behavior\VariationsTile.cs" />
     <Compile Include="Map\Tile\Categories\CityTiles.cs" />
@@ -116,6 +118,7 @@
     <Compile Include="Map\Tile\Categories\InsideTiles.cs" />
     <Compile Include="Map\Tile\EarlyTileInitalizer.cs" />
     <Compile Include="Map\Tile\Events\PortalEvents.cs" />
+    <Compile Include="Map\Tile\Events\TallGrassEvents.cs" />
     <Compile Include="Map\Tile\Events\TextBoxEvents.cs" />
     <Compile Include="Map\Legacy\OldMapLoader.cs" />
     <Compile Include="Map\Map.cs" />

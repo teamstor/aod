@@ -160,21 +160,26 @@ namespace TeamStor.RPG.Gameplay
             }
         }
 
-        public void Draw(SpriteBatch batch)
+        public void Draw(SpriteBatch batch, bool upperHalf)
         {
             string texture = "front";
-            if(Heading == Direction.Left)
-                texture = "left";
-            if(Heading == Direction.Right)
-                texture = "right";
+            if(Heading == Direction.Left || Heading == Direction.Right)
+                texture = "side";
             if(Heading == Direction.Up)
                 texture = "back";
 
             int frame = 0;
             if(IsWalking)
-                frame = ((int)World.Game.TotalFixedUpdates / 10) % (Heading == Direction.Up || Heading == Direction.Down ? 3 : 2);
+                frame = ((int)World.Game.TotalFixedUpdates / (InputMap.FindMapping(InputAction.Run).Held(World.Input) ? 8 : 6)) % 4;
 
-            batch.Texture(WorldPosition + new Vector2(0, _landWhen > World.Game.Time ? -1 : 0), World.Game.Assets.Get<Texture2D>("npc/pig/" + texture + frame + ".png"), Color.White);
+            batch.Texture(WorldPosition + new Vector2(0, _landWhen > World.Game.Time ? -1 : 0) - new Vector2(0, upperHalf ? 16 : 0), 
+                World.Game.Assets.Get<Texture2D>("player/" + texture + frame + ".png"), 
+                Color.White,
+                null,
+                new Rectangle(0, upperHalf ? 0 : 16, 16, 16),
+                0,
+                null,
+                Heading == Direction.Right ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
         }
     }
 }

@@ -26,5 +26,6 @@ namespace TeamStor.RPG
         }, false, Grass.TransitionPriority() - 1);
 
         public static Tile Stone = new Tile("ground/stone", Tile.MapLayer.Terrain, "Stone", "tiles/ground/stone.png", false, Grass.TransitionPriority() - 1);
+        public static Tile Gravel = new Tile("ground/gravel", Tile.MapLayer.Terrain, "Gravel", "tiles/ground/gravel.png", false, Grass.TransitionPriority() - 2);
     }
 }

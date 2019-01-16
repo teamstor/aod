@@ -118,7 +118,8 @@ namespace TeamStor.RPG.Gameplay
 
             Matrix oldTransform = batch.Transform;
             batch.Transform = Matrix.CreateScale(2) * Matrix.CreateTranslation(80, 160 - (float)_offset.Value, 0) * oldTransform;
-            Combatant.Draw(batch);
+            Combatant.Draw(batch, false);
+            Combatant.Draw(batch, true);
 
             batch.Transform = Matrix.CreateScale(2) * Matrix.CreateTranslation(screenSize.X - 80 - 32, 160 - (float)_offset.Value, 0) * oldTransform;
             if(Enemy is NPC)

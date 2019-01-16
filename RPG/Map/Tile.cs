@@ -156,6 +156,12 @@ namespace TeamStor.RPG
         {
             bool result = false;
 
+            if(_useTransitionFunc != null)
+                return _useTransitionFunc(result, from, to, map, other, metadata);
+
+            if(map.Info.Environment == Map.Environment.Inside)
+                return false;
+
             if(Layer == MapLayer.Terrain && TransitionPriority() != -1 && other.TransitionPriority(otherMetadata) != -1)
             {
                 if(other.TransitionPriority(otherMetadata) < TransitionPriority(metadata))
@@ -163,9 +169,6 @@ namespace TeamStor.RPG
                 else if(other.TransitionPriority(otherMetadata) == TransitionPriority(metadata))
                     result = other.ID.GetHashCode() > ID.GetHashCode();
             }
-
-            if(_useTransitionFunc != null)
-                return _useTransitionFunc(result, from, to, map, other, metadata);
 
             return result;
         }

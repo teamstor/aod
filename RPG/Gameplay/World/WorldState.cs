@@ -307,10 +307,20 @@ namespace TeamStor.RPG.Gameplay.World
 
             foreach(NPC npc in NPCs)
                 npc.Draw(batch);
-            Player.Draw(batch);
+
+            // we start by drawing the lower half on the body between the terrain layer and the decoration layer
+            if(!Player.IsWalking)
+                Player.Draw(batch, false);
 
             Map.Draw(Tile.MapLayer.Decoration, Game, new Rectangle((int)-Camera.Offset.X, (int)-Camera.Offset.Y, (int)screenSize.X, (int)screenSize.Y));
-         
+
+            // if the player is walking we draw everything over the decoration layer so he won't be covered by tall grass, etc
+            if(Player.IsWalking)
+                Player.Draw(batch, false);
+
+            // the upper half is drawn over the decoration layer since the head should cover trees and other tiles on that layer
+            Player.Draw(batch, true);
+
             if(_debug)
             {
                 batch.Outline(new Rectangle(Player.Position.X * 16, Player.Position.Y * 16, 16, 16), Color.Red);
