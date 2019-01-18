@@ -75,6 +75,7 @@
     <Compile Include="Gameplay\Behavior\NPC\NullNPCBehavior.cs" />
     <Compile Include="Gameplay\Behavior\NPC\PigNPCBehavior.cs" />
     <Compile Include="Gameplay\Behavior\NPC\SimpleWalkBehavior.cs" />
+    <Compile Include="Gameplay\Combat\CombatMenu.cs" />
     <Compile Include="Gameplay\Combat\CombatState.cs" />
     <Compile Include="Gameplay\INPCBehavior.cs" />
     <Compile Include="Gameplay\Direction.cs" />

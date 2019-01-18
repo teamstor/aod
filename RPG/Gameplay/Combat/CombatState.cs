@@ -17,6 +17,12 @@ using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 
 namespace TeamStor.RPG.Gameplay
 {
+    public enum CombatTurn
+    {
+        Player,
+        Enemy
+    }
+
     /// <summary>
     /// Game state while the player is in combat with an enemy.
     /// </summary>
@@ -27,6 +33,22 @@ namespace TeamStor.RPG.Gameplay
 
         private TweenedDouble _offset;
         private bool _showWarning = false;
+
+        /// <summary>
+        /// The combat menu.
+        /// </summary>
+        public CombatMenu Menu
+        {
+            get; private set;
+        } = new CombatMenu();
+
+        /// <summary>
+        /// Entity that currently has the turn in combat.
+        /// </summary>
+        public CombatTurn Turn
+        {
+            get; private set;
+        } = CombatTurn.Player;
 
         /// <summary>
         /// The player fighting.
@@ -90,15 +112,27 @@ namespace TeamStor.RPG.Gameplay
 
             while(!_offset.IsComplete)
                 yield return null;
+
+            while(true)
+            {
+                // player turn
+                Menu.Page = CombatMenuPage.ActionSelection;
+
+                // enemy turn
+                yield return null;
+
+                if(InputMap.FindMapping(InputAction.Back).Pressed(Input))
+                    break;
+            }
+
+            typeof(Game).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(Game, Combatant.World);
+            OnLeave(Combatant.World);
         }
 
         public override void Update(double deltaTime, double totalTime, long count)
         {
-            if(InputMap.FindMapping(InputAction.Back).Pressed(Input))
-            {
-                typeof(Game).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(Game, Combatant.World);
-                OnLeave(Combatant.World);
-            }
+            if(Turn == CombatTurn.Player)
+                Menu.Update(this);
         }
 
         public override void FixedUpdate(long count)
@@ -113,6 +147,9 @@ namespace TeamStor.RPG.Gameplay
 
             batch.Texture(new Vector2(0, -(float)_offset.Value), Assets.Get<Texture2D>(bg), Color.White);
             batch.Texture(new Vector2(0, 270 - (float)_offset.Value * 2), Assets.Get<Texture2D>("combat/menu.png"), Color.White);
+
+            if(Turn == CombatTurn.Player)
+                Menu.Draw(batch, new Rectangle(0, (int)(270 - (float)_offset.Value * 2), 270, Assets.Get<Texture2D>("combat/menu.png").Height), this);
 
             Font font = Assets.Get<Font>("fonts/bitcell.ttf");
 
