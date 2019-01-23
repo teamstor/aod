@@ -305,7 +305,10 @@ namespace TeamStor.RPG.Gameplay.World
         private void DrawToScreenOrRenderTarget(SpriteBatch batch, Vector2 screenSize, RenderTarget2D target)
         {
             if(target != null)
+            {
+                batch.SamplerState = SamplerState.PointClamp;
                 batch.RenderTarget = target;
+            }
             else
                 screenSize = Program.ScaleBatch(batch);
 
