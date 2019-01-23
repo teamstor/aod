@@ -160,6 +160,7 @@ namespace TeamStor.RPG.Editor
             Categories.Last().Objects.Add(GroundTiles.Grass);
             Categories.Last().Objects.Add(GroundTiles.Dirt);
             Categories.Last().Objects.Add(GroundTiles.Stone);
+            Categories.Last().Objects.Add(GroundTiles.StoneDarker);
             Categories.Last().Objects.Add(GroundTiles.Gravel);
 
             Categories.Add(new Category("Foliage", "editor/tilemenu/foliage.png"));

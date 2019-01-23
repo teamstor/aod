@@ -115,15 +115,45 @@ namespace TeamStor.RPG.Gameplay
 
             while(true)
             {
-                // player turn
-                Menu.Page = CombatMenuPage.ActionSelection;
+                bool stop = false;
+                Menu.NewTurn();
+
+                while(Menu.PendingAction == CombatPendingPlayerAction.None)
+                    yield return null;
+
+                switch(Menu.PendingAction)
+                {
+                    case CombatPendingPlayerAction.AttemptRunAway:
+                        yield return Wait.Seconds(Game, 0.5);
+
+                        bool didRunAway = (new Random((int)Game.TotalUpdates)).NextDouble() > 0.5f;
+
+                        Menu.ShowMessage(didRunAway ? 
+                            "You safely ran away from " + Enemy.Name + "." : 
+                            "You failed to escape.", true, Game.Time + (didRunAway ? 3.5 : 3.0));
+                        yield return Wait.Seconds(Game, 3.5);
+
+                        if(didRunAway)
+                            stop = true;
+                        break;
+
+                    default:
+                        // wtf
+                        break;
+                }
+
+                stop = stop || InputMap.FindMapping(InputAction.Back).Pressed(Input);
+                if(stop)
+                    break;
 
                 // enemy turn
                 yield return null;
-
-                if(InputMap.FindMapping(InputAction.Back).Pressed(Input))
-                    break;
             }
+
+            _offset.TweenTo(0, TweenEaseType.EaseInOutCubic);
+
+            while(!_offset.IsComplete)
+                yield return null;
 
             typeof(Game).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(Game, Combatant.World);
             OnLeave(Combatant.World);
