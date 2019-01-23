@@ -31,6 +31,17 @@ namespace TeamStor.RPG.Gameplay
         private Point _savedCombatantPosition, _savedEnemyPosition;
         private Direction _savedCombatantHeading, _savedEnemyHeading;
 
+        private TweenedDouble _transition;
+
+        private enum TransitionType
+        {
+            CombatIn,
+            CombatOut
+        }
+
+        private TransitionType _transitionType = TransitionType.CombatIn;
+        private static RenderTarget2D _transitionRenderTarget;
+
         private TweenedDouble _offset;
         private bool _showWarning = false;
 
@@ -84,7 +95,11 @@ namespace TeamStor.RPG.Gameplay
 
         public override void OnEnter(GameState previousState)
         {
+            if(_transitionRenderTarget == null)
+                _transitionRenderTarget = new RenderTarget2D(Game.GraphicsDevice, 480, 270, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+
             _offset = new TweenedDouble(Game, 0);
+            _transition = new TweenedDouble(Game, 1);
 
             Coroutine.Start(RunCombat);
         }
@@ -100,6 +115,11 @@ namespace TeamStor.RPG.Gameplay
 
         private IEnumerator<ICoroutineOperation> RunCombat()
         {
+            DrawToScreenOrRenderTarget(Game.Batch, new Vector2(480, 270), _transitionRenderTarget);
+
+            _transition.TweenTo(0, TweenEaseType.EaseOutCubic, 0.5);
+            yield return Wait.Seconds(Game, 0.8);
+
             for(int i = 0; i < 12; i++)
             {
                 _showWarning = !_showWarning;
@@ -108,7 +128,7 @@ namespace TeamStor.RPG.Gameplay
 
             yield return Wait.Seconds(Game, 0.7);
 
-            _offset.TweenTo(40, TweenEaseType.EaseInOutCubic);
+            _offset.TweenTo(40, TweenEaseType.EaseInOutCubic, 0.6f);
 
             while(!_offset.IsComplete)
                 yield return null;
@@ -142,7 +162,6 @@ namespace TeamStor.RPG.Gameplay
                         break;
                 }
 
-                stop = stop || InputMap.FindMapping(InputAction.Back).Pressed(Input);
                 if(stop)
                     break;
 
@@ -150,10 +169,18 @@ namespace TeamStor.RPG.Gameplay
                 yield return null;
             }
 
-            _offset.TweenTo(0, TweenEaseType.EaseInOutCubic);
+            _offset.TweenTo(0, TweenEaseType.EaseInOutCubic, 0.6f);
 
             while(!_offset.IsComplete)
                 yield return null;
+
+            yield return Wait.Seconds(Game, 0.3);
+
+            DrawToScreenOrRenderTarget(Game.Batch, new Vector2(480, 270), _transitionRenderTarget);
+            _transitionType = TransitionType.CombatOut;
+            _transition.TweenTo(1, TweenEaseType.EaseInCubic, 0.5);
+
+            yield return Wait.Seconds(Game, 0.6);
 
             typeof(Game).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(Game, Combatant.World);
             OnLeave(Combatant.World);
@@ -169,9 +196,12 @@ namespace TeamStor.RPG.Gameplay
         {
         }
 
-        public override void Draw(SpriteBatch batch, Vector2 screenSize)
+        private void DrawToScreenOrRenderTarget(SpriteBatch batch, Vector2 screenSize, RenderTarget2D target)
         {
-            screenSize = Program.ScaleBatch(batch);
+            if(target != null)
+                batch.RenderTarget = target;
+            else
+                screenSize = Program.ScaleBatch(batch);
 
             string bg = "combat/plains.png";
 
@@ -201,7 +231,37 @@ namespace TeamStor.RPG.Gameplay
                 batch.Text(font, 32, "OH SHIT!!! " + Enemy.Name + " ENCOUNTERED", screenSize / 2 - measure / 2, Color.Red);
             }
 
-            Program.BlackBorders(batch);
+            if(target != null)
+                batch.RenderTarget = null;
+            else
+                Program.BlackBorders(batch);
+        }
+
+        public override void Draw(SpriteBatch batch, Vector2 screenSize)
+        {
+            if(_transition != 0)
+            {
+                screenSize = Program.ScaleBatch(batch);
+
+                batch.Rectangle(new Rectangle(0, 0, 480, 270), Color.Black);
+
+                Rectangle rectangle = new Rectangle(0, 0, 480, 270);
+                float extraScale = _transition * 0.2f;
+                if(_transitionType == TransitionType.CombatIn)
+                    extraScale *= -1;
+
+                rectangle.Width += (int)(480 * extraScale);
+                rectangle.Height += (int)(270 * extraScale);
+
+                rectangle.X = 480 / 2 - rectangle.Width / 2;
+                rectangle.Y = 270 / 2 - rectangle.Height / 2;
+
+                batch.Texture(rectangle, _transitionRenderTarget, Color.White * (1.0f - _transition));
+
+                Program.BlackBorders(batch);
+            }
+            else
+                DrawToScreenOrRenderTarget(batch, screenSize, null);
         }
     }
 }
