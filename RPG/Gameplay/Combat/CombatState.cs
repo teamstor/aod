@@ -138,6 +138,7 @@ namespace TeamStor.RPG.Gameplay
             while(true)
             {
                 bool stop = false;
+                bool backToPlayerTurn = false;
                 Menu.NewTurn();
 
                 while(Menu.PendingAction == CombatPendingPlayerAction.None)
@@ -161,7 +162,6 @@ namespace TeamStor.RPG.Gameplay
 
                     case CombatPendingPlayerAction.OpenInventory:
                         _offset.TweenTo(0, TweenEaseType.EaseInOutCubic, 0.3f);
-
                         while(!_offset.IsComplete)
                             yield return null;
 
@@ -173,9 +173,13 @@ namespace TeamStor.RPG.Gameplay
                         _inventoryUI = null;
 
                         _offset.TweenTo(40, TweenEaseType.EaseInOutCubic, 0.3f);
-
                         while(!_offset.IsComplete)
                             yield return null;
+
+                        backToPlayerTurn = true;
+                        Menu.Page = CombatMenuPage.ActionSelection;
+                        Menu.SelectedButton = Menu.Buttons[CombatMenuPage.ActionSelection].IndexOf("Inventory");
+
                         break;
 
                     default:
@@ -186,8 +190,13 @@ namespace TeamStor.RPG.Gameplay
                 if(stop)
                     break;
 
-                // enemy turn
-                yield return null;
+                if(!backToPlayerTurn)
+                {
+                    // enemy turn
+                    yield return null;
+                }
+
+                backToPlayerTurn = false;
             }
 
             _offset.TweenTo(0, TweenEaseType.EaseInOutCubic, 0.6f);

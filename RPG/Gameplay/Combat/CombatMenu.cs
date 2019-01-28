@@ -110,7 +110,7 @@ namespace TeamStor.RPG.Gameplay
         /// <summary>
         /// Button selected on the current page.
         /// </summary>
-        public int SelectedButton { get; private set; }
+        public int SelectedButton { get; set; }
 
         /// <summary>
         /// Pending player action.
@@ -125,7 +125,8 @@ namespace TeamStor.RPG.Gameplay
         /// </summary>
         public void NewTurn()
         {
-            Page = CombatMenuPage.ActionSelection;
+            if(Page != CombatMenuPage.ActionSelection)
+                Page = CombatMenuPage.ActionSelection;
             PendingAction = CombatPendingPlayerAction.None;
         }
 
