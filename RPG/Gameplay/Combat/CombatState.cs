@@ -11,7 +11,7 @@ using TeamStor.Engine.Coroutine;
 using TeamStor.Engine.Graphics;
 using TeamStor.Engine.Tween;
 using TeamStor.RPG.Gameplay.World;
-
+using TeamStor.RPG.Gameplay.World.UI;
 using Game = TeamStor.Engine.Game;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 
@@ -76,6 +76,8 @@ namespace TeamStor.RPG.Gameplay
         {
             get; private set;
         }
+
+        private InventoryUI _inventoryUI;
 
         public CombatState(Player player, LivingEntity enemy)
         {
@@ -157,6 +159,25 @@ namespace TeamStor.RPG.Gameplay
                             stop = true;
                         break;
 
+                    case CombatPendingPlayerAction.OpenInventory:
+                        _offset.TweenTo(0, TweenEaseType.EaseInOutCubic, 0.3f);
+
+                        while(!_offset.IsComplete)
+                            yield return null;
+
+                        _inventoryUI = new InventoryUI(Combatant, this);
+
+                        while(!_inventoryUI.IsShowingCompleted)
+                            yield return null;
+
+                        _inventoryUI = null;
+
+                        _offset.TweenTo(40, TweenEaseType.EaseInOutCubic, 0.3f);
+
+                        while(!_offset.IsComplete)
+                            yield return null;
+                        break;
+
                     default:
                         // wtf
                         break;
@@ -190,6 +211,9 @@ namespace TeamStor.RPG.Gameplay
         {
             if(Turn == CombatTurn.Player)
                 Menu.Update(this);
+
+            if(_inventoryUI != null)
+                _inventoryUI.ManualUpdate();
         }
 
         public override void FixedUpdate(long count)
@@ -233,6 +257,9 @@ namespace TeamStor.RPG.Gameplay
 
                 batch.Text(font, 32, "OH SHIT!!! " + Enemy.Name + " ENCOUNTERED", screenSize / 2 - measure / 2, Color.Red);
             }
+
+            if(_inventoryUI != null)
+                _inventoryUI.ManualDraw();
 
             if(target != null)
                 batch.RenderTarget = null;

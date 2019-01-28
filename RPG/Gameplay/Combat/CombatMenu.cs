@@ -26,10 +26,6 @@ namespace TeamStor.RPG.Gameplay
         /// </summary>
         MagicSelection,
         /// <summary>
-        /// Used for selecting an item.
-        /// </summary>
-        Inventory,
-        /// <summary>
         /// Used for showing player and enemy statistics.
         /// </summary>
         Stats
@@ -42,7 +38,12 @@ namespace TeamStor.RPG.Gameplay
         /// <summary>
         /// Attempts to run away from the enemy.
         /// </summary>
-        AttemptRunAway
+        AttemptRunAway,
+
+        /// <summary>
+        /// Uses an item from the player inventory
+        /// </summary>
+        OpenInventory
     }
 
     /// <summary>
@@ -93,13 +94,6 @@ namespace TeamStor.RPG.Gameplay
 
             {
                 CombatMenuPage.MagicSelection, new List<string>()
-                {
-                    "Back"
-                }
-            },
-
-            {
-                CombatMenuPage.Inventory, new List<string>()
                 {
                     "Back"
                 }
@@ -180,11 +174,14 @@ namespace TeamStor.RPG.Gameplay
                         case CombatMenuPage.ActionSelection:
                             if(Buttons[Page][SelectedButton] == "Magic")
                                 Page = CombatMenuPage.MagicSelection;
-                            if(Buttons[Page][SelectedButton] == "Inventory")
-                                Page = CombatMenuPage.Inventory;
-                            if(Buttons[Page][SelectedButton] == "Stats")
+                            else if(Buttons[Page][SelectedButton] == "Inventory")
+                            {
+                                PendingAction = CombatPendingPlayerAction.OpenInventory;
+                                Page = CombatMenuPage.None;
+                            }
+                            else if(Buttons[Page][SelectedButton] == "Stats")
                                 Page = CombatMenuPage.Stats;
-                            if(Buttons[Page][SelectedButton] == "Run")
+                            else if(Buttons[Page][SelectedButton] == "Run")
                             {
                                 PendingAction = CombatPendingPlayerAction.AttemptRunAway;
                                 Page = CombatMenuPage.None;
@@ -192,7 +189,6 @@ namespace TeamStor.RPG.Gameplay
                             break;
 
                         case CombatMenuPage.MagicSelection:
-                        case CombatMenuPage.Inventory:
                         case CombatMenuPage.Stats:
                             if(Buttons[Page][SelectedButton] == "Back")
                                 Page = CombatMenuPage.ActionSelection;
@@ -313,7 +309,6 @@ namespace TeamStor.RPG.Gameplay
                 }
 
                 if(Page == CombatMenuPage.MagicSelection || 
-                    Page == CombatMenuPage.Inventory ||
                     Page == CombatMenuPage.Stats)
                 {
                     if(Page == CombatMenuPage.MagicSelection)
