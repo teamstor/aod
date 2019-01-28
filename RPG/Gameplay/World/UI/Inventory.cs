@@ -44,6 +44,17 @@ namespace TeamStor.RPG.Gameplay.World.UI
         } = false;
 
         /// <summary>
+        /// Offset of the menu.
+        /// </summary>
+        public float MenuOffset
+        {
+            get
+            {
+                return _offsetY;
+            }
+        }
+
+        /// <summary>
         /// Creates a standalone inventory UI that needs to be updated manually.
         /// </summary>
         /// <param name="entity">The entity to use the inventory with.</param>

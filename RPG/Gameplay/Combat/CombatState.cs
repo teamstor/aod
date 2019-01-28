@@ -268,7 +268,10 @@ namespace TeamStor.RPG.Gameplay
             }
 
             if(_inventoryUI != null)
+            {
+                batch.Rectangle(new Rectangle(0, 0, 480, 270), Color.Black * ((1.0f - _inventoryUI.MenuOffset) * 0.6f));
                 _inventoryUI.ManualDraw();
+            }
 
             if(target != null)
                 batch.RenderTarget = null;
