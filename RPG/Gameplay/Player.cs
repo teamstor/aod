@@ -25,12 +25,6 @@ namespace TeamStor.RPG.Gameplay
 
         public Player(WorldState world) : base(world, "Player")
         {
-            Vitality = 10;
-            Spirit = 10;
-
-            Health = 100;
-            Magicka = 100;
-
             for(int i = 0; i < 12; i++)
             {
                 Inventory.Push(Item.TestItem);

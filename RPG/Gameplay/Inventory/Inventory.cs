@@ -47,6 +47,8 @@ namespace TeamStor.RPG.Gameplay
             {
                 get
                 {
+                    if(Slot == Inventory.EMPTY_SLOT)
+                        return null;
                     if(Inventory.OccupiedSlots <= Slot)
                         return null;
 

@@ -237,6 +237,41 @@ namespace TeamStor.RPG.Gameplay.World
         {
             Inventory = new Inventory(this);
             Name = name;
+
+            Level = 1;
+
+            Vitality = 10;
+            Spirit = 10;
+
+            Health = 100;
+            Magicka = 100;
+        }
+
+        public string StatsInfoString
+        {
+            get
+            {
+                string s = Name + " (Level " + Level + ")\n";
+                s += "HP: " + Health + "/" + MaxHealth + "\n";
+                if(MaxMagicka == 0)
+                    s += "MP: (none)\n";
+                else
+                    s += "MP: " + Magicka + "/" + MaxMagicka + "\n";
+
+                s += "\n";
+
+                s += "Strength: " + Strength + "\n";
+                s += "Agility: " + Agility + "\n";
+                s += "Intellect: " + Intellect + "\n";
+                s += "Vitality: " + Vitality + "\n";
+                s += "Spirit: " + Spirit + "\n";
+
+                s += "\n";
+
+                s += "Armor: Physical " + PhysicalArmor + ", Magical " + MagicArmor;
+
+                return s;
+            }
         }
     }
 }

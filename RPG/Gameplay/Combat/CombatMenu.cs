@@ -28,7 +28,11 @@ namespace TeamStor.RPG.Gameplay
         /// <summary>
         /// Used for selecting an item.
         /// </summary>
-        Inventory
+        Inventory,
+        /// <summary>
+        /// Used for showing player and enemy statistics.
+        /// </summary>
+        Stats
     }
 
     public enum CombatPendingPlayerAction
@@ -83,7 +87,7 @@ namespace TeamStor.RPG.Gameplay
             {
                 CombatMenuPage.ActionSelection, new List<string>()
                 {
-                    "Attack", "Magic", "Inventory", "Run"
+                    "Attack", "Magic", "Inventory", "Run", "Stats"
                 }
             },
 
@@ -96,6 +100,13 @@ namespace TeamStor.RPG.Gameplay
 
             {
                 CombatMenuPage.Inventory, new List<string>()
+                {
+                    "Back"
+                }
+            },
+
+            {
+                CombatMenuPage.Stats, new List<string>()
                 {
                     "Back"
                 }
@@ -171,6 +182,8 @@ namespace TeamStor.RPG.Gameplay
                                 Page = CombatMenuPage.MagicSelection;
                             if(Buttons[Page][SelectedButton] == "Inventory")
                                 Page = CombatMenuPage.Inventory;
+                            if(Buttons[Page][SelectedButton] == "Stats")
+                                Page = CombatMenuPage.Stats;
                             if(Buttons[Page][SelectedButton] == "Run")
                             {
                                 PendingAction = CombatPendingPlayerAction.AttemptRunAway;
@@ -180,6 +193,7 @@ namespace TeamStor.RPG.Gameplay
 
                         case CombatMenuPage.MagicSelection:
                         case CombatMenuPage.Inventory:
+                        case CombatMenuPage.Stats:
                             if(Buttons[Page][SelectedButton] == "Back")
                                 Page = CombatMenuPage.ActionSelection;
                             break;
@@ -203,6 +217,20 @@ namespace TeamStor.RPG.Gameplay
             }
         }
 
+        private void DrawTextMultiline(SpriteBatch batch, Font font, string text, Vector2 pos, Color color, bool startFromRight)
+        {
+            int y = (int)pos.Y;
+
+            foreach(string s in text.Split('\n'))
+            {
+                Vector2 measure = font.Measure(16, s);
+                int x = startFromRight ? (int)pos.X - (int)measure.X : (int)pos.X;
+
+                batch.Text(font, 16, s, new Vector2(x, y), color);
+                y += 16;
+            }
+        }
+
         /// <summary>
         /// Draws the menu text on top of the menu background.
         /// </summary>
@@ -211,6 +239,14 @@ namespace TeamStor.RPG.Gameplay
         public void Draw(SpriteBatch batch, Rectangle menuRectangle, CombatState state)
         {
             Font font = state.Assets.Get<Font>("fonts/bitcell.ttf");
+
+            if(Page == CombatMenuPage.Stats)
+            {
+                batch.Rectangle(new Rectangle(0, 0, 480, 270 - menuRectangle.Height), Color.Black * 0.6f);
+
+                DrawTextMultiline(batch, font, state.Combatant.StatsInfoString, new Vector2(10, 4), Color.White * 0.8f, false);
+                DrawTextMultiline(batch, font, state.Enemy.StatsInfoString, new Vector2(480 - 10, 4), Color.White * 0.8f, true);
+            }
 
             if(Buttons.ContainsKey(Page))
             {
@@ -249,6 +285,8 @@ namespace TeamStor.RPG.Gameplay
                         action = "Choose an item to use on yourself";
                     if(Buttons[Page][SelectedButton] == "Run")
                         action = "Attempt to run away from combat";
+                    if(Buttons[Page][SelectedButton] == "Stats")
+                        action = "Shows statistics for you and your enemy";
 
                     Rectangle hpRectangle = new Rectangle(480 - 90 - 30, menuRectangle.Y + menuRectangle.Height / 2 - (16 * 2 + 4) / 2 + 2, 90, 16);
 
@@ -274,7 +312,9 @@ namespace TeamStor.RPG.Gameplay
                     batch.Text(font, 16, state.Enemy.Health + "/" + state.Enemy.MaxHealth, new Vector2(hpRectangle.X + hpRectangle.Width - 4 - measure.X, hpRectangle.Y - 4), Color.White);
                 }
 
-                if(Page == CombatMenuPage.MagicSelection || Page == CombatMenuPage.Inventory)
+                if(Page == CombatMenuPage.MagicSelection || 
+                    Page == CombatMenuPage.Inventory ||
+                    Page == CombatMenuPage.Stats)
                 {
                     if(Page == CombatMenuPage.MagicSelection)
                     {

@@ -211,9 +211,6 @@ namespace TeamStor.RPG.Gameplay
             batch.Texture(new Vector2(0, -(float)_offset.Value), Assets.Get<Texture2D>(bg), Color.White);
             batch.Texture(new Vector2(0, 270 - (float)_offset.Value * 2), Assets.Get<Texture2D>("combat/menu.png"), Color.White);
 
-            if(Turn == CombatTurn.Player)
-                Menu.Draw(batch, new Rectangle(0, (int)(270 - (float)_offset.Value * 2), 270, Assets.Get<Texture2D>("combat/menu.png").Height), this);
-
             Font font = Assets.Get<Font>("fonts/bitcell.ttf");
 
             Matrix oldTransform = batch.Transform;
@@ -226,6 +223,9 @@ namespace TeamStor.RPG.Gameplay
                 (Enemy as NPC).Draw(batch);
         
             batch.Transform = oldTransform;
+
+            if(Turn == CombatTurn.Player)
+                Menu.Draw(batch, new Rectangle(0, (int)(270 - (float)_offset.Value * 2), 270, Assets.Get<Texture2D>("combat/menu.png").Height), this);
 
             if(_showWarning)
             {

@@ -43,13 +43,6 @@ namespace TeamStor.RPG.Gameplay.World
         {
             OriginTile = originTile;
             Template = template;
-
-            // TODO: från template
-            Vitality = 10;
-            Spirit = 10;
-
-            Health = 75;
-            Magicka = 75;
         }
 
         public void Update(double deltaTime, double totalTime, long count)
