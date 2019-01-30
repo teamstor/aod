@@ -229,6 +229,7 @@ namespace TeamStor.RPG.Editor
             Categories.Add(new Category("NPCs", "editor/tilemenu/npcs.png"));
 
             Category animals = new Category("Animals", "");
+            animals.Objects.Add(NPCs.Pig.TileTemplate);
             animals.Objects.Add(NPCs.GreenPig.TileTemplate);
 
             Categories.Last().Objects.Add(animals);

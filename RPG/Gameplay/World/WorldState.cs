@@ -230,6 +230,9 @@ namespace TeamStor.RPG.Gameplay.World
 
                     if(Player.Position != _lastPlayerPos)
                     {
+                        if(Map.Info.CombatArea)
+                            RandomEncounter.TryRandomEncounter(this);
+
                         oldEvents?.OnWalkLeave(Map.GetMetadata(layer, _lastPlayerPos.X, _lastPlayerPos.Y), this, _lastPlayerPos);
                         newEvents?.OnWalkEnter(Map.GetMetadata(layer, Player.Position.X, Player.Position.Y), this, Player.Position);
                     }

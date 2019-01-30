@@ -31,6 +31,10 @@ namespace TeamStor.RPG
             _latestMap = world.Map;
             _walkedOn = mapPos;
             _walkedOnTick = world.Game.TotalFixedUpdates;
+
+            // if this map is a combat area we should just encounter enemies on every single tile
+            if(!world.Map.Info.CombatArea)
+                RandomEncounter.TryRandomEncounter(world);
         }
 
         public override void OnWalkLeave(TileMetadata metadata, WorldState world, Point mapPos)

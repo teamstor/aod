@@ -74,6 +74,13 @@ namespace TeamStor.RPG
             /// Weather of the map.
             /// </summary>
             public Weather Weather;
+
+            /// <summary>
+            /// If this map is a combat area.
+            /// In other words, if all tiles should have a chance to meet enemies.
+            /// Used in caves.
+            /// </summary>
+            public bool CombatArea;
         }
 
         // (ID 16 bit) | (Metadata 16 bit)
@@ -411,6 +418,10 @@ namespace TeamStor.RPG
                         case "weather":
                             info.Weather = (Weather)reader.ReadAsInt32().Value;
                             break;
+
+                        case "combatarea":
+                            info.CombatArea = reader.ReadAsBoolean().Value;
+                            break;
                     }
                 }
                 else if(reader.TokenType == JsonToken.EndObject)
@@ -615,6 +626,8 @@ namespace TeamStor.RPG
                     writer.WriteValue(Info.Environment);
                     writer.WritePropertyName("weather");
                     writer.WriteValue(Info.Weather);
+                    writer.WritePropertyName("combatarea");
+                    writer.WriteValue(Info.CombatArea);
                     writer.WriteEndObject();
 
                     writer.WritePropertyName("width");

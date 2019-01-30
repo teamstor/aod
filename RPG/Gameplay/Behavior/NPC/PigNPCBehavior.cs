@@ -9,7 +9,7 @@ using TeamStor.RPG.Gameplay.World.UI;
 namespace TeamStor.RPG.Gameplay.Behavior
 {
     /// <summary>
-    /// Behavior for the (green) pig.
+    /// Behavior for pigs.
     /// </summary>
     public class PigNPCBehavior : SimpleWalkBehavior
     {
@@ -21,25 +21,11 @@ namespace TeamStor.RPG.Gameplay.Behavior
         {
             if(isFacingPlayer)
             {
-                TextBox.Show(player.World, new TextBoxContent
-                {
+                TextBox.Show(player.World, new TextBoxContent {
                     Speaker = npc.Template.Name,
-                    Text = "Hej. Jag är en gris."
-                }, () =>
-                {
-                    TextBox.Show(player.World, new TextBoxContent
-                    {
-                        Speaker = "Player",
-                        Text = "Grisar ska inte kunna prata?"
-                    }, () => {
-                        TextBox.Show(player.World, new TextBoxContent
-                        {
-                            Speaker = npc.Template.Name,
-                            Text = "Dags att dö"
-                        }, () => {
-                            player.World.StartCombat(npc);
-                        });
-                    });
+                    Text = "*nöff nöff*"
+                }, () => {
+                    player.World.StartCombat(npc);
                 });
             }
         }
