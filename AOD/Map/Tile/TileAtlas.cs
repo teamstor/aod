@@ -74,7 +74,7 @@ namespace TeamStor.AOD
 
                 Stopwatch timer = Stopwatch.StartNew();
                 Texture2D t;
-                if(Game.Assets.TryLoadAsset(texture, out t))
+                if(Game.Assets.TryLoadAsset(texture, out t, true))
                 {
                     if(t.Width > ATLAS_SIZE || t.Height > ATLAS_SIZE)
                     {

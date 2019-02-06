@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -77,9 +78,25 @@ namespace TeamStor.AOD
             Settings.Save();
         }
 
+        private static bool _hasPreloaded = false;
+
         private static void OnUpdate(object sender, Game.UpdateEventArgs e)
         {
             Game game = sender as Game;
+
+            if(!_hasPreloaded)
+            {
+                _hasPreloaded = true;
+
+                // preload all tile assets on first frame
+                foreach(string asset in Directory.EnumerateFiles("data/tiles", "*.png", SearchOption.AllDirectories))
+                {
+                    Texture2D a;
+                    game.Assets.TryLoadAsset(asset.Replace("data/", "").Replace("data\\", ""), out a, true);
+                    
+                    Console.WriteLine("Preloaded " + asset);
+                }
+            }
 
             if(Settings.Fullscreen != game.Fullscreen)
                 Settings.Fullscreen = game.Fullscreen;
