@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SDL2;
 using TeamStor.Engine.Graphics;
 using TeamStor.Engine.Tween;
 using TeamStor.AOD.Gameplay;
@@ -253,19 +254,22 @@ namespace TeamStor.AOD.Editor
             Rectangle.TweenTo(new Rectangle(Rectangle.TargetValue.X, Rectangle.TargetValue.Y, (int)TotalArea.X, Rectangle.TargetValue.Height), TweenEaseType.Linear, 0);
         }
 
-        private void OnSearchInput(object sender, TextInputEventArgs e)
+        private void OnSearchInput(char c)
         {
-            if(e.Character == '\b' && _searchTerm.Length > 0)
+            if(c == (char) 22)
+                _searchTerm += SDL.SDL_GetClipboardText();
+            if(c == '\b' && _searchTerm.Length > 0)
                 _searchTerm = _searchTerm.Substring(0, _searchTerm.Length - 1);
-            else if(Char.IsLetterOrDigit(e.Character) || Char.IsPunctuation(e.Character) || e.Character == ' ')
-                _searchTerm += e.Character;
+            else if(Char.IsLetterOrDigit(c) || Char.IsPunctuation(c) || c == ' ')
+                _searchTerm += c;
 
             _searchTerm = _searchTerm.TrimStart();
         }
 
         private void RemoveSearchInput(object sender, Game.ChangeStateEventArgs e)
         {
-            Game.Window.TextInput -= OnSearchInput;
+            TextInputEXT.TextInput -= OnSearchInput;
+            TextInputEXT.StopTextInput();
             Game.OnStateChange -= RemoveSearchInput;
         }
 
@@ -340,7 +344,8 @@ namespace TeamStor.AOD.Editor
                     _isSearching = true;
                     _quitQueued = true;
 
-                    game.Window.TextInput += OnSearchInput;
+                    TextInputEXT.TextInput += OnSearchInput;
+                    TextInputEXT.StartTextInput();
                     game.OnStateChange += RemoveSearchInput;
                 }
             }
@@ -394,14 +399,16 @@ namespace TeamStor.AOD.Editor
                 _isSearching = false;
                 _searchTerm = "";
 
-                game.Window.TextInput -= OnSearchInput;
+                TextInputEXT.TextInput -= OnSearchInput;
+                TextInputEXT.StopTextInput();
                 game.OnStateChange -= RemoveSearchInput;
             }
             else if(_isSearching && game.Input.KeyPressed(Keys.Escape))
             {
                 _isSearching = false;
                 _searchTerm = "";
-                game.Window.TextInput -= OnSearchInput;
+                TextInputEXT.TextInput -= OnSearchInput;
+                TextInputEXT.StopTextInput();
                 game.OnStateChange -= RemoveSearchInput;
             }
 
@@ -433,7 +440,7 @@ namespace TeamStor.AOD.Editor
             {
                 if(_scrollTarget != -1)
                 {
-                    Scroll = MathHelper.LerpPrecise(Scroll, _scrollTarget, (float)Game.DeltaTime * 14f);
+                    Scroll = MathHelper.Lerp(Scroll, _scrollTarget, (float)Game.DeltaTime * 14f);
                     if(Math.Abs(Scroll - _scrollTarget) <= 0.75f)
                         _scrollTarget = -1;
                 }
@@ -630,7 +637,8 @@ namespace TeamStor.AOD.Editor
                     _isSearching = true;
                     _quitQueued = true;
 
-                    game.Window.TextInput += OnSearchInput;
+                    TextInputEXT.TextInput += OnSearchInput;
+                    TextInputEXT.StartTextInput();
                     game.OnStateChange += RemoveSearchInput;
                 }
             }

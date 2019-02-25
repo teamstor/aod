@@ -84,7 +84,7 @@ namespace TeamStor.AOD.Menu
         {
             get
             {
-                return Controller.Game.Assets.Get<Texture2D>("ui/button/normal.png").Bounds.Size.ToVector2();
+                return new Vector2(Controller.Game.Assets.Get<Texture2D>("ui/button/normal.png").Width, Controller.Game.Assets.Get<Texture2D>("ui/button/normal.png").Height);
             }
         }
 

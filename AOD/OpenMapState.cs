@@ -4,6 +4,7 @@ using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SDL2;
 using TeamStor.Engine;
 using TeamStor.AOD.Gameplay.World;
 using Game = TeamStor.Engine.Game;
@@ -27,32 +28,36 @@ namespace TeamStor.AOD
 					return _targetMap.Remove(0, 1);
 
 				if(_targetMap.StartsWith("!"))
-					return Settings.SettingsDirectory + "/maps/" + _targetMap.Remove(0, 1);
+					return Settings.SettingsDirectory + "/maps/" + _targetMap.Remove(0, 1) + ".json";
 
-				return AppDomain.CurrentDomain.BaseDirectory + "data/maps/" + _targetMap;
+				return AppDomain.CurrentDomain.BaseDirectory + "data/maps/" + _targetMap + ".json";
 			}
 		}
 		
 		public override void OnEnter(GameState previousState)
 		{
 			_lastState = previousState;
-			Game.Window.TextInput += OnTextInput;
+			TextInputEXT.TextInput += OnTextInput;
+			TextInputEXT.StartTextInput();
 		}
 
-		private void OnTextInput(object sender, TextInputEventArgs e)
+		private void OnTextInput(char c)
 		{
-			if(e.Character == '\b')
+			if(c == (char) 22)
+				_targetMap += SDL.SDL_GetClipboardText();
+			if(c == '\b')
 			{
 				if(_targetMap.Length > 0)
 					_targetMap = _targetMap.Substring(0, _targetMap.Length - 1);
 			}
-			else if(Char.IsLetterOrDigit(e.Character) || Char.IsPunctuation(e.Character) || e.Character == ' ')
-				_targetMap += e.Character == ' ' ? '_' : e.Character;
+			else if(Char.IsLetterOrDigit(c) || Char.IsPunctuation(c) || c == ' ')
+				_targetMap += c == ' ' ? '_' : c;
 		}
 
 		public override void OnLeave(GameState nextState)
 		{
-			Game.Window.TextInput -= OnTextInput;
+			TextInputEXT.TextInput -= OnTextInput;
+			TextInputEXT.StopTextInput();
 		}
 
 		public override void Update(double deltaTime, double totalTime, long count)

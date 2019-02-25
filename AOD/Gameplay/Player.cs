@@ -128,8 +128,8 @@ namespace TeamStor.AOD.Gameplay
                 if(InputMap.FindMapping(InputAction.Action).Pressed(World.Input))
                 {
                     Point interactionPoint = Position + Heading.ToPoint();
-                    interactionPoint.X = MathHelper.Clamp(interactionPoint.X, 0, World.Map.Width - 1);
-                    interactionPoint.Y = MathHelper.Clamp(interactionPoint.Y, 0, World.Map.Height - 1);
+                    interactionPoint.X = (int)MathHelper.Clamp(interactionPoint.X, 0, World.Map.Width - 1);
+                    interactionPoint.Y = (int)MathHelper.Clamp(interactionPoint.Y, 0, World.Map.Height - 1);
 
                     foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
                     {

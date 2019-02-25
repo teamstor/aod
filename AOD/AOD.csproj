@@ -35,9 +35,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MonoGame.Framework, Version=3.7.0.1129, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\team-stor-engine\Dependencies\MonoGame.Framework.dll</HintPath>
+    <Reference Include="FNA, Version=19.2.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\team-stor-engine\Dependencies\FNA.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

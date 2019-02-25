@@ -18,18 +18,12 @@ namespace TeamStor.AOD
 {
     static class Program
     {
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
-        private static extern bool SetProcessDPIAware();
 
         public const string VERSION = "1.0 (beta)";
         
         [STAThreadAttribute]
         private static void Main()
-        {
-            // http://crsouza.com/2015/04/13/how-to-fix-blurry-windows-forms-windows-in-high-dpi-settings/
-            if(Environment.OSVersion.Platform == PlatformID.Win32NT && Environment.OSVersion.Version.Major >= 6)
-                SetProcessDPIAware();
-            
+        {            
             Settings.Load();
 
             Game game = Game.Run(new PreloaderState(), "data", true);
@@ -83,6 +77,9 @@ namespace TeamStor.AOD
         {
             Game game = sender as Game;
 
+            if(game.Window.Title != "Age of Darkness ")
+                game.Window.Title = "Age of Darkness";
+
             if(Settings.Fullscreen != game.Fullscreen)
                 Settings.Fullscreen = game.Fullscreen;
             
@@ -119,7 +116,7 @@ namespace TeamStor.AOD
                 scale = Math.Floor(scale);
                         
             Point size = new Point((int)((1920 / 4) * scale), (int)((1080 / 4) * scale));
-            Rectangle rectangle = new Rectangle(new Point(batch.Device.Viewport.Width / 2 - size.X / 2, batch.Device.Viewport.Height / 2 - size.Y / 2), size);
+            Rectangle rectangle = new Rectangle(batch.Device.Viewport.Width / 2 - size.X / 2, batch.Device.Viewport.Height / 2 - size.Y / 2, size.X, size.Y);
 
             batch.Transform = Matrix.CreateScale((float)scale) * Matrix.CreateTranslation(rectangle.X, rectangle.Y, 0);
             batch.SamplerState = SamplerState.PointClamp;
@@ -135,7 +132,7 @@ namespace TeamStor.AOD
                 scale = Math.Floor(scale);
                         
             Point size = new Point((int)((1920 / 4) * scale), (int)((1080 / 4) * scale));
-            Rectangle rectangle = new Rectangle(new Point(batch.Device.Viewport.Width / 2 - size.X / 2, batch.Device.Viewport.Height / 2 - size.Y / 2), size);
+            Rectangle rectangle = new Rectangle(batch.Device.Viewport.Width / 2 - size.X / 2, batch.Device.Viewport.Height / 2 - size.Y / 2, size.X, size.Y);
             
             batch.Scissor = null;
             batch.Transform = Matrix.Identity;
@@ -144,6 +141,24 @@ namespace TeamStor.AOD
             batch.Rectangle(new Rectangle(0, rectangle.Y + rectangle.Height, batch.Device.Viewport.Width, batch.Device.Viewport.Height), Color.Black);
             batch.Rectangle(new Rectangle(0, 0, rectangle.X, batch.Device.Viewport.Height), Color.Black);
             batch.Rectangle(new Rectangle(rectangle.X + rectangle.Width, 0, batch.Device.Viewport.Width, batch.Device.Viewport.Height), Color.Black);
+        }
+    }
+
+    public static class Methods
+    {
+        public static Point ToPoint(this Vector2 vector)
+        {
+            return new Point((int)vector.X, (int)vector.Y);
+        }
+        
+        public static Vector2 ToVector2(this Point point)
+        {
+            return new Vector2(point.X, point.Y);
+        }
+        
+        public static bool Contains(this Rectangle rectangle, Vector2 vec)
+        {
+            return rectangle.Contains(vec.ToPoint());
         }
     }
 }

@@ -389,8 +389,8 @@ namespace TeamStor.AOD
                 {
                     for(int y = 0; y < Math.Min(oldHeight, Height); y++)
                     {
-                        int xPos = MathHelper.Clamp(x + xOffset_, 0, Width - 1);
-                        int yPos = MathHelper.Clamp(y + yOffset_, 0, Height - 1);
+                        int xPos = (int)MathHelper.Clamp(x + xOffset_, 0, Width - 1);
+                        int yPos = (int)MathHelper.Clamp(y + yOffset_, 0, Height - 1);
 
                         LayerToTileArray(layer)[yPos * Width + xPos] = oldTiles[y * oldWidth + x];
                     }

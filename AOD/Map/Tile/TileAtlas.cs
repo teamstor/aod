@@ -101,7 +101,7 @@ namespace TeamStor.AOD
                     t.GetData(0, t.Bounds, tileData, 0, t.Width * t.Height);
 
                     region.Texture = _atlases.Last();
-                    region.Rectangle = new Rectangle(_currentPoint, new Point(t.Width, t.Height));
+                    region.Rectangle = new Rectangle(_currentPoint.X, _currentPoint.Y, t.Width, t.Height);
 
                     _atlases.Last().SetData(0, region.Rectangle, tileData, 0, t.Width * t.Height);
 

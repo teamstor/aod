@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SDL2;
 using TeamStor.Engine;
 using TeamStor.Engine.Graphics;
 using TeamStor.Engine.Tween;
@@ -51,7 +52,8 @@ namespace TeamStor.AOD.Editor
 		{
 			if(_first)
 			{
-				game.Window.TextInput += OnTextInput;
+				TextInputEXT.TextInput += OnTextInput;
+				TextInputEXT.StartTextInput();
 				game.OnStateChange += OnStateChange;
 				_first = false;
 
@@ -127,24 +129,28 @@ namespace TeamStor.AOD.Editor
 		
 		private void OnStateChange(object sender, Game.ChangeStateEventArgs e)
 		{
-			((Game)sender).Window.TextInput -= OnTextInput;
+			TextInputEXT.StopTextInput();
+			TextInputEXT.TextInput -= OnTextInput;
 			((Game)sender).OnStateChange -= OnStateChange;
 		}
 
-		private void OnTextInput(object sender, TextInputEventArgs e)
+		private void OnTextInput(char c)
 		{
 			if(Focused)
 			{
 				string oldText = Text;
 
-				if(e.Character == '\b' && Text.Length > 0)
+				if(c == (char) 22)
+					Text += SDL.SDL_GetClipboardText();
+
+				if(c == '\b' && Text.Length > 0)
 					Text = Text.Substring(0, Text.Length - 1);
-				else if(Char.IsLetterOrDigit(e.Character) || Char.IsPunctuation(e.Character) || e.Character == ' ')
-					Text += e.Character;
+				else if(Char.IsLetterOrDigit(c) || Char.IsPunctuation(c) || c == ' ')
+					Text += c;
 
 				Text = Text.TrimStart();
 
-				if(e.Key == Keys.Enter)
+				if(c == (char)13)
 					Text += '\n';
 
 				if(Text != oldText)

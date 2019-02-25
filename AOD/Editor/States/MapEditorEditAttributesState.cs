@@ -285,7 +285,7 @@ namespace TeamStor.AOD.Editor.States
 
             if(SelectedTile != new Point(-1, -1))
             {
-                batch.Rectangle(new Rectangle(Point.Zero, screenSize.ToPoint()), Color.Black * 0.6f);
+                batch.Rectangle(new Rectangle(0, 0, screenSize.ToPoint().X, screenSize.ToPoint().Y), Color.Black * 0.6f);
 
                 string tileName = BaseState.Map[Layer, SelectedTile.X, SelectedTile.Y].Name(BaseState.Map.GetMetadata(Layer, SelectedTile.X, SelectedTile.Y), BaseState.Map.Info.Environment);
                 string str = "\"" + tileName + "\" (" + SelectedTile.X + ", " + SelectedTile.Y + ")";
