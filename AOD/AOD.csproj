@@ -169,10 +169,12 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent Condition="'$(OS)' == 'Windows_NT' ">
+    	rd /s /q "$(TargetDir)\data"
 		XCOPY "$(ProjectDir)..\team-stor-engine\Dependencies" "$(TargetDir)" /S /Y
 		XCOPY "$(ProjectDir)..\data" "$(TargetDir)\data" /S /Y
 	  </PostBuildEvent>
     <PostBuildEvent Condition="'$(OS)' != 'Windows_NT'">
+    	rm -rf "$(TargetDir)/data"
 		cp -rf "$(ProjectDir)../team-stor-engine/Dependencies/." "$(TargetDir)"
 		cp -rf "$(ProjectDir)../data/." "$(TargetDir)/data"
 	  </PostBuildEvent>
