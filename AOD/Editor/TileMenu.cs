@@ -536,7 +536,7 @@ namespace TeamStor.AOD.Editor
 
             if(_screenFade != 1.0f)
             {
-                game.Batch.Text(SpriteBatch.FontStyle.Bold, 15, SelectedTile.Name(), new Vector2(Rectangle.Value.X + 8, Rectangle.Value.Y + 4),
+                game.Batch.Text(SpriteBatch.FontStyle.Bold, 15, SelectedTile.Name(null, _environment), new Vector2(Rectangle.Value.X + 8, Rectangle.Value.Y + 4),
                     Color.White * (1.0f - _screenFade) * (Disabled ? 0.3f : 0.6f));
                 
                 Rectangle tileRect = new Rectangle(Rectangle.Value.X + Rectangle.Value.Width - 4 - 16 - 2, Rectangle.Value.Y + 6, 16, 16);

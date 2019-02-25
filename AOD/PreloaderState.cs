@@ -66,9 +66,7 @@ namespace TeamStor.AOD
 
 		private IEnumerator<ICoroutineOperation> LoadCoroutine()
 		{
-			for(int i = 0; i < 5; i++)
-				yield return null;
-			
+			int i = 0;
 			foreach(string asset in Directory.EnumerateFiles(AppDomain.CurrentDomain.BaseDirectory + "data/tiles", "*.png", SearchOption.AllDirectories))
 			{
 				Texture2D a;
@@ -77,8 +75,13 @@ namespace TeamStor.AOD
 						Replace(AppDomain.CurrentDomain.BaseDirectory + "data\\", ""), 
 					out a, 
 					true);
-										
+														
 				LatestAsset = asset;
+				if(i++ >= 4)
+				{
+					yield return null;
+					i = 0;
+				}
 			}
 			
 			yield return null;

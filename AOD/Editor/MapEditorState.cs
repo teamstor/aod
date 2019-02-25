@@ -479,6 +479,7 @@ namespace TeamStor.AOD.Editor
 
 		public override void Draw(SpriteBatch batch, Vector2 screenSize)
 		{
+			batch.UseSmartRound = false;
 			batch.Transform = Camera.Transform;
 			batch.SamplerState = SamplerState.PointWrap;
 
@@ -558,7 +559,7 @@ namespace TeamStor.AOD.Editor
                     }
                 }
 
-                batch.Text(SpriteBatch.FontStyle.Bold, 15, "Map Editor (data: " + (size / (double)1024).ToString("0.00") + " KB)", new Vector2(20, (int)_topTextY + 10),
+                batch.Text(SpriteBatch.FontStyle.Bold, 15, "AoD Map Editor (" + (size / (double)1024).ToString("0.00") + " KB)", new Vector2(20, (int)_topTextY + 10),
                     Color.White * MathHelper.Clamp(_topTextFade, 0, 1));
                 batch.Text(SpriteBatch.FontStyle.Bold, 15, str, new Vector2(20, (int)_topTextY + 10 + (15 * 1.25f)),
                     Color.White * (MathHelper.Clamp(_topTextFade, 0, 1) * 0.8f));
@@ -603,6 +604,8 @@ namespace TeamStor.AOD.Editor
 
                 batch.Texture(new Vector2(screenSize.X / 2 - 160 / 2, screenSize.Y / 2 - 140), Assets.Get<Texture2D>("crash_recovery/angrymonkey" + ((Game.TotalFixedUpdates / 6) % 7) + ".png"), Color.White * (float)Math.Min(_returnFromPlaytestWarning, 1));
             }
-        }
+
+            batch.UseSmartRound = true;
+		}
 	}
 }

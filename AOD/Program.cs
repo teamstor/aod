@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Media;
 using TeamStor.Engine.Coroutine;
 using TeamStor.AOD.Editor;
 using TeamStor.AOD.Gameplay;
+using TeamStor.Engine.Internal;
 
 namespace TeamStor.AOD
 {
@@ -31,7 +32,7 @@ namespace TeamStor.AOD
             
             Settings.Load();
 
-            Game game = Game.Run(new PreloaderState(), "data", false);
+            Game game = Game.Run(new PreloaderState(), "data", true);
             
             if(game.Fullscreen != Settings.Fullscreen)
                 game.Fullscreen = Settings.Fullscreen;
@@ -90,13 +91,15 @@ namespace TeamStor.AOD
             if(game.Input.Key(Keys.LeftShift) && 
                 game.Input.KeyPressed(Keys.F8) && 
                 game.CurrentState.GetType() != typeof(MapEditorState)&& 
-                game.CurrentState.GetType() != typeof(PreloaderState))
+                game.CurrentState.GetType() != typeof(PreloaderState) && 
+                game.CurrentState.GetType() != typeof(TeamStorLogoState))
                 game.CurrentState = new MapEditorState();
 
             if(game.Input.Key(Keys.LeftShift) &&
                game.Input.KeyPressed(Keys.F9) && 
                game.CurrentState.GetType() != typeof(OpenMapState) && 
-               game.CurrentState.GetType() != typeof(PreloaderState))
+               game.CurrentState.GetType() != typeof(PreloaderState) && 
+               game.CurrentState.GetType() != typeof(TeamStorLogoState))
             {
                 OpenMapState state = new OpenMapState();
                 state.Game = game;

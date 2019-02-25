@@ -271,6 +271,9 @@ namespace TeamStor.AOD.Editor.States
 		        BaseState.Buttons["layer-control"].Alpha = MathHelper.Lerp(BaseState.Buttons["layer-control"].Alpha, alpha, (float)deltaTime * 25f);
 	        }
 
+	        if(Input.MousePressed(MouseButton.Middle) && !Input.Mouse(MouseButton.Left))
+		        _tool = _tool == EditTool.PaintOne ? EditTool.PaintRectangle : EditTool.PaintOne;
+
             if(!BaseState.IsPointObscured(Input.MousePosition))
 	        {
 		        switch(_tool)
@@ -312,6 +315,9 @@ namespace TeamStor.AOD.Editor.States
 		{
 			get
 			{
+				if(Menu.IsHovered)
+					return "No action selected";
+				
 				if(!BaseState.Buttons["tool-paintone"].Active && BaseState.Buttons["tool-paintone"].Rectangle.Contains(Input.MousePosition))
 					return "Place tiles";
 				if(!BaseState.Buttons["tool-rectangle"].Active && BaseState.Buttons["tool-rectangle"].Rectangle.Contains(Input.MousePosition))
