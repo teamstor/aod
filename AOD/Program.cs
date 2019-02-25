@@ -77,7 +77,7 @@ namespace TeamStor.AOD
         {
             Game game = sender as Game;
 
-            if(game.Window.Title != "Age of Darkness ")
+            if(game.Window.Title != "Age of Darkness")
                 game.Window.Title = "Age of Darkness";
 
             if(Settings.Fullscreen != game.Fullscreen)
