@@ -55,7 +55,7 @@ namespace TeamStor.AOD
 		{
 			foreach(string map in Directory.EnumerateFiles(AppDomain.CurrentDomain.BaseDirectory + "data/maps", "*.json", SearchOption.AllDirectories))
 			{
-				PreloadedMaps.Add(map, Map.Load(map));
+				PreloadedMaps.Add(map.Replace("\\", "/"), Map.Load(map));
 				LatestAsset = map;
 				
 				Thread.Sleep(50);

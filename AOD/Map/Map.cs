@@ -529,7 +529,7 @@ namespace TeamStor.AOD
         public static Map Load(string file)
         {
             if(IsPreloaded(file))
-                return PreloaderState.PreloadedMaps[file];
+                return PreloaderState.PreloadedMaps[file.Replace("\\", "/")];
             
             if(System.IO.File.Exists(file))
                 return Load(System.IO.File.OpenRead(file));
@@ -904,7 +904,7 @@ namespace TeamStor.AOD
         /// <returns>If we have the specified map file cached.</returns>
         public static bool IsPreloaded(string mapFile)
         {
-            return PreloaderState.PreloadedMaps.ContainsKey(mapFile);
+            return PreloaderState.PreloadedMaps.ContainsKey(mapFile.Replace("\\", "/"));
         }
     }
 }
