@@ -29,7 +29,7 @@ namespace TeamStor.AOD
 				if(_targetMap.StartsWith("!"))
 					return Settings.SettingsDirectory + "/maps/" + _targetMap.Remove(0, 1);
 
-				return "data/maps/" + _targetMap;
+				return AppDomain.CurrentDomain.BaseDirectory + "data/maps/" + _targetMap;
 			}
 		}
 		
@@ -85,8 +85,8 @@ namespace TeamStor.AOD
 			batch.Text(SpriteBatch.FontStyle.MonoBold, 24, _targetMap + (Game.TotalFixedUpdates % 40 > 20 ? "|" : " "), new Vector2(screenSize.X / 2 - measure.X / 2, 180), Color.White);
 
 			bool exists = File.Exists(TargetMap);
-			measure = Game.DefaultFonts.MonoBold.Measure(14, TargetMap);
-			batch.Text(SpriteBatch.FontStyle.MonoBold, 14, TargetMap, new Vector2(screenSize.X / 2 - measure.X / 2, 210), exists ? Color.White * 0.7f : Color.Red * 0.7f);
+			measure = Game.DefaultFonts.MonoBold.Measure(14, TargetMap + (Map.IsPreloaded(TargetMap) ? " (preloaded)" : ""));
+			batch.Text(SpriteBatch.FontStyle.MonoBold, 14, TargetMap + (Map.IsPreloaded(TargetMap) ? " (preloaded)" : ""), new Vector2(screenSize.X / 2 - measure.X / 2, 210), exists ? Color.White * 0.7f : Color.Red * 0.7f);
 			
 			measure = Game.DefaultFonts.Bold.Measure(18, "@ = No prefix\n! = User/settings directory");
 			batch.Text(SpriteBatch.FontStyle.Bold, 18, "@ = No prefix\n! = User/settings directory", new Vector2(screenSize.X / 2 - measure.X / 2, 280), Color.White);

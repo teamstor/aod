@@ -10,14 +10,13 @@ namespace TeamStor.AOD.Gameplay
     /// <summary>
     /// Event stored in a save to be restored at a later date.
     /// This will be loaded and saved in chronological order.
-    /// Loading occurs by saving the type name of the event and then later creating
-    /// a new instance with reflection. If the specified type doesn't exist
-    /// the save event will be ignored.
+    /// Loading occurs by saving the type name of the event and then later creating TODO: kanske inte 
+    /// a new instance with reflection. If the specified type doesn't exist the save event will be ignored.
     /// </summary>
     public abstract class SaveRecord
     {
         /// <summary>
-        /// Time when this event occured (UTC).
+        /// Time when this event occured.
         /// </summary>
         public DateTime TimeOfEvent { get; private set; }
 

@@ -136,6 +136,7 @@
     <Compile Include="Menu\MenuController.cs" />
     <Compile Include="Menu\MenuState.cs" />
     <Compile Include="OpenMapState.cs" />
+    <Compile Include="PreloaderState.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />

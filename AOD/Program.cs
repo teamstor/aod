@@ -21,7 +21,7 @@ namespace TeamStor.AOD
         private static extern bool SetProcessDPIAware();
 
         public const string VERSION = "1.0 (beta)";
-
+        
         [STAThreadAttribute]
         private static void Main()
         {
@@ -31,7 +31,7 @@ namespace TeamStor.AOD
             
             Settings.Load();
 
-            Game game = Game.Run(new Menu.MenuState(), "data", false);
+            Game game = Game.Run(new PreloaderState(), "data", false);
             
             if(game.Fullscreen != Settings.Fullscreen)
                 game.Fullscreen = Settings.Fullscreen;
@@ -78,25 +78,9 @@ namespace TeamStor.AOD
             Settings.Save();
         }
 
-        private static bool _hasPreloaded = false;
-
         private static void OnUpdate(object sender, Game.UpdateEventArgs e)
         {
             Game game = sender as Game;
-
-            if(!_hasPreloaded)
-            {
-                _hasPreloaded = true;
-
-                // preload all tile assets on first frame
-                foreach(string asset in Directory.EnumerateFiles("data/tiles", "*.png", SearchOption.AllDirectories))
-                {
-                    Texture2D a;
-                    game.Assets.TryLoadAsset(asset.Replace("data/", "").Replace("data\\", ""), out a, true);
-                    
-                    Console.WriteLine("Preloaded " + asset);
-                }
-            }
 
             if(Settings.Fullscreen != game.Fullscreen)
                 Settings.Fullscreen = game.Fullscreen;
@@ -105,12 +89,14 @@ namespace TeamStor.AOD
             
             if(game.Input.Key(Keys.LeftShift) && 
                 game.Input.KeyPressed(Keys.F8) && 
-                game.CurrentState.GetType() != typeof(MapEditorState))
+                game.CurrentState.GetType() != typeof(MapEditorState)&& 
+                game.CurrentState.GetType() != typeof(PreloaderState))
                 game.CurrentState = new MapEditorState();
 
             if(game.Input.Key(Keys.LeftShift) &&
                game.Input.KeyPressed(Keys.F9) && 
-               game.CurrentState.GetType() != typeof(OpenMapState))
+               game.CurrentState.GetType() != typeof(OpenMapState) && 
+               game.CurrentState.GetType() != typeof(PreloaderState))
             {
                 OpenMapState state = new OpenMapState();
                 state.Game = game;

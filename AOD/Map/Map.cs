@@ -528,27 +528,28 @@ namespace TeamStor.AOD
         /// <param name="file">The file to load.</param>
         public static Map Load(string file)
         {
+            if(IsPreloaded(file))
+                return PreloaderState.PreloadedMaps[file];
+            
             if(System.IO.File.Exists(file))
                 return Load(System.IO.File.OpenRead(file));
-            else
-            {
-                Map errorMap = Load(System.IO.File.OpenRead("data/maps/error.json"));
+            
+            Map errorMap = Load("data/maps/error.json");
 
-                for(int x = 0; x < errorMap.Width; x++)
+            for(int x = 0; x < errorMap.Width; x++)
+            {
+                for(int y = 0; y < errorMap.Height; y++)
                 {
-                    for(int y = 0; y < errorMap.Height; y++)
+                    if(errorMap[Tile.MapLayer.Control, x, y] == ControlTiles.TextBox)
                     {
-                        if(errorMap[Tile.MapLayer.Control, x, y] == ControlTiles.TextBox)
-                        {
-                            string text = errorMap.GetMetadata(Tile.MapLayer.Control, x, y).GetOrDefault("value", "");
-                            text = text.Replace("@mapfile", file);
-                            errorMap.GetMetadata(Tile.MapLayer.Control, x, y)["value"] = text;
-                        }
+                        string text = errorMap.GetMetadata(Tile.MapLayer.Control, x, y).GetOrDefault("value", "");
+                        text = text.Replace("@mapfile", file);
+                        errorMap.GetMetadata(Tile.MapLayer.Control, x, y)["value"] = text;
                     }
                 }
-
-                return errorMap;
             }
+
+            return errorMap;
         }
 
         /// <summary>
@@ -897,6 +898,13 @@ namespace TeamStor.AOD
                         tile.DrawAfterTransition(game, new Point(x, y), this, GetMetadata(layer, x, y), Info.Environment);
                 }
             }
+        }
+        
+        /// <param name="mapFile">The map file to check.</param>
+        /// <returns>If we have the specified map file cached.</returns>
+        public static bool IsPreloaded(string mapFile)
+        {
+            return PreloaderState.PreloadedMaps.ContainsKey(mapFile);
         }
     }
 }

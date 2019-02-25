@@ -115,7 +115,7 @@ namespace TeamStor.AOD.Gameplay
                         break;
                 }
 
-                while(File.Exists("data/" + textureTemplate.Replace("{name}", ID).Replace("{i}", i.ToString())))
+                while(File.Exists(AppDomain.CurrentDomain.BaseDirectory + "data/" + textureTemplate.Replace("{name}", ID).Replace("{i}", i.ToString())))
                     i++;
 
                 _frameCounts.Add(direction, i);

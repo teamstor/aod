@@ -26,7 +26,7 @@ namespace TeamStor.AOD.Menu
             MenuButton newGame = new MenuButton("New Game");
             newGame.Clicked = (btn) =>
             {
-                Game.CurrentState = new WorldState(Map.Load("data/maps/mapt.json"));
+                Game.CurrentState = new WorldState(Map.Load(AppDomain.CurrentDomain.BaseDirectory + "data/maps/mapt.json"));
             };
 
             _menuController.Add(newGame);

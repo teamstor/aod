@@ -105,12 +105,9 @@ namespace TeamStor.AOD
 
                     _atlases.Last().SetData(0, region.Rectangle, tileData, 0, t.Width * t.Height);
 
-                    Console.WriteLine("Added " + texture + " to atlas " + _atlases.Count + " @ " + region.Rectangle);
-
                     _minHeightThisRow = Math.Max(_minHeightThisRow, t.Height);
                     _currentPoint.X += t.Width;
 
-                    Game.Assets.UnloadAsset(texture);
                     _tiles.Add(texture, region);
                     TotalGenerationTime += (float)timer.Elapsed.TotalMilliseconds;
 

@@ -499,7 +499,7 @@ namespace TeamStor.AOD.Gameplay.World
 
         private void LoadMapAndTransition(string newMapFile, bool transition, SpawnArgs? spawnArgs = null)
         {
-            Map newMap = Map.Load(newMapFile);
+            Map newMap = Map.Load(AppDomain.CurrentDomain.BaseDirectory + newMapFile);
 
             WorldState newState =
                 spawnArgs.HasValue ? new WorldState(newMap, spawnArgs.Value, transition) :
@@ -524,7 +524,10 @@ namespace TeamStor.AOD.Gameplay.World
         {
             Paused = true;
 
-            Task.Run(() => LoadMapAndTransition(newMap, transition, spawnArgs));
+            if(Map.IsPreloaded(AppDomain.CurrentDomain.BaseDirectory + newMap))
+                LoadMapAndTransition(newMap, transition, spawnArgs);
+            else
+                Task.Run(() => LoadMapAndTransition(newMap, transition, spawnArgs));
         }
 
         private IEnumerator<ICoroutineOperation> RunCombatCoroutine(object enemy)
