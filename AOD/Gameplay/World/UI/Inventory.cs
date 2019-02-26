@@ -23,11 +23,13 @@ namespace TeamStor.AOD.Gameplay.World.UI
     public class InventoryUI
     {
         private bool _closed = false;
+        private bool _transitioning = false;
+        
         private bool _rightPaneSelected = false;
 
         private class PaneAction
         {
-            public delegate void OnActionDelegate(LivingEntity entity, Inventory.ItemSlotReference item, InventoryUI ui);
+            public delegate void OnActionDelegate(PaneAction a, LivingEntity entity, Inventory.ItemSlotReference item, InventoryUI ui);
 
             public string Name;
             public OnActionDelegate OnAction { get; private set; }
@@ -76,22 +78,26 @@ namespace TeamStor.AOD.Gameplay.World.UI
         /// Creates a standalone inventory UI that needs to be updated manually.
         /// </summary>
         /// <param name="entity">The entity to use the inventory with.</param>
-        public InventoryUI(LivingEntity entity, GameState state)
+        public InventoryUI(LivingEntity entity, GameState state, bool reverseOffset = false)
         {
             _entity = entity;
-            _offsetY = new TweenedDouble(state.Game, 1.0);
+            _offsetY = new TweenedDouble(state.Game, reverseOffset ? -1.0 : 1.0);
             _state = state;
 
             state.Coroutine.Start(ShowCoroutine);
+            if(_entity.Inventory.OccupiedSlots == 0)
+                _selectedSlot = -1;
             state.Coroutine.AddExisting(ChangeSelectedSlot(_selectedSlot));
         }
 
-        private InventoryUI(WorldState world, LivingEntity entity)
+        private InventoryUI(WorldState world, LivingEntity entity, bool reverseOffset = false)
         {
             _state = world;
             _entity = entity;
 
-            _offsetY = new TweenedDouble(world.Game, 1.0);
+            _offsetY = new TweenedDouble(world.Game, reverseOffset ? -1.0 : 1.0);
+            if(_entity.Inventory.OccupiedSlots == 0)
+                _selectedSlot = -1;
             _state.Coroutine.AddExisting(ChangeSelectedSlot(_selectedSlot));
         }
 
@@ -111,17 +117,21 @@ namespace TeamStor.AOD.Gameplay.World.UI
             yield return Wait.Seconds(_state.Game, 0.1);
 
             while(!_closed)
-            {
                 yield return null;
-            }
 
-            _offsetY.TweenTo(1.0, TweenEaseType.EaseInQuad, 0.1);
-            while(!_offsetY.IsComplete)
-                yield return null;
+            if(_transitioning)
+                yield return Wait.Seconds(_state.Game, 0.1);
+            else
+            {
+                _offsetY.TweenTo(1.0, TweenEaseType.EaseInQuad, 0.1);
+                while(!_offsetY.IsComplete)
+                    yield return null;
+            }
 
             if(_state is WorldState)
             {
-                (_state as WorldState).Paused = false;
+                if(!_transitioning)
+                    (_state as WorldState).Paused = false;
                 (_state as WorldState).UpdateHook -= UpdateHook;
                 (_state as WorldState).DrawHook -= DrawHook;
             }
@@ -138,7 +148,7 @@ namespace TeamStor.AOD.Gameplay.World.UI
             {
                 _selectedSlot = -1;
 
-                int y = 37 + selectedSlot * 15;
+                int y = 37 + Math.Max(0, selectedSlot * 15);
                 int height = (_entity.Inventory.OccupiedSlots * 15);
                 Rectangle itemsListBounds = new Rectangle(16, 37, 171, 210);
 
@@ -181,29 +191,82 @@ namespace TeamStor.AOD.Gameplay.World.UI
 
             _selectedSlot = selectedSlot;
             _selectedAction = 0;
-
+            
             _actions.Clear();
 
-            Inventory.ItemSlotReference i = _entity.Inventory[_selectedSlot];
-            foreach(InventoryEquipSlot slot in Enum.GetValues(typeof(InventoryEquipSlot)))
+            if(_selectedSlot != -1)
             {
-                if(slot != InventoryEquipSlot.None && i.ReferencedItem.EquippableIn.HasFlag(slot))
+                _actions.Add(new PaneAction("Drop", (a, ent, item, ui) =>
                 {
-                    _actions.Add(new PaneAction((i.Inventory[slot].Slot == i.Slot ? "Unequip " : "Equip ") + slot, (ent, item, ui) =>
+                    foreach(InventoryEquipSlot islot in Enum.GetValues(typeof(InventoryEquipSlot)))
                     {
+                        if(islot != InventoryEquipSlot.None && ent.Inventory[islot].Slot == item.Slot)
+                            ent.Inventory[islot] = ent.Inventory[Inventory.EMPTY_SLOT];
+                    }
 
-                    }));
+                    ent.Inventory.PopAt(item.Slot);
+                    
+                    int slot = ui._selectedSlot;
+                    ui._selectedSlot = -1;
+                    
+                    if(slot >= ent.Inventory.OccupiedSlots)
+                        ent.World.Coroutine.AddExisting(ChangeSelectedSlot(slot - 1));
+                    else
+                        ent.World.Coroutine.AddExisting(ChangeSelectedSlot(slot));
+                }));
+                
+                Inventory.ItemSlotReference i = _entity.Inventory[_selectedSlot];
+                foreach(InventoryEquipSlot slot in Enum.GetValues(typeof(InventoryEquipSlot)))
+                {
+                    if(slot != InventoryEquipSlot.None && i.ReferencedItem.EquippableIn.HasFlag(slot))
+                    {
+                        string text = "Equip ";
+                        switch(slot)
+                        {
+                            case InventoryEquipSlot.Head:
+                                text += "on head";
+                                break;
+                            case InventoryEquipSlot.Chest:
+                                text += "chest";
+                                break;
+                            case InventoryEquipSlot.Leggings:
+                                text += "leggings";
+                                break;
+                            case InventoryEquipSlot.Boots:
+                                text += "boots";
+                                break;
+                            
+                            case InventoryEquipSlot.Weapon:
+                                text += "weapon";
+                                break;
+                            case InventoryEquipSlot.Ring:
+                                text += "ring";
+                                break;
+                        }
+
+                        if(i.Inventory[slot].Slot == i.Slot)
+                            text = text.
+                                Replace("Equip", "Unequip").
+                                Replace("on", "from");
+                        
+                        _actions.Add(new PaneAction(text, (a, ent, item, ui) =>
+                        {
+                            if(ent.Inventory[slot].Slot == item.Slot)
+                                ent.Inventory[slot] = ent.Inventory[Inventory.EMPTY_SLOT];
+                            else
+                            {
+                                ent.Inventory[slot] = ent.Inventory[item.Slot];
+
+                                foreach(InventoryEquipSlot slot_2 in Enum.GetValues(typeof(InventoryEquipSlot)))
+                                {
+                                    if(slot_2 != InventoryEquipSlot.None && slot_2 != slot && ent.Inventory[slot_2].Slot == item.Slot)
+                                        ent.Inventory[slot_2] = ent.Inventory[Inventory.EMPTY_SLOT];
+                                }
+                            }
+                        }));
+                    }
                 }
             }
-
-            _actions.Add(new PaneAction("Delete", (ent, item, ui) =>
-            {
-                ent.Inventory.PopAt(item.Slot);
-                ui._rightPaneSelected = false;
-
-                if(ui._selectedSlot >= ent.Inventory.OccupiedSlots)
-                    ui._selectedSlot--;
-            }));
         }
 
         public void ManualUpdate()
@@ -222,56 +285,79 @@ namespace TeamStor.AOD.Gameplay.World.UI
 
         private void UpdateHook(object sender, Game.UpdateEventArgs e)
         {
-            if(InputMap.FindMapping(InputAction.Back).Held(_state.Input))
-                _closed = true;
-
-            if(_rightPaneSelected)
+            if(_offsetY.Value == 0)
             {
-                if(InputMap.FindMapping(InputAction.Left).Pressed(_state.Input))
+                if(!_closed && _state is WorldState && InputMap.FindMapping(InputAction.Player).Held(_state.Input))
                 {
-                    if(_selectedAction > 0)
-                        _selectedAction--;
-                    else
-                        _rightPaneSelected = false;
-                }
-                if(InputMap.FindMapping(InputAction.Right).Pressed(_state.Input))
-                {
-                    if(_selectedAction < _actions.Count - 1)
-                        _selectedAction++;
-                    else
-                        _rightPaneSelected = false;
+                    PlayerUI.Show(_state as WorldState, null, true);
+                    _transitioning = true;
                 }
 
-                if(InputMap.FindMapping(InputAction.Action).Pressed(_state.Input))
-                    _actions[_selectedAction].OnAction(_entity, _entity.Inventory[_selectedSlot], this);
-            }
-            else if(_selectedSlot != -1 && !_rightPaneSelected)
-            {
-                if(InputMap.FindMapping(InputAction.Up).Pressed(_state.Input))
-                {
-                    if(_selectedSlot > 0)
-                        _state.Coroutine.AddExisting(ChangeSelectedSlot(_selectedSlot - 1));
-                    else
-                        _state.Coroutine.AddExisting(ChangeSelectedSlot(_entity.Inventory.OccupiedSlots - 1));
-                }
+                if(InputMap.FindMapping(InputAction.Back).Held(_state.Input) ||
+                   (_state is WorldState && InputMap.FindMapping(InputAction.Player).Held(_state.Input)))
+                    _closed = true;
 
-                if(InputMap.FindMapping(InputAction.Down).Pressed(_state.Input))
+                if(_rightPaneSelected)
                 {
-                    if(_selectedSlot < _entity.Inventory.OccupiedSlots - 1)
-                        _state.Coroutine.AddExisting(ChangeSelectedSlot(_selectedSlot + 1));
-                    else
-                        _state.Coroutine.AddExisting(ChangeSelectedSlot(0));
-                }
+                    if(InputMap.FindMapping(InputAction.Left).Pressed(_state.Input))
+                    {
+                        if(_selectedAction > 0)
+                            _selectedAction--;
+                        else
+                            _rightPaneSelected = false;
+                    }
 
-                if(InputMap.FindMapping(InputAction.Left).Pressed(_state.Input))
-                {
-                    _rightPaneSelected = true;
-                    _selectedAction = _actions.Count - 1;
+                    if(InputMap.FindMapping(InputAction.Right).Pressed(_state.Input))
+                    {
+                        if(_selectedAction < _actions.Count - 1)
+                            _selectedAction++;
+                        else
+                            _rightPaneSelected = false;
+                    }
+
+                    if(InputMap.FindMapping(InputAction.Action).Pressed(_state.Input))
+                    {
+                        int oldAction = _selectedAction;
+                        _actions[_selectedAction].OnAction(_actions[_selectedAction], _entity, _entity.Inventory[_selectedSlot], this);
+
+                        // update actions manually
+                        IEnumerator<ICoroutineOperation> func = ChangeSelectedSlot(_selectedSlot);
+                        while(func.MoveNext())
+                        {
+                        }
+
+                        _selectedAction = oldAction;
+                    }
                 }
-                if(InputMap.FindMapping(InputAction.Right).Pressed(_state.Input))
+                else if(_selectedSlot != -1 && !_rightPaneSelected)
                 {
-                    _rightPaneSelected = true;
-                    _selectedAction = 0;
+                    if(InputMap.FindMapping(InputAction.Up).Pressed(_state.Input))
+                    {
+                        if(_selectedSlot > 0)
+                            _state.Coroutine.AddExisting(ChangeSelectedSlot(_selectedSlot - 1));
+                        else
+                            _state.Coroutine.AddExisting(ChangeSelectedSlot(_entity.Inventory.OccupiedSlots - 1));
+                    }
+
+                    if(InputMap.FindMapping(InputAction.Down).Pressed(_state.Input))
+                    {
+                        if(_selectedSlot < _entity.Inventory.OccupiedSlots - 1)
+                            _state.Coroutine.AddExisting(ChangeSelectedSlot(_selectedSlot + 1));
+                        else
+                            _state.Coroutine.AddExisting(ChangeSelectedSlot(0));
+                    }
+
+                    if(InputMap.FindMapping(InputAction.Left).Pressed(_state.Input))
+                    {
+                        _rightPaneSelected = true;
+                        _selectedAction = _actions.Count - 1;
+                    }
+
+                    if(InputMap.FindMapping(InputAction.Right).Pressed(_state.Input))
+                    {
+                        _rightPaneSelected = true;
+                        _selectedAction = 0;
+                    }
                 }
             }
         }
@@ -282,13 +368,32 @@ namespace TeamStor.AOD.Gameplay.World.UI
             SpriteBatch batch = args.Batch;
             Vector2 screenSize = args.ScreenSize;
 
-            batch.Rectangle(new Rectangle(0, 0, args.Batch.Device.Viewport.Width, args.Batch.Device.Viewport.Height), Color.Black * (1.0f - _offsetY) * 0.3f);
-
             Texture2D bg = _state.Assets.Get<Texture2D>("ui/inventory.png");
             batch.Texture(new Vector2(0, 270 - bg.Height + (bg.Height + 20) * (float)_offsetY.Value), bg, Color.White);
 
             Font font = _state.Assets.Get<Font>("fonts/bitcell.ttf");
-            batch.Text(font, 16, "Inventory", new Vector2(16, 8 + (bg.Height + 20) * (float)_offsetY.Value), Color.White);
+
+            if(_state is CombatState)
+                batch.Text(font, 
+                    16, 
+                    "Inventory", 
+                    new Vector2(16, 8 + (bg.Height + 20) * (float)_offsetY.Value), 
+                    Color.White);
+            else
+            {
+                batch.Text(font, 
+                    16, 
+                    "[" + InputMap.FindMapping(InputAction.Inventory).Key + "] Inventory", 
+                    new Vector2(16, 8 + (bg.Height + 20) * (float)_offsetY.Value), 
+                    Color.White);
+                
+                // only the player uses the inventory for now
+                batch.Text(font, 
+                    16, 
+                    "[" + InputMap.FindMapping(InputAction.Player).Key + "] " + _entity.Name, 
+                    new Vector2(16 + (int)font.Measure(16, "[" + InputMap.FindMapping(InputAction.Inventory).Key + "] Inventory").X + 6, 8 + (bg.Height + 20) * (float)_offsetY.Value), 
+                    Color.White * 0.6f);
+            }
 
             Rectangle itemsListRectangle = new Rectangle(16, 31, 171, 222);
             Vector2 transformLT = Vector2.Transform(itemsListRectangle.Location.ToVector2(), batch.Transform);
@@ -378,23 +483,27 @@ namespace TeamStor.AOD.Gameplay.World.UI
                         new Vector2(blockRectangle.X + 4, blockRectangle.Y - 4), Color.White);
                 }
 
-                int x = 10;
+                int x = 0;
+                batch.Text(font, 16, "Actions", new Vector2(infoRectangle.X + x + 10, infoRectangle.Y + infoRectangle.Height - 72 - 8), Color.White);
+                
                 foreach(PaneAction action in _actions)
                 {
                     bool selected = _rightPaneSelected && _selectedAction == _actions.IndexOf(action);
                     //float alpha = selected ? 0.8f + (float)Math.Sin(_state.Game.Time * 10) * 0.2f : 0.6f;
-                    float alpha = selected ? 0.9f : 0.6f;
+                    float alpha = selected ? 0.8f : 0.6f;
 
-                    batch.Text(font, 16, "[" + action.Name + "]", new Vector2(infoRectangle.X + x, infoRectangle.Y + infoRectangle.Height - 80), Color.White * alpha);
+                    batch.Text(font, 16, action.Name, new Vector2(infoRectangle.X + x + 10, infoRectangle.Y + infoRectangle.Height - 60 - 8), Color.White * alpha);
+                    if(selected)
+                        batch.Texture(new Vector2(infoRectangle.X + x, infoRectangle.Y + infoRectangle.Height - 60), _state.Assets.Get<Texture2D>("ui/arrow.png"), Color.White);
 
-                    x += (int)font.Measure(16, "[" + action.Name + "]").X + 10;
+                    x += (int)font.Measure(16, action.Name).X + 16;
                 }
             }
         }
 
-        public static IEnumerator<ICoroutineOperation> Show(WorldState world, LivingEntity entity, OnInventoryUICompleted completeEvent = null)
+        public static IEnumerator<ICoroutineOperation> Show(WorldState world, LivingEntity entity, OnInventoryUICompleted completeEvent = null, bool reverseOffset = false)
         {
-            InventoryUI inventory = new InventoryUI(world, entity);
+            InventoryUI inventory = new InventoryUI(world, entity, reverseOffset);
             inventory._completedEvent = completeEvent;
             return world.Coroutine.Start(inventory.ShowCoroutine);
         }

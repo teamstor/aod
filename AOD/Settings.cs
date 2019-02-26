@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
 using SharpFont;
 
@@ -107,6 +108,46 @@ namespace TeamStor.AOD
 									}
 									break;
 								}
+
+                                if(token == "keyboard")
+                                {
+	                                while(reader.Read())
+	                                {
+		                                if(reader.TokenType == JsonToken.PropertyName)
+		                                {
+			                                token = (string)reader.Value;
+
+			                                foreach(InputAction action in Enum.GetValues(typeof(InputAction)))
+			                                {
+				                                if(token == action.ToString().ToLowerInvariant())
+					                                InputMap.UpdateMappingKey(action, (Keys)Enum.Parse(typeof(Keys), reader.ReadAsString(), true));
+			                                }
+		                                }
+		                                else if(reader.TokenType == JsonToken.EndObject)
+			                                break;
+	                                }
+	                                break;
+                                }
+                                
+                                if(token == "gamepad")
+                                {
+	                                while(reader.Read())
+	                                {
+		                                if(reader.TokenType == JsonToken.PropertyName)
+		                                {
+			                                token = (string)reader.Value;
+
+			                                foreach(InputAction action in Enum.GetValues(typeof(InputAction)))
+			                                {
+				                                if(token == action.ToString().ToLowerInvariant())
+					                                InputMap.UpdateMappingGamepad(action, (Buttons)Enum.Parse(typeof(Buttons), reader.ReadAsString(), true));
+			                                }
+		                                }
+		                                else if(reader.TokenType == JsonToken.EndObject)
+			                                break;
+	                                }
+	                                break;
+                                }
 							}
 						}
 					}
@@ -147,6 +188,29 @@ namespace TeamStor.AOD
 					writer.WritePropertyName("music");
 					writer.WriteValue((int)(MusicVolume * 100.0));
 					writer.WriteEndObject();
+					
+					writer.WritePropertyName("keyboard");
+					writer.WriteStartObject();
+					
+					foreach(InputAction action in Enum.GetValues(typeof(InputAction)))
+					{
+						writer.WritePropertyName(action.ToString().ToLowerInvariant());
+						writer.WriteValue(InputMap.FindMapping(action).Key.ToString().ToLowerInvariant());
+					}
+					
+					writer.WriteEndObject();
+					
+					writer.WritePropertyName("gamepad");
+					writer.WriteStartObject();
+					
+					foreach(InputAction action in Enum.GetValues(typeof(InputAction)))
+					{
+						writer.WritePropertyName(action.ToString().ToLowerInvariant());
+						writer.WriteValue(InputMap.FindMapping(action).GamepadButton.ToString().ToLowerInvariant());
+					}
+					
+					writer.WriteEndObject();
+					
 					writer.WriteEndObject();
 				}
 			}

@@ -55,6 +55,12 @@ namespace TeamStor.AOD.Gameplay
                 return;
             }
 
+            if(InputMap.FindMapping(InputAction.Player).Pressed(World.Input))
+            {
+                PlayerUI.Show(World);
+                return;
+            }
+
             if(!IsWalking)
             {
                 Speed = InputMap.FindMapping(InputAction.Run).Held(World.Input) ? 3.5 : 2.5;

@@ -43,6 +43,8 @@ namespace TeamStor.AOD
             /// <returns>If this mapping is pressed on either the keyboard or any gamepad.</returns>
             public bool Held(InputManager input)
             {
+                if(GamepadButton == 0)
+                    return input.Key(Key);
                 return input.Key(Key) ||
                        input.Gamepad(0).IsButtonDown(GamepadButton) ||
                        input.Gamepad(1).IsButtonDown(GamepadButton) ||
@@ -54,6 +56,8 @@ namespace TeamStor.AOD
             /// <returns>If this mapping was pressed this frame either the keyboard or any gamepad.</returns>
             public bool Pressed(InputManager input)
             {
+                if(GamepadButton == 0)
+                    return input.KeyPressed(Key);
                 return input.KeyPressed(Key) || 
                     (input.Gamepad(0).IsButtonDown(GamepadButton) && input.LastGamepad(0).IsButtonUp(GamepadButton)) ||
                     (input.Gamepad(1).IsButtonDown(GamepadButton) && input.LastGamepad(1).IsButtonUp(GamepadButton)) ||
@@ -65,6 +69,8 @@ namespace TeamStor.AOD
             /// <returns>If this mapping was released this frame either the keyboard or any gamepad.</returns>
             public bool Released(InputManager input)
             {
+                if(GamepadButton == 0)
+                    return input.KeyReleased(Key);
                 return input.KeyReleased(Key) ||
                     (input.Gamepad(0).IsButtonUp(GamepadButton) && input.LastGamepad(0).IsButtonDown(GamepadButton)) ||
                     (input.Gamepad(1).IsButtonUp(GamepadButton) && input.LastGamepad(1).IsButtonDown(GamepadButton)) ||
@@ -87,6 +93,7 @@ namespace TeamStor.AOD
             _defaultMappings.Add(InputAction.Action, new Mapping(InputAction.Action, Keys.Z, Buttons.A));
             _defaultMappings.Add(InputAction.Back, new Mapping(InputAction.Back, Keys.Escape, Buttons.X));
             _defaultMappings.Add(InputAction.Inventory, new Mapping(InputAction.Inventory, Keys.E, Buttons.Y));
+            _defaultMappings.Add(InputAction.Player, new Mapping(InputAction.Player, Keys.R, 0));
             _defaultMappings.Add(InputAction.Run, new Mapping(InputAction.Run, Keys.LeftShift, Buttons.LeftShoulder));
 
             foreach(InputAction action in Enum.GetValues(typeof(InputAction)))

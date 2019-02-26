@@ -30,6 +30,11 @@ namespace TeamStor.AOD
         /// Used for opening the inventory UI.
         /// </summary>
         Inventory,
+        
+        /// <summary>
+        /// Used for opening the player UI.
+        /// </summary>
+        Player,
 
         /// <summary>
         /// Used for running.

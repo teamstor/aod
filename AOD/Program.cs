@@ -25,6 +25,8 @@ namespace TeamStor.AOD
         [STAThreadAttribute]
         private static void Main()
         {            
+            // initalize input map before settings
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(InputMap).TypeHandle);
             Settings.Load();
 
             Game game = Game.Run(new PreloaderState(), "data", true);
