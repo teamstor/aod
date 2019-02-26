@@ -86,6 +86,10 @@ namespace TeamStor.AOD.Editor
 
         public override void OnEnter(GameState previousState)
 		{
+            if(!Directory.Exists(Settings.SettingsDirectory + "/maps"))
+                // creates directories recursively
+                Directory.CreateDirectory(Settings.SettingsDirectory + "/maps");
+
             Game.IsMouseVisible = true;
             if(previousState is WorldState)
                 Map = (previousState as WorldState).Map;
@@ -188,6 +192,8 @@ namespace TeamStor.AOD.Editor
                     OpenFileDialog dialog = new OpenFileDialog();
 
                     dialog.Filter = "Map files (*.json)|*.json|All files (*.*)|*.*";
+                    dialog.RestoreDirectory = true;
+                    dialog.InitialDirectory = Settings.SettingsDirectory + Path.DirectorySeparatorChar + "maps";
                     if(dialog.ShowDialog() == DialogResult.OK)
                     {
                         _dataOperation = DataOperation.Loading;
@@ -216,6 +222,8 @@ namespace TeamStor.AOD.Editor
 					SaveFileDialog dialog = new SaveFileDialog();
 					
 					dialog.Filter = "Map files (*.json)|*.json|All files (*.*)|*.*";
+                    dialog.RestoreDirectory = true;
+                    dialog.InitialDirectory = Settings.SettingsDirectory + Path.DirectorySeparatorChar + "maps";
                     if(dialog.ShowDialog() == DialogResult.OK)
                     {
                         _dataOperation = DataOperation.Saving;

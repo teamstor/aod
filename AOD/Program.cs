@@ -13,6 +13,7 @@ using TeamStor.Engine.Coroutine;
 using TeamStor.AOD.Editor;
 using TeamStor.AOD.Gameplay;
 using TeamStor.Engine.Internal;
+using System.Diagnostics;
 
 namespace TeamStor.AOD
 {
@@ -30,6 +31,9 @@ namespace TeamStor.AOD
             
             if(game.Fullscreen != Settings.Fullscreen)
                 game.Fullscreen = Settings.Fullscreen;
+
+            if(game.VSync != Settings.VSync)
+                game.VSync = Settings.VSync;
 
             MediaPlayer.Volume = MathHelper.Clamp((float)(Settings.MasterVolume * Settings.MusicVolume), 0.0f, 1.0f);
             
@@ -82,6 +86,9 @@ namespace TeamStor.AOD
 
             if(Settings.Fullscreen != game.Fullscreen)
                 Settings.Fullscreen = game.Fullscreen;
+
+            if(Settings.VSync != game.VSync)
+                Settings.VSync = game.VSync;
             
             MediaPlayer.Volume = MathHelper.Clamp((float)(Settings.MasterVolume * Settings.MusicVolume), 0.0f, 1.0f);
             
@@ -105,6 +112,23 @@ namespace TeamStor.AOD
                 // do it manually so we don't call OnLeave in the other state
                 typeof(Game).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(game, state);
                 state.OnEnter(prevState);
+            }
+
+            if(game.Input.Key(Keys.LeftShift) &&
+                game.Input.KeyPressed(Keys.F10) &&
+                game.CurrentState.GetType() != typeof(PreloaderState) &&
+                game.CurrentState.GetType() != typeof(TeamStorLogoState))
+            {
+                switch(SDL2.SDL.SDL_GetPlatform())
+                {
+                    case "Windows":
+                        Process.Start(Settings.SettingsDirectory);
+                        break;
+
+                    case "Linux":
+                        Process.Start("xdg-open", "\"" + Settings.SettingsDirectory.Replace("\"", "\\\"") + "\"");
+                        break;
+                }
             }
         }
 

@@ -14,6 +14,11 @@ namespace TeamStor.AOD
 		/// If the game should be displayed in fullscreen.
 		/// </summary>
 		public static bool Fullscreen = false;
+
+        /// <summary>
+        /// If the game should use v-sync.
+        /// </summary>
+        public static bool VSync = true;
 		
 		/// <summary>
 		/// Volume of all audio in the game.
@@ -80,8 +85,10 @@ namespace TeamStor.AOD
 								string token = (string)reader.Value;
 								if(token == "fullscreen")
 									Fullscreen = reader.ReadAsString() == "true";
-									
-								if(token == "volume")
+                                if(token == "vsync")
+                                    VSync = reader.ReadAsString() == "true";
+
+                                if(token == "volume")
 								{
 									while(reader.Read())
 									{
@@ -130,8 +137,10 @@ namespace TeamStor.AOD
 					writer.WriteStartObject();
 					writer.WritePropertyName("fullscreen");
 					writer.WriteValue(Fullscreen ? "true" : "false");
-					
-					writer.WritePropertyName("volume");
+                    writer.WritePropertyName("vsync");
+                    writer.WriteValue(VSync ? "true" : "false");
+
+                    writer.WritePropertyName("volume");
 					writer.WriteStartObject();
 					writer.WritePropertyName("master");
 					writer.WriteValue((int)(MasterVolume * 100.0));

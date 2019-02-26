@@ -19,18 +19,20 @@ namespace TeamStor.AOD
 	{
 		private GameState _lastState;
 		private string _targetMap = "";
+        private string[] _targetMaps = new string[6];
 
-		public string TargetMap
+		public string[] TargetMaps
 		{
 			get
 			{
-				if(_targetMap.StartsWith("@"))
-					return _targetMap.Remove(0, 1);
+                _targetMaps[0] = Settings.SettingsDirectory + "/maps/" + _targetMap + ".json";
+                _targetMaps[1] = AppDomain.CurrentDomain.BaseDirectory + "data/maps/" + _targetMap + ".json";
+                _targetMaps[2] = _targetMap + ".json";
+                _targetMaps[3] = Settings.SettingsDirectory + "/maps/" + _targetMap;
+                _targetMaps[4] = AppDomain.CurrentDomain.BaseDirectory + "data/maps/" + _targetMap;
+                _targetMaps[5] = _targetMap;
 
-				if(_targetMap.StartsWith("!"))
-					return Settings.SettingsDirectory + "/maps/" + _targetMap.Remove(0, 1) + ".json";
-
-				return AppDomain.CurrentDomain.BaseDirectory + "data/maps/" + _targetMap + ".json";
+                return _targetMaps;
 			}
 		}
 		
@@ -60,6 +62,17 @@ namespace TeamStor.AOD
 			TextInputEXT.StopTextInput();
 		}
 
+        private string FindClosestMatch()
+        {
+            foreach(string s in TargetMaps)
+            {
+                if(File.Exists(s))
+                    return s;
+            }
+
+            return "";
+        }
+
 		public override void Update(double deltaTime, double totalTime, long count)
 		{
 			if(Input.KeyPressed(Keys.Escape))
@@ -68,9 +81,9 @@ namespace TeamStor.AOD
 				OnLeave(_lastState);
 			}
 
-			if(File.Exists(TargetMap) && Input.KeyPressed(Keys.Enter))
+			if(!string.IsNullOrEmpty(FindClosestMatch()) && Input.KeyPressed(Keys.Enter))
 			{
-				WorldState state = new WorldState(Map.Load(TargetMap));
+				WorldState state = new WorldState(Map.Load(FindClosestMatch()));
 				_lastState.OnLeave(state);
 
 				Game.CurrentState = state;
@@ -89,12 +102,14 @@ namespace TeamStor.AOD
 			Vector2 measure = Game.DefaultFonts.MonoBold.Measure(24, _targetMap + "|");
 			batch.Text(SpriteBatch.FontStyle.MonoBold, 24, _targetMap + (Game.TotalFixedUpdates % 40 > 20 ? "|" : " "), new Vector2(screenSize.X / 2 - measure.X / 2, 180), Color.White);
 
-			bool exists = File.Exists(TargetMap);
-			measure = Game.DefaultFonts.MonoBold.Measure(14, TargetMap + (Map.IsPreloaded(TargetMap) ? " (preloaded)" : ""));
-			batch.Text(SpriteBatch.FontStyle.MonoBold, 14, TargetMap + (Map.IsPreloaded(TargetMap) ? " (preloaded)" : ""), new Vector2(screenSize.X / 2 - measure.X / 2, 210), exists ? Color.White * 0.7f : Color.Red * 0.7f);
-			
-			measure = Game.DefaultFonts.Bold.Measure(18, "@ = No prefix\n! = User/settings directory");
-			batch.Text(SpriteBatch.FontStyle.Bold, 18, "@ = No prefix\n! = User/settings directory", new Vector2(screenSize.X / 2 - measure.X / 2, 280), Color.White);
-		}
+            string match = FindClosestMatch();
+            bool exists = File.Exists(match);
+            string msg = match.Replace("\\", "/") + (Map.IsPreloaded(match) ? " (preloaded)" : "");
+            if(!exists)
+                msg = "No map with name \"" + _targetMap + "\" found in any folder";
+
+            measure = Game.DefaultFonts.MonoBold.Measure(14, msg);
+			batch.Text(SpriteBatch.FontStyle.MonoBold, 14, msg, new Vector2(screenSize.X / 2 - measure.X / 2, 210), exists ? Color.White * 0.7f : Color.Red * 0.7f);
+        }
 	}
 }
