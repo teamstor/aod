@@ -15,7 +15,15 @@ namespace TeamStor.AOD.Gameplay
         /// <summary>
         /// A pig. Nöff nöff.
         /// </summary>
-        public static NPCTemplate Pig = new NPCTemplate("Pig", "pig", new PigNPCBehavior());
+        public static NPCTemplate Pig = new NPCTemplate("Pig", "pig", new PigNPCBehavior()).
+            AttributeInitializeSelf((npc) =>
+            {
+                npc.Level = 4;
+                npc.Vitality = 100;
+                npc.Health = npc.MaxHealth;
+
+                npc.Inventory[InventoryEquipSlot.Head] = npc.Inventory.Push(Item.TestItem);
+            });
 
         /// <summary>
         /// A green test pig.

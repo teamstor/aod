@@ -19,8 +19,8 @@ namespace TeamStor.AOD.Gameplay
             get; private set;
         } = new Dictionary<string, Item>();
 
-        public static Item TestItem = new Item("test", "Test Item #1", "items/icons/test/8x8.png", "items/icons/test/32x32.png");
-        public static Item TestItem2 = new Item("test2", "Test Item #2", "items/icons/test/8x8.png", "items/icons/test/32x32.png");
+        public static ArmorItem TestItem = new ArmorItem("test", "Test Item #1", "This is the legendary test item 1.\nWow. Asså wow.", "items/icons/test/8x8.png", "items/icons/test/32x32.png", ArmorItem.ProtectionType.Physical, 4, InventoryEquipSlot.Head);
+        public static Item TestItem2 = new Item("test2", "Test Item #2", "This is the infamous test item 2.\nIt's not as good as test item 1.", "items/icons/test/8x8.png", "items/icons/test/32x32.png", InventoryEquipSlot.None);
 
         /// <summary>
         /// ID of the item.
@@ -34,6 +34,14 @@ namespace TeamStor.AOD.Gameplay
         /// Name of the item visible in the UI.
         /// </summary>
         public virtual string Name
+        {
+            get; private set;
+        }
+
+        /// <summary>
+        /// Description of the item visible in the UI.
+        /// </summary>
+        public virtual string Description
         {
             get; private set;
         }
@@ -62,12 +70,14 @@ namespace TeamStor.AOD.Gameplay
             get;
         } = InventoryEquipSlot.None;
 
-        public Item(string id, string name, string smallIcon, string icon, bool createGlobally = true)
+        public Item(string id, string name, string description, string smallIcon, string icon, InventoryEquipSlot equippableIn, bool createGlobally = true)
         {
             ID = id;
             Name = name;
+            Description = description;
             SmallIcon = smallIcon;
             Icon = icon;
+            EquippableIn = equippableIn;
 
             if(createGlobally)
                 Items.Add(id, this);

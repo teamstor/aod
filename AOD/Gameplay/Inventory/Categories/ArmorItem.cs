@@ -36,7 +36,8 @@ namespace TeamStor.AOD.Gameplay
             get; private set;
         }
 
-        public ArmorItem(string id, string name, string smallIcon, string icon, ProtectionType protectionType, int armorValue, bool createGlobally = true) : base(id, name, smallIcon, icon, createGlobally)
+        public ArmorItem(string id, string name, string description, string smallIcon, string icon, ProtectionType protectionType, int armorValue, InventoryEquipSlot equippableIn, bool createGlobally = true) : 
+            base(id, name, description, smallIcon, icon, equippableIn, createGlobally)
         {
             Protection = protectionType;
             ArmorValue = armorValue;

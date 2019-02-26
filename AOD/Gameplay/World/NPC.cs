@@ -43,6 +43,8 @@ namespace TeamStor.AOD.Gameplay.World
         {
             OriginTile = originTile;
             Template = template;
+
+            Template.InitializeSelf(this);
         }
 
         public void Update(double deltaTime, double totalTime, long count)

@@ -160,7 +160,7 @@ namespace TeamStor.AOD.Gameplay
         {
             if(slot == EMPTY_SLOT)
                 return true;
-            if(slot <= OccupiedSlots)
+            if(slot >= OccupiedSlots)
                 return false;
 
             _slots.RemoveAt(slot);

@@ -164,5 +164,20 @@ namespace TeamStor.AOD.Gameplay
 
             return (tile as Tile).Template;
         }
+
+        public delegate void InitializeSelfOverrideDelegate(NPC npcEntity);
+
+        private InitializeSelfOverrideDelegate _initFunc;
+        public NPCTemplate AttributeInitializeSelf(InitializeSelfOverrideDelegate d) { _initFunc = d; return this; }
+
+        /// <summary>
+        /// Initializes an NPC entity from this template.
+        /// </summary>
+        /// <param name="npcEntity">The NPC entity created from this template.</param>
+        public virtual void InitializeSelf(NPC npcEntity)
+        {
+            if(_initFunc != null)
+                _initFunc(npcEntity);
+        }
     }
 }
