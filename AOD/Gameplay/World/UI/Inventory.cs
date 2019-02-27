@@ -1,16 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TeamStor.Engine;
 using TeamStor.Engine.Coroutine;
 using TeamStor.Engine.Graphics;
 using TeamStor.Engine.Tween;
-using static TeamStor.Engine.Graphics.SpriteBatch;
+using System.Linq;
 
 using Game = TeamStor.Engine.Game;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
@@ -44,6 +40,7 @@ namespace TeamStor.AOD.Gameplay.World.UI
         private List<PaneAction> _actions = new List<PaneAction>();
         private int _selectedAction = 0;
 
+        private List<Inventory.ItemSlotReference> _sortedList = new List<Inventory.ItemSlotReference>();
         private int _selectedSlot;
 
         private OnInventoryUICompleted _completedEvent;
@@ -84,6 +81,8 @@ namespace TeamStor.AOD.Gameplay.World.UI
             _offsetY = new TweenedDouble(state.Game, noOffset ? 0.0 : 1.0);
             _state = state;
 
+            UpdateSortedList();
+
             state.Coroutine.Start(ShowCoroutine);
             if(_entity.Inventory.OccupiedSlots == 0)
                 _selectedSlot = -1;
@@ -95,10 +94,21 @@ namespace TeamStor.AOD.Gameplay.World.UI
             _state = world;
             _entity = entity;
 
+            UpdateSortedList();
+
             _offsetY = new TweenedDouble(world.Game, noOffset ? 0.0 : 1.0);
             if(_entity.Inventory.OccupiedSlots == 0)
                 _selectedSlot = -1;
             _state.Coroutine.AddExisting(ChangeSelectedSlot(_selectedSlot));
+        }
+
+        private void UpdateSortedList()
+        {
+            _sortedList.Clear();
+            // sort by type, icon name and name
+            // TODO: categories?
+            _sortedList = _entity.Inventory.OrderByDescending(
+                i => i.Item.GetType().Name + i.Item.Icon + i.Item.Name).ToList();
         }
 
         private IEnumerator<ICoroutineOperation> ShowCoroutine()
@@ -196,6 +206,12 @@ namespace TeamStor.AOD.Gameplay.World.UI
 
             if(_selectedSlot != -1)
             {
+                _actions.Add(new PaneAction("Duplicate", (a, ent, item, ui) =>
+                {
+                    ent.Inventory.Push(item.Item);
+                    UpdateSortedList();
+                }));
+
                 _actions.Add(new PaneAction("Drop", (a, ent, item, ui) =>
                 {
                     foreach(InventoryEquipSlot islot in Enum.GetValues(typeof(InventoryEquipSlot)))
@@ -205,6 +221,7 @@ namespace TeamStor.AOD.Gameplay.World.UI
                     }
 
                     ent.Inventory.PopAt(item.Slot);
+                    UpdateSortedList();
                     
                     int slot = ui._selectedSlot;
                     ui._selectedSlot = -1;
@@ -215,10 +232,10 @@ namespace TeamStor.AOD.Gameplay.World.UI
                         ent.World.Coroutine.AddExisting(ChangeSelectedSlot(slot));
                 }));
                 
-                Inventory.ItemSlotReference i = _entity.Inventory[_selectedSlot];
+                Inventory.ItemSlotReference i = _sortedList[_selectedSlot];
                 foreach(InventoryEquipSlot slot in Enum.GetValues(typeof(InventoryEquipSlot)))
                 {
-                    if(slot != InventoryEquipSlot.None && i.ReferencedItem.EquippableIn.HasFlag(slot))
+                    if(slot != InventoryEquipSlot.None && i.Item.EquippableIn.HasFlag(slot))
                     {
                         string text = "Equip ";
                         switch(slot)
@@ -287,6 +304,12 @@ namespace TeamStor.AOD.Gameplay.World.UI
         {
             if(_offsetY == 0)
             {
+                if(!_closed && _state is WorldState && InputMap.FindMapping(InputAction.Spells).Pressed(_state.Input))
+                {
+                    SpellsUI.Show(_state as WorldState, null, true);
+                    _transitioning = true;
+                }
+
                 if(!_closed && _state is WorldState && InputMap.FindMapping(InputAction.Player).Pressed(_state.Input))
                 {
                     PlayerUI.Show(_state as WorldState, null, true);
@@ -294,6 +317,7 @@ namespace TeamStor.AOD.Gameplay.World.UI
                 }
 
                 if(InputMap.FindMapping(InputAction.Back).Pressed(_state.Input) ||
+                   (_state is WorldState && InputMap.FindMapping(InputAction.Spells).Pressed(_state.Input)) ||
                    (_state is WorldState && InputMap.FindMapping(InputAction.Player).Pressed(_state.Input)))
                     _closed = true;
 
@@ -315,10 +339,12 @@ namespace TeamStor.AOD.Gameplay.World.UI
                             _rightPaneSelected = false;
                     }
 
-                    if(InputMap.FindMapping(InputAction.Action).Pressed(_state.Input) && _actions.Count > 0)
+                    if(InputMap.FindMapping(InputAction.Action).Pressed(_state.Input) && 
+                        _actions.Count > 0 &&
+                        !(_state is CombatState && !(_sortedList[_selectedSlot].Item is CombatItem)))
                     {
                         int oldAction = _selectedAction;
-                        _actions[_selectedAction].OnAction(_actions[_selectedAction], _entity, _entity.Inventory[_selectedSlot], this);
+                        _actions[_selectedAction].OnAction(_actions[_selectedAction], _entity, _sortedList[_selectedSlot], this);
 
                         // update actions manually
                         IEnumerator<ICoroutineOperation> func = ChangeSelectedSlot(_selectedSlot);
@@ -381,17 +407,29 @@ namespace TeamStor.AOD.Gameplay.World.UI
                     Color.White);
             else
             {
+                int x = 16;
+
                 batch.Text(font, 
                     16, 
                     "[" + InputMap.FindMapping(InputAction.Inventory).Key + "] Inventory", 
-                    new Vector2(16, 8 + (bg.Height + 20) * (float)_offsetY.Value), 
+                    new Vector2(x, 8 + (bg.Height + 20) * (float)_offsetY.Value), 
                     Color.White);
-                
+
+                x += (int)font.Measure(16, "[" + InputMap.FindMapping(InputAction.Inventory).Key + "] Inventory").X + 6;
+
                 // only the player uses the inventory for now
                 batch.Text(font, 
                     16, 
-                    "[" + InputMap.FindMapping(InputAction.Player).Key + "] " + _entity.Name, 
-                    new Vector2(16 + (int)font.Measure(16, "[" + InputMap.FindMapping(InputAction.Inventory).Key + "] Inventory").X + 6, 8 + (bg.Height + 20) * (float)_offsetY.Value), 
+                    "[" + InputMap.FindMapping(InputAction.Spells).Key + "] Spells", 
+                    new Vector2(x, 8 + (bg.Height + 20) * (float)_offsetY.Value), 
+                    Color.White * 0.6f);
+
+                x += (int)font.Measure(16, "[" + InputMap.FindMapping(InputAction.Spells).Key + "] Spells").X + 6;
+
+                batch.Text(font,
+                    16,
+                    "[" + InputMap.FindMapping(InputAction.Player).Key + "] " + _entity.Name,
+                    new Vector2(x, 8 + (bg.Height + 20) * (float)_offsetY.Value),
                     Color.White * 0.6f);
             }
 
@@ -422,20 +460,50 @@ namespace TeamStor.AOD.Gameplay.World.UI
             {
                 for(int i = 0; i < _entity.Inventory.OccupiedSlots; i++)
                 {
-                    Inventory.ItemSlotReference reference = _entity.Inventory[i];
+                    Inventory.ItemSlotReference reference = _sortedList[i];
                     int y = itemsListRectangle.Y + i * 15 + (int)((bg.Height + 20) * _offsetY.Value);
-                    bool selected = _selectedSlot == i && !_rightPaneSelected;
+                    bool selected = _selectedSlot == i;
+                    float alpha = selected ? 0.7f + (float)Math.Sin(_state.Game.Time * 10) * 0.1f : 0.4f;
 
                     batch.Texture(
                         new Vector2(itemsListRectangle.X + 6, y),
-                        _state.Assets.Get<Texture2D>(reference.ReferencedItem.SmallIcon),
-                        Color.White * (selected ? 0.8f : 0.4f));
+                        _state.Assets.Get<Texture2D>(reference.Item.SmallIcon),
+                        Color.White * alpha);
 
                     batch.Text(font,
                         16,
-                        reference.ReferencedItem.Name,
+                        reference.Item.Name,
                         new Vector2(itemsListRectangle.X + 18, y - 8),
-                        Color.White * (selected ? 0.8f : 0.4f));
+                        Color.White * alpha);
+
+                    int statusX = itemsListRectangle.X + itemsListRectangle.Width - 6 - 8;
+
+                    if(reference.Item.EquippableIn != InventoryEquipSlot.None)
+                    {
+                        bool drawn = false;
+
+                        foreach(InventoryEquipSlot slot in Enum.GetValues(typeof(InventoryEquipSlot)))
+                        {
+                            if(slot != InventoryEquipSlot.None && _entity.Inventory[slot].Slot == reference.Slot)
+                            {
+                                batch.Texture(new Vector2(statusX, y), _state.Assets.Get<Texture2D>("items/icons/status/equipped.png"), Color.White * 0.5f);
+                                drawn = true;
+                                break;
+                            }
+                        }
+
+                        if(!drawn)
+                            batch.Texture(new Vector2(statusX, y), _state.Assets.Get<Texture2D>("items/icons/status/not_equipped.png"), Color.White * 0.5f);
+
+                        statusX -= 10;
+                    }
+
+                    // unusable
+                    if(_state is CombatState && !(reference.Item is CombatItem))
+                    {
+                        batch.Texture(new Vector2(statusX, y), _state.Assets.Get<Texture2D>("items/icons/status/unusable.png"), Color.White * 0.5f);
+                        statusX -= 10;
+                    }
                 }
             }
 
@@ -448,18 +516,18 @@ namespace TeamStor.AOD.Gameplay.World.UI
 
             if(_entity.Inventory.OccupiedSlots > 0 && _selectedSlot != -1)
             {
-                Inventory.ItemSlotReference reference = _entity.Inventory[_selectedSlot];
+                Inventory.ItemSlotReference reference = _sortedList[_selectedSlot];
 
                 batch.Texture(
                     new Vector2(infoRectangle.X + infoRectangle.Width / 2 - 16, infoRectangle.Y),
-                    _state.Assets.Get<Texture2D>(reference.ReferencedItem.Icon),
+                    _state.Assets.Get<Texture2D>(reference.Item.Icon),
                     Color.White);
 
-                Vector2 measure = font.Measure(16, reference.ReferencedItem.Name);
-                batch.Text(font, 16, reference.ReferencedItem.Name, new Vector2(infoRectangle.X + infoRectangle.Width / 2 - measure.X / 2, infoRectangle.Y + 30), Color.White);
+                Vector2 measure = font.Measure(16, reference.Item.Name);
+                batch.Text(font, 16, reference.Item.Name, new Vector2(infoRectangle.X + infoRectangle.Width / 2 - measure.X / 2, infoRectangle.Y + 30), Color.White);
 
                 int y = 44;
-                foreach(string s in reference.ReferencedItem.Description.Split('\n'))
+                foreach(string s in reference.Item.Description.Split('\n'))
                 {
                     measure = font.Measure(16, s);
                     batch.Text(font, 16, s, new Vector2(infoRectangle.X + infoRectangle.Width / 2 - measure.X / 2, infoRectangle.Y + y), Color.White * 0.7f);
@@ -467,36 +535,41 @@ namespace TeamStor.AOD.Gameplay.World.UI
                     y += 12;
                 }
 
-                if(reference.ReferencedItem is ArmorItem)
+                if(reference.Item is ArmorItem)
                 {
                     Rectangle blockRectangle = new Rectangle(infoRectangle.X + infoRectangle.Width / 2 - 140 / 2, infoRectangle.Y + 90, 140, 16);
 
                     batch.Rectangle(blockRectangle, Color.White * 0.1f);
-                    blockRectangle.Width = (int)(140 * ((float)(reference.ReferencedItem as ArmorItem).ArmorValue / 100));
+                    blockRectangle.Width = (int)(140 * ((float)(reference.Item as ArmorItem).ArmorValue / 100));
                     batch.Rectangle(blockRectangle, Color.White * 0.3f);
                     blockRectangle.Width = 140;
 
                     batch.Text(font, 16, 
-                        ((reference.ReferencedItem as ArmorItem).Protection == ArmorItem.ProtectionType.Magical ? "Magical" : "Physical") +
+                        ((reference.Item as ArmorItem).Protection == ArmorItem.ProtectionType.Magical ? "Magical" : "Physical") +
                         " Armor: +" + 
-                        (reference.ReferencedItem as ArmorItem).ArmorValue, 
+                        (reference.Item as ArmorItem).ArmorValue, 
                         new Vector2(blockRectangle.X + 4, blockRectangle.Y - 4), Color.White);
                 }
 
                 int x = 0;
                 batch.Text(font, 16, "Actions", new Vector2(infoRectangle.X + x + 10, infoRectangle.Y + infoRectangle.Height - 72 - 8), Color.White);
-                
-                foreach(PaneAction action in _actions)
+
+                if(_state is CombatState && !(_sortedList[_selectedSlot].Item is CombatItem))
+                    batch.Text(font, 16, "This item is not usable in combat", new Vector2(infoRectangle.X + x + 10, infoRectangle.Y + infoRectangle.Height - 60 - 8), Color.White * 0.6f);
+                else
                 {
-                    bool selected = _rightPaneSelected && _selectedAction == _actions.IndexOf(action);
-                    //float alpha = selected ? 0.8f + (float)Math.Sin(_state.Game.Time * 10) * 0.2f : 0.6f;
-                    float alpha = selected ? 0.8f : 0.6f;
+                    foreach(PaneAction action in _actions)
+                    {
+                        bool selected = _rightPaneSelected && _selectedAction == _actions.IndexOf(action);
+                        //float alpha = selected ? 0.8f + (float)Math.Sin(_state.Game.Time * 10) * 0.2f : 0.6f;
+                        float alpha = selected ? 0.8f : 0.6f;
 
-                    batch.Text(font, 16, action.Name, new Vector2(infoRectangle.X + x + 10, infoRectangle.Y + infoRectangle.Height - 60 - 8), Color.White * alpha);
-                    if(selected)
-                        batch.Texture(new Vector2(infoRectangle.X + x, infoRectangle.Y + infoRectangle.Height - 60), _state.Assets.Get<Texture2D>("ui/arrow.png"), Color.White);
+                        batch.Text(font, 16, action.Name, new Vector2(infoRectangle.X + x + 10, infoRectangle.Y + infoRectangle.Height - 60 - 8), Color.White * alpha);
+                        if(selected)
+                            batch.Texture(new Vector2(infoRectangle.X + x, infoRectangle.Y + infoRectangle.Height - 60), _state.Assets.Get<Texture2D>("ui/arrow.png"), Color.White);
 
-                    x += (int)font.Measure(16, action.Name).X + 16;
+                        x += (int)font.Measure(16, action.Name).X + 16;
+                    }
                 }
             }
         }

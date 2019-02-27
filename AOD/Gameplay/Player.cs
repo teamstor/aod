@@ -52,6 +52,12 @@ namespace TeamStor.AOD.Gameplay
                 return;
             }
 
+            if(InputMap.FindMapping(InputAction.Spells).Pressed(World.Input))
+            {
+                SpellsUI.Show(World);
+                return;
+            }
+
             if(InputMap.FindMapping(InputAction.Player).Pressed(World.Input))
             {
                 PlayerUI.Show(World);

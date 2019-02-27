@@ -396,8 +396,6 @@ namespace TeamStor.AOD
                     }
                 }
             }
-
-            GC.Collect();
         }
 
         private static void ReadJSONInfo(JsonReader reader, Information info)
@@ -628,10 +626,6 @@ namespace TeamStor.AOD
                     // this might be an old map
                     return OldMapLoader.Load(stream);
                 }
-                finally
-                {
-                    GC.Collect();
-                }
             }
         }
         
@@ -712,8 +706,6 @@ namespace TeamStor.AOD
                     writer.WriteEndObject();
                 }
             }
-
-            GC.Collect();
         }
 
         /// <param name="point">Point to check.</param>

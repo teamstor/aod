@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ namespace TeamStor.AOD.Gameplay
     /// <summary>
     /// Entity inventory.
     /// </summary>
-    public class Inventory
+    public class Inventory : IEnumerable<Inventory.ItemSlotReference>
     {
         /// <summary>
         /// Special slot number that is always guaranteed to be empty.
@@ -43,7 +44,7 @@ namespace TeamStor.AOD.Gameplay
             /// <summary>
             /// Item this item reference is referencing.
             /// </summary>
-            public Item ReferencedItem
+            public Item Item
             {
                 get
                 {
@@ -63,7 +64,7 @@ namespace TeamStor.AOD.Gameplay
             {
                 get
                 {
-                    return ReferencedItem == null;
+                    return Item == null;
                 }
             }
 
@@ -75,7 +76,7 @@ namespace TeamStor.AOD.Gameplay
 
             public static implicit operator Item(ItemSlotReference r)
             {
-                return r.ReferencedItem;
+                return r.Item;
             }
         }
 
@@ -114,7 +115,7 @@ namespace TeamStor.AOD.Gameplay
         {
             get
             {
-                if(this[_equips[slot]].IsEmptyReference || !(this[_equips[slot]].ReferencedItem.EquippableIn.HasFlag(slot)))
+                if(this[_equips[slot]].IsEmptyReference || !(this[_equips[slot]].Item.EquippableIn.HasFlag(slot)))
                     return this[EMPTY_SLOT];
 
                 return this[_equips[slot]];
@@ -122,7 +123,7 @@ namespace TeamStor.AOD.Gameplay
 
             set
             {
-                if(value.IsEmptyReference || !value.ReferencedItem.EquippableIn.HasFlag(slot))
+                if(value.IsEmptyReference || !value.Item.EquippableIn.HasFlag(slot))
                     _equips[slot] = EMPTY_SLOT;
                 else
                     _equips[slot] = value.Slot;
@@ -178,6 +179,17 @@ namespace TeamStor.AOD.Gameplay
 
             _slots.RemoveAt(_slots.Count - 1);
             return true;
+        }
+
+        public IEnumerator<ItemSlotReference> GetEnumerator()
+        {
+            for(int i = 0; i < OccupiedSlots; i++)
+                yield return this[i];
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

@@ -95,7 +95,8 @@ namespace TeamStor.AOD
             _defaultMappings.Add(InputAction.Run, new Mapping(InputAction.Run, Keys.LeftShift, Buttons.LeftShoulder));
 
             _defaultMappings.Add(InputAction.Inventory, new Mapping(InputAction.Inventory, Keys.E, Buttons.Y));
-            _defaultMappings.Add(InputAction.Player, new Mapping(InputAction.Player, Keys.R, 0));
+            _defaultMappings.Add(InputAction.Spells, new Mapping(InputAction.Spells, Keys.R, 0));
+            _defaultMappings.Add(InputAction.Player, new Mapping(InputAction.Player, Keys.T, 0));
             _defaultMappings.Add(InputAction.SwitchTabLeft, new Mapping(InputAction.SwitchTabLeft, Keys.Q, Buttons.LeftTrigger));
             _defaultMappings.Add(InputAction.SwitchTabRight, new Mapping(InputAction.SwitchTabRight, Keys.Q, Buttons.RightTrigger));
 

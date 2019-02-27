@@ -13,13 +13,13 @@ namespace TeamStor.AOD.Gameplay.World.UI
     /// <summary>
     /// Shows the players stats and equips.
     /// </summary>
-    public class PlayerUI
+    public class SpellsUI
     {
         private bool _closed = false;
         private bool _transitioning = false;
 
-        private OnPlayerUICompleted _completedEvent;
-        public delegate void OnPlayerUICompleted(Player entity);
+        private OnSpellsUICompleted _completedEvent;
+        public delegate void OnSpellsUICompleted(Player entity);
 
         private TweenedDouble _offsetY;
 
@@ -27,14 +27,14 @@ namespace TeamStor.AOD.Gameplay.World.UI
         private Player _entity;
 
         /// <summary>
-        /// If this player UI has been closed and has finished showing.
+        /// If this spells UI has been closed and has finished showing.
         /// </summary>
         public bool IsShowingCompleted
         {
             get; private set;
         } = false;
 
-        private PlayerUI(WorldState world, Player entity, bool noOffset)
+        private SpellsUI(WorldState world, Player entity, bool noOffset)
         {
             _world = world;
             _entity = entity;
@@ -87,15 +87,15 @@ namespace TeamStor.AOD.Gameplay.World.UI
                     _transitioning = true;
                 }
 
-                if(!_closed && InputMap.FindMapping(InputAction.Spells).Pressed(_world.Input))
+                if(!_closed && InputMap.FindMapping(InputAction.Player).Pressed(_world.Input))
                 {
-                    SpellsUI.Show(_world, null, true);
+                    PlayerUI.Show(_world, null, true);
                     _transitioning = true;
                 }
 
                 if(InputMap.FindMapping(InputAction.Back).Pressed(_world.Input) ||
                    InputMap.FindMapping(InputAction.Inventory).Pressed(_world.Input) ||
-                   InputMap.FindMapping(InputAction.Spells).Pressed(_world.Input))
+                   InputMap.FindMapping(InputAction.Player).Pressed(_world.Input))
                     _closed = true;
             }
         }
@@ -125,7 +125,7 @@ namespace TeamStor.AOD.Gameplay.World.UI
                 16,
                 "[" + InputMap.FindMapping(InputAction.Spells).Key + "] Spells",
                 new Vector2(x, 8 + (bg.Height + 20) * (float)_offsetY.Value),
-                Color.White * 0.6f);
+                Color.White);
 
             x += (int)font.Measure(16, "[" + InputMap.FindMapping(InputAction.Spells).Key + "] Spells").X + 6;
 
@@ -133,14 +133,14 @@ namespace TeamStor.AOD.Gameplay.World.UI
                 16,
                 "[" + InputMap.FindMapping(InputAction.Player).Key + "] " + _entity.Name,
                 new Vector2(x, 8 + (bg.Height + 20) * (float)_offsetY.Value),
-                Color.White);
+                Color.White * 0.6f);
         }
 
-        public static IEnumerator<ICoroutineOperation> Show(WorldState world, OnPlayerUICompleted completeEvent = null, bool noOffset = false)
+        public static IEnumerator<ICoroutineOperation> Show(WorldState world, OnSpellsUICompleted completeEvent = null, bool noOffset = false)
         {
-            PlayerUI pui = new PlayerUI(world, world.Player, noOffset);
-            pui._completedEvent = completeEvent;
-            return world.Coroutine.Start(pui.ShowCoroutine);
+            SpellsUI sui = new SpellsUI(world, world.Player, noOffset);
+            sui._completedEvent = completeEvent;
+            return world.Coroutine.Start(sui.ShowCoroutine);
         }
     }
 }

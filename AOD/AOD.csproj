@@ -94,6 +94,7 @@
     <Compile Include="Gameplay\World\PositionedEntity.cs" />
     <Compile Include="Gameplay\World\RandomEncounter.cs" />
     <Compile Include="Gameplay\World\UI\Inventory.cs" />
+    <Compile Include="Gameplay\World\UI\Spells.cs" />
     <Compile Include="Gameplay\World\UI\Player.cs" />
     <Compile Include="Gameplay\World\UI\TextBox.cs" />
     <Compile Include="Gameplay\World\WorldState.cs" />

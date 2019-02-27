@@ -30,7 +30,12 @@ namespace TeamStor.AOD
         /// Used for opening the inventory UI.
         /// </summary>
         Inventory,
-        
+
+        /// <summary>
+        /// Used for opening the spells UI.
+        /// </summary>
+        Spells,
+
         /// <summary>
         /// Used for opening the player UI.
         /// </summary>
