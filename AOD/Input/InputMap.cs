@@ -92,9 +92,12 @@ namespace TeamStor.AOD
 
             _defaultMappings.Add(InputAction.Action, new Mapping(InputAction.Action, Keys.Z, Buttons.A));
             _defaultMappings.Add(InputAction.Back, new Mapping(InputAction.Back, Keys.Escape, Buttons.X));
+            _defaultMappings.Add(InputAction.Run, new Mapping(InputAction.Run, Keys.LeftShift, Buttons.LeftShoulder));
+
             _defaultMappings.Add(InputAction.Inventory, new Mapping(InputAction.Inventory, Keys.E, Buttons.Y));
             _defaultMappings.Add(InputAction.Player, new Mapping(InputAction.Player, Keys.R, 0));
-            _defaultMappings.Add(InputAction.Run, new Mapping(InputAction.Run, Keys.LeftShift, Buttons.LeftShoulder));
+            _defaultMappings.Add(InputAction.SwitchTabLeft, new Mapping(InputAction.SwitchTabLeft, Keys.Q, Buttons.LeftTrigger));
+            _defaultMappings.Add(InputAction.SwitchTabRight, new Mapping(InputAction.SwitchTabRight, Keys.Q, Buttons.RightTrigger));
 
             foreach(InputAction action in Enum.GetValues(typeof(InputAction)))
                 ResetMappingToDefault(action);

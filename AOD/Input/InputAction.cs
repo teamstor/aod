@@ -37,6 +37,16 @@ namespace TeamStor.AOD
         Player,
 
         /// <summary>
+        /// Used to switch tabs in UIs.
+        /// </summary>
+        SwitchTabLeft,
+
+        /// <summary>
+        /// Used to switch tabs in UIs.
+        /// </summary>
+        SwitchTabRight,
+
+        /// <summary>
         /// Used for running.
         /// </summary>
         Run

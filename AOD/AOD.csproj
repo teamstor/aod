@@ -79,6 +79,7 @@
     <Compile Include="Gameplay\INPCBehavior.cs" />
     <Compile Include="Gameplay\Direction.cs" />
     <Compile Include="Gameplay\Inventory\Categories\ArmorItem.cs" />
+    <Compile Include="Gameplay\Inventory\Categories\CombatItem.cs" />
     <Compile Include="Gameplay\Inventory\InventoryEquipSlot.cs" />
     <Compile Include="Gameplay\Inventory\Inventory.cs" />
     <Compile Include="Gameplay\Inventory\Item.cs" />

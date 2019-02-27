@@ -247,7 +247,7 @@ namespace TeamStor.AOD.Gameplay.World.UI
                         if(i.Inventory[slot].Slot == i.Slot)
                             text = text.
                                 Replace("Equip", "Unequip").
-                                Replace("on", "from");
+                                Replace("on ", "from ");
                         
                         _actions.Add(new PaneAction(text, (a, ent, item, ui) =>
                         {

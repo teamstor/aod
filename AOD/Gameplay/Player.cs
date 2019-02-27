@@ -25,12 +25,9 @@ namespace TeamStor.AOD.Gameplay
 
         public Player(WorldState world) : base(world, "Player")
         {
-            for(int i = 0; i < 12; i++)
-            {
-                Inventory.Push(Item.TestItem);
-                Inventory.Push(Item.TestItem);
-                Inventory.Push(Item.TestItem2);
-            }
+            Inventory.Push(Item.TestItem);
+            Inventory.Push(Item.TestItem2);
+            Inventory.Push(Item.Thunderfury);
 
             Speed = 2.5;
             MoveInstantly(new Point(0, 0));

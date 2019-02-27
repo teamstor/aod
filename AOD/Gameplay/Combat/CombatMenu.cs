@@ -25,6 +25,7 @@ namespace TeamStor.AOD.Gameplay
         /// Page that is used for selecting what magic attack to use.
         /// </summary>
         MagicSelection,
+
         /// <summary>
         /// Used for showing player and enemy statistics.
         /// </summary>
