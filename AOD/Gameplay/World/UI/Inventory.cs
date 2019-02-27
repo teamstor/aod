@@ -78,10 +78,10 @@ namespace TeamStor.AOD.Gameplay.World.UI
         /// Creates a standalone inventory UI that needs to be updated manually.
         /// </summary>
         /// <param name="entity">The entity to use the inventory with.</param>
-        public InventoryUI(LivingEntity entity, GameState state, bool reverseOffset = false)
+        public InventoryUI(LivingEntity entity, GameState state, bool noOffset = false)
         {
             _entity = entity;
-            _offsetY = new TweenedDouble(state.Game, reverseOffset ? -1.0 : 1.0);
+            _offsetY = new TweenedDouble(state.Game, noOffset ? 0.0 : 1.0);
             _state = state;
 
             state.Coroutine.Start(ShowCoroutine);
@@ -90,12 +90,12 @@ namespace TeamStor.AOD.Gameplay.World.UI
             state.Coroutine.AddExisting(ChangeSelectedSlot(_selectedSlot));
         }
 
-        private InventoryUI(WorldState world, LivingEntity entity, bool reverseOffset = false)
+        private InventoryUI(WorldState world, LivingEntity entity, bool noOffset = false)
         {
             _state = world;
             _entity = entity;
 
-            _offsetY = new TweenedDouble(world.Game, reverseOffset ? -1.0 : 1.0);
+            _offsetY = new TweenedDouble(world.Game, noOffset ? 0.0 : 1.0);
             if(_entity.Inventory.OccupiedSlots == 0)
                 _selectedSlot = -1;
             _state.Coroutine.AddExisting(ChangeSelectedSlot(_selectedSlot));
@@ -285,16 +285,16 @@ namespace TeamStor.AOD.Gameplay.World.UI
 
         private void UpdateHook(object sender, Game.UpdateEventArgs e)
         {
-            if(_offsetY.Value == 0)
+            if(_offsetY == 0)
             {
-                if(!_closed && _state is WorldState && InputMap.FindMapping(InputAction.Player).Held(_state.Input))
+                if(!_closed && _state is WorldState && InputMap.FindMapping(InputAction.Player).Pressed(_state.Input))
                 {
                     PlayerUI.Show(_state as WorldState, null, true);
                     _transitioning = true;
                 }
 
-                if(InputMap.FindMapping(InputAction.Back).Held(_state.Input) ||
-                   (_state is WorldState && InputMap.FindMapping(InputAction.Player).Held(_state.Input)))
+                if(InputMap.FindMapping(InputAction.Back).Pressed(_state.Input) ||
+                   (_state is WorldState && InputMap.FindMapping(InputAction.Player).Pressed(_state.Input)))
                     _closed = true;
 
                 if(_rightPaneSelected)
@@ -315,7 +315,7 @@ namespace TeamStor.AOD.Gameplay.World.UI
                             _rightPaneSelected = false;
                     }
 
-                    if(InputMap.FindMapping(InputAction.Action).Pressed(_state.Input))
+                    if(InputMap.FindMapping(InputAction.Action).Pressed(_state.Input) && _actions.Count > 0)
                     {
                         int oldAction = _selectedAction;
                         _actions[_selectedAction].OnAction(_actions[_selectedAction], _entity, _entity.Inventory[_selectedSlot], this);
@@ -501,9 +501,9 @@ namespace TeamStor.AOD.Gameplay.World.UI
             }
         }
 
-        public static IEnumerator<ICoroutineOperation> Show(WorldState world, LivingEntity entity, OnInventoryUICompleted completeEvent = null, bool reverseOffset = false)
+        public static IEnumerator<ICoroutineOperation> Show(WorldState world, LivingEntity entity, OnInventoryUICompleted completeEvent = null, bool noOffset = false)
         {
-            InventoryUI inventory = new InventoryUI(world, entity, reverseOffset);
+            InventoryUI inventory = new InventoryUI(world, entity, noOffset);
             inventory._completedEvent = completeEvent;
             return world.Coroutine.Start(inventory.ShowCoroutine);
         }

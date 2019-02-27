@@ -41,12 +41,12 @@ namespace TeamStor.AOD.Gameplay.World.UI
             get; private set;
         } = false;
 
-        private PlayerUI(WorldState world, Player entity, bool reverseOffset)
+        private PlayerUI(WorldState world, Player entity, bool noOffset)
         {
             _world = world;
             _entity = entity;
 
-            _offsetY = new TweenedDouble(world.Game, reverseOffset ? -1.0 : 1.0);
+            _offsetY = new TweenedDouble(world.Game, noOffset ? 0.0 : 1.0);
         }
 
         private IEnumerator<ICoroutineOperation> ShowCoroutine()
@@ -86,16 +86,16 @@ namespace TeamStor.AOD.Gameplay.World.UI
 
         private void UpdateHook(object sender, Game.UpdateEventArgs e)
         {
-            if(_offsetY.Value == 0)
+            if(_offsetY == 0)
             {
-                if(!_closed && InputMap.FindMapping(InputAction.Inventory).Held(_world.Input))
+                if(!_closed && InputMap.FindMapping(InputAction.Inventory).Pressed(_world.Input))
                 {
                     InventoryUI.Show(_world, _entity, null, true);
                     _transitioning = true;
                 }
 
-                if(InputMap.FindMapping(InputAction.Back).Held(_world.Input) ||
-                   InputMap.FindMapping(InputAction.Inventory).Held(_world.Input))
+                if(InputMap.FindMapping(InputAction.Back).Pressed(_world.Input) ||
+                   InputMap.FindMapping(InputAction.Inventory).Pressed(_world.Input))
                     _closed = true;
             }
         }
@@ -124,9 +124,9 @@ namespace TeamStor.AOD.Gameplay.World.UI
                 Color.White);
         }
 
-        public static IEnumerator<ICoroutineOperation> Show(WorldState world, OnPlayerUICompleted completeEvent = null, bool reverseOffset = false)
+        public static IEnumerator<ICoroutineOperation> Show(WorldState world, OnPlayerUICompleted completeEvent = null, bool noOffset = false)
         {
-            PlayerUI pui = new PlayerUI(world, world.Player, reverseOffset);
+            PlayerUI pui = new PlayerUI(world, world.Player, noOffset);
             pui._completedEvent = completeEvent;
             return world.Coroutine.Start(pui.ShowCoroutine);
         }
