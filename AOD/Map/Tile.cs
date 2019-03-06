@@ -197,15 +197,18 @@ namespace TeamStor.AOD
 
             SpriteEffects effects = SpriteEffects.None;
 
-            bool flipHorizontal = map.HasMetadata(Layer, mapPos.X, mapPos.Y) &&
-                map.GetMetadata(Layer, mapPos.X, mapPos.Y).GetOrDefault("flip-h", "false") == "True";
-            if(flipHorizontal)
-                effects |= SpriteEffects.FlipHorizontally;
+            if(mapPos.X >= 0 && mapPos.X < map.Width && mapPos.Y >= 0 && mapPos.X < map.Height)
+            {
+                bool flipHorizontal = map.HasMetadata(Layer, mapPos.X, mapPos.Y) &&
+                    map.GetMetadata(Layer, mapPos.X, mapPos.Y).GetOrDefault("flip-h", "false") == "True";
+                if(flipHorizontal)
+                    effects |= SpriteEffects.FlipHorizontally;
 
-            bool flipVertical = map.HasMetadata(Layer, mapPos.X, mapPos.Y) && 
-                map.GetMetadata(Layer, mapPos.X, mapPos.Y).GetOrDefault("flip-v", "false") == "True";
-            if(flipVertical)
-                effects |= SpriteEffects.FlipVertically;
+                bool flipVertical = map.HasMetadata(Layer, mapPos.X, mapPos.Y) &&
+                    map.GetMetadata(Layer, mapPos.X, mapPos.Y).GetOrDefault("flip-v", "false") == "True";
+                if(flipVertical)
+                    effects |= SpriteEffects.FlipVertically;
+            }
 
             game.Batch.Texture(
                 new Vector2(mapPos.X * 16, mapPos.Y * 16),
