@@ -496,7 +496,13 @@ namespace TeamStor.AOD.Editor
 
             foreach(Tile.MapLayer layer in Tile.CachedAllMapLayers)
             {
-	            if(layer == Tile.MapLayer.Control)
+                Rectangle area = new Rectangle(
+                    (int)-(Camera.Translation.X / Camera.Zoom.Value),
+                    (int)-(Camera.Translation.Y / Camera.Zoom.Value),
+                    (int)(screenSize.X / Math.Floor(Camera.Zoom.Value)),
+                    (int)(screenSize.Y / Math.Floor(Camera.Zoom.Value)));
+
+                if(layer == Tile.MapLayer.Control)
 	            {
 		            bool shouldDraw = false;
 
@@ -509,14 +515,8 @@ namespace TeamStor.AOD.Editor
 			            break;
 	            }
 
-                Rectangle area = new Rectangle(
-                    (int)-(Camera.Translation.X / Camera.Zoom.Value),
-                    (int)-(Camera.Translation.Y / Camera.Zoom.Value),
-                    (int)(screenSize.X / Math.Floor(Camera.Zoom.Value)),
-                    (int)(screenSize.Y / Math.Floor(Camera.Zoom.Value)));
-
                 if(layer == Tile.MapLayer.Control)
-                    batch.Rectangle(area, Color.Black * 0.6f);
+                    batch.Rectangle(area, Color.Black * 0.4f);
 
                 Map.Draw(layer, Game, area);
             }

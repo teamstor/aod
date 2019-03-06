@@ -195,12 +195,27 @@ namespace TeamStor.AOD
         {
             TileAtlas.Region region = Map.Atlas[TextureName(metadata, environment)];
 
+            SpriteEffects effects = SpriteEffects.None;
+
+            bool flipHorizontal = map.HasMetadata(Layer, mapPos.X, mapPos.Y) &&
+                map.GetMetadata(Layer, mapPos.X, mapPos.Y).GetOrDefault("flip-h", "false") == "True";
+            if(flipHorizontal)
+                effects |= SpriteEffects.FlipHorizontally;
+
+            bool flipVertical = map.HasMetadata(Layer, mapPos.X, mapPos.Y) && 
+                map.GetMetadata(Layer, mapPos.X, mapPos.Y).GetOrDefault("flip-v", "false") == "True";
+            if(flipVertical)
+                effects |= SpriteEffects.FlipVertically;
+
             game.Batch.Texture(
                 new Vector2(mapPos.X * 16, mapPos.Y * 16),
                 region.Texture,
                 color.HasValue ? color.Value : Color.White,
                 Vector2.One,
-                region.Rectangle);
+                region.Rectangle,
+                0,
+                null,
+                effects);
         }
 
         /// <summary>

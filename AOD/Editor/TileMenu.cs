@@ -166,6 +166,7 @@ namespace TeamStor.AOD.Editor
 
             Categories.Add(new Category("Foliage", "editor/tilemenu/foliage.png"));
             Categories.Last().Objects.Add(FoliageTiles.Tree);
+            Categories.Last().Objects.Add(FoliageTiles.Birch);
             Categories.Last().Objects.Add(FoliageTiles.Bush);
             Categories.Last().Objects.Add(FoliageTiles.TallGrass);
             Categories.Last().Objects.Add(FoliageTiles.Rock);
@@ -186,6 +187,7 @@ namespace TeamStor.AOD.Editor
             roofs.Objects.Add(CityTiles.RoofRed);
             roofs.Objects.Add(CityTiles.RoofPurple);
             roofs.Objects.Add(Separator);
+            roofs.Objects.Add(CityTiles.RoofPurpleTip);
             roofs.Objects.Add(CityTiles.RoofBeam);
             Categories.Last().Objects.Add(roofs);
 
@@ -217,6 +219,11 @@ namespace TeamStor.AOD.Editor
 
             Categories.Last().Objects.Add(InsideTiles.Door);
             Categories.Last().Objects.Add(InsideTiles.Doormat);
+
+            Categories.Last().Objects.Add(Separator);
+            Categories.Last().Objects.Add(InsideTiles.Bookshelf);
+            Categories.Last().Objects.Add(InsideTiles.Chair);
+            Categories.Last().Objects.Add(InsideTiles.Table);
 
             Categories.Add(new Category("Control", "editor/tilemenu/control.png"));
             Categories.Last().Objects.Add(ControlTiles.Spawnpoint);
