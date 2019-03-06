@@ -120,6 +120,53 @@ namespace TeamStor.AOD.Gameplay.World
             }
         }
 
+        private int _xpValue;
+
+        /// <summary>
+        /// Amount of player experience. Used for leveling.
+        /// </summary>
+        public int XP
+        {
+            get
+            {
+                return _xpValue;
+            }
+            set
+            {
+                _xpValue = value;
+                while(_xpValue >= NeededXP)
+                {
+                    _xpValue -= NeededXP;
+                    Level++;
+
+                    if(OnLevelUp != null)
+                        OnLevelUp(this, Level, _xpValue);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Amount of XP needed to advance to the next level.
+        /// </summary>
+        public int NeededXP
+        {
+            get
+            {
+                // TODO: ändra ekvationen
+                return (Level * 100) + (Level * 5);
+            }
+        }
+
+        /// <param name="entity">The entity (wow)</param>
+        /// <param name="newLevel">The new level of the player</param>
+        /// <param name="xpLeft">The amount of XP left over after leveling</param>
+        public delegate void LevelUpDelegate(LivingEntity entity, int newLevel, int xpLeft);
+
+        /// <summary>
+        /// Event called when the entity levels up.
+        /// </summary>
+        public LevelUpDelegate OnLevelUp;
+
         /// <summary>
         /// Affects the amount of damage this entity gives with melee weapons.
         /// </summary>

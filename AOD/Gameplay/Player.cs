@@ -29,7 +29,7 @@ namespace TeamStor.AOD.Gameplay
             Inventory.Push(Item.TestItem2);
             Inventory.Push(Item.Thunderfury);
 
-            Speed = 2.5;
+            Speed = 3.5;
             MoveInstantly(new Point(0, 0));
 
             for(int x = 0; x < world.Map.Width; x++)
@@ -42,31 +42,33 @@ namespace TeamStor.AOD.Gameplay
             }
 
             NextPosition = Position;
+
+            Level = 8;
+            XP = NeededXP / 3;
         }
 
         public void Update(double deltaTime, double totalTime, long count)
         {
-            if(InputMap.FindMapping(InputAction.Inventory).Pressed(World.Input))
-            {
-                InventoryUI.Show(World, this);
-                return;
-            }
-
-            if(InputMap.FindMapping(InputAction.Spells).Pressed(World.Input))
-            {
-                SpellsUI.Show(World);
-                return;
-            }
-
-            if(InputMap.FindMapping(InputAction.Player).Pressed(World.Input))
-            {
-                PlayerUI.Show(World);
-                return;
-            }
-
             if(!IsWalking)
             {
-                Speed = InputMap.FindMapping(InputAction.Run).Held(World.Input) ? 3.5 : 2.5;
+                if(InputMap.FindMapping(InputAction.Inventory).Pressed(World.Input))
+                {
+                    InventoryUI.Show(World, this);
+                    return;
+                }
+
+                if(InputMap.FindMapping(InputAction.Spells).Pressed(World.Input))
+                {
+                    SpellsUI.Show(World);
+                    return;
+                }
+
+                if(InputMap.FindMapping(InputAction.Player).Pressed(World.Input))
+                {
+                    PlayerUI.Show(World);
+                    return;
+                }
+
                 Direction _lastHeading = Heading;
 
                 if(InputMap.FindMapping(InputAction.Up).Held(World.Input))
@@ -173,7 +175,7 @@ namespace TeamStor.AOD.Gameplay
 
             int frame = 0;
             if(IsWalking)
-                frame = ((int)World.Game.TotalFixedUpdates / (InputMap.FindMapping(InputAction.Run).Held(World.Input) ? 8 : 6)) % 4;
+                frame = ((int)World.Game.TotalFixedUpdates / 8) % 4;
 
             batch.Texture(WorldPosition + new Vector2(0, _landWhen > World.Game.Time ? -1 : 0) - new Vector2(0, upperHalf ? 16 : 0), 
                 World.Game.Assets.Get<Texture2D>("player/" + texture + frame + ".png"), 
