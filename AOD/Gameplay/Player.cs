@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TeamStor.AOD.Gameplay.Quests;
 using TeamStor.Engine.Graphics;
 using TeamStor.AOD.Gameplay.World;
 using TeamStor.AOD.Gameplay.World.UI;
@@ -46,6 +47,9 @@ namespace TeamStor.AOD.Gameplay
         
         public Player(WorldState world) : base(world, "Player")
         {
+            AddQuest(new TestQuest1());
+            AddQuest(new TestQuest2());
+            
             Speed = 3.5;
             MoveInstantly(new Point(0, 0));
 

@@ -355,6 +355,9 @@ namespace TeamStor.AOD.Gameplay.World
             batch.Transform = oldTransform;
 
             Font alkhemikal = Assets.Get<Font>("fonts/Alkhemikal.ttf");
+            Font poco = Assets.Get<Font>("fonts/Poco.ttf");
+
+            Color gold = new Color(255, 194, 0);
 
             Rectangle transitionRectangle = Rectangle.Empty;
             if(Player.Heading == Direction.Up)
@@ -366,11 +369,42 @@ namespace TeamStor.AOD.Gameplay.World
 
             batch.Text(alkhemikal, 16, Map.Info.Name,
                 new Vector2(screenSize.X / 2 - measure.X / 2, 40),
-                Color.Goldenrod * _drawNameAlpha);
+                gold * _drawNameAlpha);
 
             batch.Line(new Vector2(screenSize.X / 2 - measure.X / 2 - 4, 40 + measure.Y + 2),
                 new Vector2(screenSize.X / 2 + measure.X / 2 + 4, 40 + measure.Y + 2),
-                Color.Goldenrod * _drawNameAlpha);
+                gold * _drawNameAlpha);
+
+            int maxWidth = 80;
+            foreach(Quest q in Player.Quests)
+            {
+                measure = poco.Measure(10, q.Name);
+                if(measure.X > maxWidth)
+                    maxWidth = (int)measure.X;
+                
+                measure = poco.Measure(10, q.Objective, 0.8f);
+                if(measure.X > maxWidth)
+                    maxWidth = (int)measure.X;
+            }
+
+            int y = 60;
+            foreach(Quest q in Player.Quests)
+            {
+                measure = poco.Measure(10, q.Name);
+                string texture = q.Fulfilled ? "quest/complete.png" : "quest/active.png";
+                
+                batch.Texture(new Vector2(screenSize.X - 8 - maxWidth - 14, y + 1), Assets.Get<Texture2D>(texture), Color.White);
+                batch.Text(poco, 10, q.Name, new Vector2(screenSize.X - 8 - maxWidth, y - 8), gold);
+                batch.Line(new Vector2(screenSize.X - 8 - maxWidth, y - 8 + measure.Y + 2),
+                    new Vector2(screenSize.X - 8, y - 8 + measure.Y + 2),
+                    gold);
+
+                y += (int)measure.Y + 4;
+                
+                measure = poco.Measure(10, q.Objective, 0.8f);
+                batch.Text(poco, 10, q.Objective, new Vector2(screenSize.X - 8 - maxWidth, y - 8), gold, 0.8f);
+                y += (int)measure.Y + 8;
+            }
 
             //batch.Rectangle(transitionRectangle, Color.Black);
             if(target == null)
@@ -409,7 +443,7 @@ namespace TeamStor.AOD.Gameplay.World
 
                 batch.Rectangle(rectangle, Color.Black * 0.7f);
 
-                int y = 8;
+                y = 8;
 
                 if(Player.NextPosition == Player.Position)
                 {
