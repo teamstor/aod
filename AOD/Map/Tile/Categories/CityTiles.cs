@@ -27,6 +27,8 @@ namespace TeamStor.AOD
         public static Tile RoofPurple = new Tile("city/roof-purple", Tile.MapLayer.Decoration, "Purple Roof", "tiles/city/roof/purple.png", true);
         public static Tile RoofRed = new Tile("city/roof-red", Tile.MapLayer.Decoration, "Red Roof", "tiles/city/roof/red.png", true);
 
+        public static Tile RoofPurpleTip = new RoofTipTile("city/roof-purple-tip", Tile.MapLayer.Decoration, "Purple Roof Tip", "tiles/city/roof/purple_tip.png", true);
+
         public static Tile WindowBlue = new Tile("city/window-blue", Tile.MapLayer.Decoration, "Blue Window", "tiles/city/window/blue.png", true);
         public static Tile WindowOrange = new Tile("city/window-orange", Tile.MapLayer.Decoration, "Orange Window", "tiles/city/window/orange.png", true);
         public static Tile WindowPurple = new Tile("city/window-purple", Tile.MapLayer.Decoration, "Purple Window", "tiles/city/window/purple.png", true);

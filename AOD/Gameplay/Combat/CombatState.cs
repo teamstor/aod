@@ -115,6 +115,76 @@ namespace TeamStor.AOD.Gameplay
             Enemy.Heading = _savedEnemyHeading;
         }
 
+        private class CombatActionArgs
+        {
+            /// <summary>
+            /// Stops combat and returns to the world.
+            /// </summary>
+            public bool Stop;
+
+            /// <summary>
+            /// Skips the enemys turn.
+            /// </summary>
+            public bool BackToPlayerTurn;
+        }
+
+        private IEnumerator<ICoroutineOperation> AttackAction(bool fromEnemy, CombatActionArgs args)
+        {
+            int armor = fromEnemy ? Combatant.PhysicalArmor : Enemy.PhysicalArmor;
+            if(armor > 100)
+                armor = 100;
+
+            bool didHit = (new Random()).Next() % 100 > armor;
+
+            LivingEntity attackingEntity = fromEnemy ? Enemy : Combatant;
+            int damage = attackingEntity.MeleeAttackDamageRange.Item1 +
+                new Random().Next() % (attackingEntity.MeleeAttackDamageRange.Item2 - attackingEntity.MeleeAttackDamageRange.Item1);
+
+            if(fromEnemy)
+            {
+
+            }
+
+            yield return null;
+        }
+
+        private IEnumerator<ICoroutineOperation> RunAwayAction(CombatActionArgs args)
+        {
+            yield return Wait.Seconds(Game, 0.5);
+
+            bool didRunAway = (new Random((int)Game.TotalUpdates)).NextDouble() > 0.5f;
+
+            Menu.ShowMessage(didRunAway ?
+                "You safely ran away from " + Enemy.Name + "." :
+                "You failed to escape.", true, Game.Time + (didRunAway ? 3.5 : 3.0));
+            yield return Wait.Seconds(Game, 3.5);
+
+            if(didRunAway)
+                args.Stop = true;
+        }
+
+        private IEnumerator<ICoroutineOperation> OpenInventoryAction(CombatActionArgs args)
+        {
+            _offset.TweenTo(0, TweenEaseType.EaseInOutCubic, 0.3f);
+            while(!_offset.IsComplete)
+                yield return null;
+
+            _inventoryUI = new InventoryUI(Combatant, this);
+
+            while(!_inventoryUI.IsShowingCompleted)
+                yield return null;
+
+            _inventoryUI = null;
+
+            _offset.TweenTo(40, TweenEaseType.EaseInOutCubic, 0.3f);
+            while(!_offset.IsComplete)
+                yield return null;
+
+            args.BackToPlayerTurn = true;
+            Menu.Page = CombatMenuPage.ActionSelection;
+            Menu.SelectedButton = Menu.Buttons[CombatMenuPage.ActionSelection].IndexOf("Inventory");
+        }
+
         private IEnumerator<ICoroutineOperation> RunCombat()
         {
             DrawToScreenOrRenderTarget(Game.Batch, new Vector2(480, 270), _transitionRenderTarget);
@@ -135,51 +205,32 @@ namespace TeamStor.AOD.Gameplay
             while(!_offset.IsComplete)
                 yield return null;
 
+            CombatActionArgs args = new CombatActionArgs();
             while(true)
             {
-                bool stop = false;
-                bool backToPlayerTurn = false;
+                args.Stop = args.BackToPlayerTurn = false;
                 Menu.NewTurn();
 
                 while(Menu.PendingAction == CombatPendingPlayerAction.None)
                     yield return null;
 
+                IEnumerator<ICoroutineOperation> subAction;
+
                 switch(Menu.PendingAction)
                 {
+                    case CombatPendingPlayerAction.AttackMelee:
+                        subAction = AttackAction(false, args);
+                        while(subAction.MoveNext()) yield return subAction.Current;
+                        break;
+
                     case CombatPendingPlayerAction.AttemptRunAway:
-                        yield return Wait.Seconds(Game, 0.5);
-
-                        bool didRunAway = (new Random((int)Game.TotalUpdates)).NextDouble() > 0.5f;
-
-                        Menu.ShowMessage(didRunAway ? 
-                            "You safely ran away from " + Enemy.Name + "." : 
-                            "You failed to escape.", true, Game.Time + (didRunAway ? 3.5 : 3.0));
-                        yield return Wait.Seconds(Game, 3.5);
-
-                        if(didRunAway)
-                            stop = true;
+                        subAction = RunAwayAction(args);
+                        while(subAction.MoveNext()) yield return subAction.Current;
                         break;
 
                     case CombatPendingPlayerAction.OpenInventory:
-                        _offset.TweenTo(0, TweenEaseType.EaseInOutCubic, 0.3f);
-                        while(!_offset.IsComplete)
-                            yield return null;
-
-                        _inventoryUI = new InventoryUI(Combatant, this);
-
-                        while(!_inventoryUI.IsShowingCompleted)
-                            yield return null;
-
-                        _inventoryUI = null;
-
-                        _offset.TweenTo(40, TweenEaseType.EaseInOutCubic, 0.3f);
-                        while(!_offset.IsComplete)
-                            yield return null;
-
-                        backToPlayerTurn = true;
-                        Menu.Page = CombatMenuPage.ActionSelection;
-                        Menu.SelectedButton = Menu.Buttons[CombatMenuPage.ActionSelection].IndexOf("Inventory");
-
+                        subAction = OpenInventoryAction(args);
+                        while(subAction.MoveNext()) yield return subAction.Current;
                         break;
 
                     default:
@@ -187,16 +238,16 @@ namespace TeamStor.AOD.Gameplay
                         break;
                 }
 
-                if(stop)
+                if(args.Stop)
                     break;
 
-                if(!backToPlayerTurn)
+                if(!args.BackToPlayerTurn)
                 {
                     // enemy turn
                     yield return null;
                 }
 
-                backToPlayerTurn = false;
+                args.BackToPlayerTurn = false;
             }
 
             _offset.TweenTo(0, TweenEaseType.EaseInOutCubic, 0.6f);

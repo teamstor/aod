@@ -21,7 +21,7 @@ namespace TeamStor.AOD.Gameplay
 
         public static ArmorItem TestItem = new ArmorItem("test", "Test Item #1", "This is the legendary test item 1.\nWow. Asså wow.", "items/icons/armors.png", "items/icons/test/32x32.png", ArmorItem.ProtectionType.Physical, 4, InventoryEquipSlot.Head);
         public static Item TestItem2 = new Item("test2", "Test Item #2", "This is the infamous test item 2.\nIt's not as good as test item 1.", "items/icons/generic.png", "items/icons/test/32x32.png", InventoryEquipSlot.None);
-        public static Item Thunderfury = new CombatItem("thunderfury", "Thunderfury", "Item Level 58", "items/icons/weapons.png", "items/icons/test2/32x32.png", InventoryEquipSlot.Weapon);
+        public static WeaponItem Thunderfury = new WeaponItem("thunderfury", "Thunderfury", "Item Level 58", "items/icons/weapons.png", "items/icons/test2/32x32.png", InventoryEquipSlot.Weapon, new Tuple<int, int>(100, 120), false);
 
         /// <summary>
         /// ID of the item.

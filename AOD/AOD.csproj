@@ -80,6 +80,7 @@
     <Compile Include="Gameplay\Direction.cs" />
     <Compile Include="Gameplay\Inventory\Categories\ArmorItem.cs" />
     <Compile Include="Gameplay\Inventory\Categories\CombatItem.cs" />
+    <Compile Include="Gameplay\Inventory\Categories\WeaponItem.cs" />
     <Compile Include="Gameplay\Inventory\InventoryEquipSlot.cs" />
     <Compile Include="Gameplay\Inventory\Inventory.cs" />
     <Compile Include="Gameplay\Inventory\Item.cs" />
@@ -107,6 +108,7 @@
     <Compile Include="Map\Tile\Behavior\City\BeamTile.cs" />
     <Compile Include="Map\Tile\Behavior\City\RoadTile.cs" />
     <Compile Include="Map\Tile\Behavior\City\RoofBeamTile.cs" />
+    <Compile Include="Map\Tile\Behavior\City\RoofTipTile.cs" />
     <Compile Include="Map\Tile\Behavior\City\WaterwheelTile.cs" />
     <Compile Include="Map\Tile\Behavior\DrawOffsetTile.cs" />
     <Compile Include="Map\Tile\Behavior\Foliage\BushTile.cs" />

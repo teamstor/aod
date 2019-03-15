@@ -271,12 +271,46 @@ namespace TeamStor.AOD.Editor.States
 		        BaseState.Buttons["layer-control"].Alpha = MathHelper.Lerp(BaseState.Buttons["layer-control"].Alpha, alpha, (float)deltaTime * 25f);
 	        }
 
-	        if(Input.MousePressed(MouseButton.Middle) && !Input.Mouse(MouseButton.Left))
-		        _tool = _tool == EditTool.PaintOne ? EditTool.PaintRectangle : EditTool.PaintOne;
-
             if(!BaseState.IsPointObscured(Input.MousePosition))
 	        {
-		        switch(_tool)
+                if(Input.MousePressed(MouseButton.Middle) && !Input.Mouse(MouseButton.Left))
+                    _tool = _tool == EditTool.PaintOne ? EditTool.PaintRectangle : EditTool.PaintOne;
+
+                if(Input.KeyPressed(Keys.R) && !_eraseMode && !Game.Input.Key(Keys.E))
+                {
+                    string flip = Input.Key(Keys.LeftShift) ? "flip-v" : "flip-h";
+                    Tile tile = BaseState.Map[Menu.SelectedTile.Layer, SelectedTile.X, SelectedTile.Y];
+                    TileMetadata meta = BaseState.Map.GetMetadata(Menu.SelectedTile.Layer, SelectedTile.X, SelectedTile.Y);
+
+                    int currentY = 0;
+                    // TODO: make it easier to call this function without removing menus
+                    TileAttributeEditor[] editors = tile.AttributeEditors(BaseState, ref currentY);
+
+                    if(editors != null)
+                    {
+                        foreach(TileAttributeEditor editor in editors)
+                        {
+                            if(editor.Name == flip)
+                            {
+                                bool enable = !(meta != null && meta.IsKeySet(flip) && meta[flip] == "True");
+
+                                if(enable)
+                                {
+                                    if(meta == null)
+                                        meta = new TileMetadata();
+                                    meta[flip] = "True";
+                                    BaseState.Map.SetMetadata(Menu.SelectedTile.Layer, SelectedTile.X, SelectedTile.Y, meta);
+                                }
+                                else
+                                    meta[flip] = "";
+                            }
+
+                            editor.Dispose();
+                        }
+                    }
+                }
+
+                switch(_tool)
 		        {
 			        case EditTool.PaintOne:
                         if(Input.Mouse(MouseButton.Left))

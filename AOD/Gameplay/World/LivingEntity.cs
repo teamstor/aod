@@ -120,6 +120,53 @@ namespace TeamStor.AOD.Gameplay.World
             }
         }
 
+        private int _xpValue;
+
+        /// <summary>
+        /// Amount of player experience. Used for leveling.
+        /// </summary>
+        public int XP
+        {
+            get
+            {
+                return _xpValue;
+            }
+            set
+            {
+                _xpValue = value;
+                while(_xpValue >= NeededXP)
+                {
+                    _xpValue -= NeededXP;
+                    Level++;
+
+                    if(OnLevelUp != null)
+                        OnLevelUp(this, Level, _xpValue);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Amount of XP needed to advance to the next level.
+        /// </summary>
+        public int NeededXP
+        {
+            get
+            {
+                // TODO: ändra ekvationen
+                return (Level * 100) + (Level * 5);
+            }
+        }
+
+        /// <param name="entity">The entity (wow)</param>
+        /// <param name="newLevel">The new level of the player</param>
+        /// <param name="xpLeft">The amount of XP left over after leveling</param>
+        public delegate void LevelUpDelegate(LivingEntity entity, int newLevel, int xpLeft);
+
+        /// <summary>
+        /// Event called when the entity levels up.
+        /// </summary>
+        public LevelUpDelegate OnLevelUp;
+
         /// <summary>
         /// Affects the amount of damage this entity gives with melee weapons.
         /// </summary>
@@ -144,6 +191,22 @@ namespace TeamStor.AOD.Gameplay.World
         /// Affects the maximum amount of magicka this entity has.
         /// </summary>
         public int Spirit;
+
+        /// <summary>
+        /// Base melee attack damage based on what weapon is equipped.
+        /// </summary>
+        public Tuple<int, int> MeleeAttackDamageRange
+        {
+            get
+            {
+                int min = !Inventory[InventoryEquipSlot.Weapon].IsEmptyReference && Inventory[InventoryEquipSlot.Weapon].Item is WeaponItem ?
+                    (Inventory[InventoryEquipSlot.Weapon].Item as WeaponItem).DamageRange.Item1 : 1;
+                int max = !Inventory[InventoryEquipSlot.Weapon].IsEmptyReference && Inventory[InventoryEquipSlot.Weapon].Item is WeaponItem ? 
+                    (Inventory[InventoryEquipSlot.Weapon].Item as WeaponItem).DamageRange.Item2 : 1;
+
+                return new Tuple<int, int>(min, max);
+            }
+        }
 
         /// <summary>
         /// Affects how much of a chance there is an enemy will hit your armor rather than you with a physical attack.

@@ -134,6 +134,52 @@ namespace TeamStor.AOD.Gameplay.World.UI
                 "[" + InputMap.FindMapping(InputAction.Player).Key + "] " + _entity.Name,
                 new Vector2(x, 8 + (bg.Height + 20) * (float)_offsetY.Value),
                 Color.White);
+
+            Player player = world.Player;
+            Point oldPosition = player.Position;
+            Direction oldHeading = player.Heading;
+            player.MoveInstantly(new Point(0, 0));
+
+            switch(((int)(_world.Game.Time * 3) % 4))
+            {
+                case 0:
+                    player.Heading = Direction.Left;
+                    break;
+
+                case 1:
+                    player.Heading = Direction.Up;
+                    break;
+
+                case 2:
+                    player.Heading = Direction.Right;
+                    break;
+
+                case 3:
+                    player.Heading = Direction.Down;
+                    break;
+            }
+
+            Matrix oldTransform = batch.Transform;
+            Vector3 scale, translation;
+            Quaternion rot;
+            batch.Transform.Decompose(out scale, out rot, out translation);
+            batch.Transform = oldTransform * Matrix.CreateTranslation((screenSize.X / 2 - 8) * scale.X, (70 + 16 + (bg.Height + 20) * (float)_offsetY.Value) * scale.Y, 0);
+
+            player.Draw(batch, false);
+            player.Draw(batch, true);
+
+            batch.Transform = oldTransform;
+            player.MoveInstantly(oldPosition);
+            player.Heading = oldHeading;
+
+            Vector2 measure = font.Measure(16, "Level " + player.Level);
+            batch.Text(font, 16, "Level " + player.Level, new Vector2(screenSize.X / 2 - measure.X / 2, 100 + (bg.Height + 20) * (float)_offsetY.Value), Color.White * 0.8f);
+
+            Rectangle xpBarRectangle = new Rectangle((int)screenSize.X / 2 - 80, (int)(120 + (bg.Height + 20) * (float)_offsetY.Value), 160, 2);
+            batch.Rectangle(xpBarRectangle, Color.White * 0.4f);
+
+            xpBarRectangle.Width = (int)(xpBarRectangle.Width * ((float)player.XP / player.NeededXP));
+            batch.Rectangle(xpBarRectangle, Color.White * 0.4f);
         }
 
         public static IEnumerator<ICoroutineOperation> Show(WorldState world, OnPlayerUICompleted completeEvent = null, bool noOffset = false)
