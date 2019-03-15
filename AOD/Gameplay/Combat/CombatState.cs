@@ -293,15 +293,18 @@ namespace TeamStor.AOD.Gameplay
             while(!_inventoryUI.IsShowingCompleted)
                 yield return null;
 
+            args.BackToPlayerTurn = !_inventoryUI.WasActionPerformedOnClose;
             _inventoryUI = null;
 
             _offset.TweenTo(40, TweenEaseType.EaseInOutCubic, 0.3f);
             while(!_offset.IsComplete)
                 yield return null;
 
-            args.BackToPlayerTurn = _inventoryUI.WasActionPerformedOnClose;
-            Menu.Page = CombatMenuPage.ActionSelection;
-            Menu.SelectedButton = Menu.Buttons[CombatMenuPage.ActionSelection].IndexOf("Inventory");
+            if(args.BackToPlayerTurn)
+            {
+                Menu.Page = CombatMenuPage.ActionSelection;
+                Menu.SelectedButton = Menu.Buttons[CombatMenuPage.ActionSelection].IndexOf("Inventory");
+            }
         }
 
         private IEnumerator<ICoroutineOperation> RunCombat()
@@ -360,6 +363,9 @@ namespace TeamStor.AOD.Gameplay
                 {
                     subAction = AttackAction(true, args);
                     while(subAction.MoveNext()) yield return subAction.Current;
+                    
+                    if(args.Stop)
+                        break;
                 }
 
                 args.BackToPlayerTurn = false;
@@ -378,8 +384,13 @@ namespace TeamStor.AOD.Gameplay
 
             yield return Wait.Seconds(Game, 0.6);
 
-            typeof(Game).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(Game, Combatant.World);
-            OnLeave(Combatant.World);
+            if(Combatant.Health <= 0)
+                Game.CurrentState = new GameOverState();
+            else
+            {
+                typeof(Game).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(Game, Combatant.World);
+                OnLeave(Combatant.World);
+            }
         }
 
         public override void Update(double deltaTime, double totalTime, long count)

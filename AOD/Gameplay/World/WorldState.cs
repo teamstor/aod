@@ -558,11 +558,6 @@ namespace TeamStor.AOD.Gameplay.World
             Paused = false;
             _transitionType = TransitionType.Normal;
 
-            if(Player.Health <= 0)
-            {
-                // player dead
-            }
-
             if((enemy as LivingEntity).Health <= 0)
                 Player.XP += (enemy as LivingEntity).XP;
         }

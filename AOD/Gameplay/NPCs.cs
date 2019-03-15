@@ -24,6 +24,7 @@ namespace TeamStor.AOD.Gameplay
                 npc.KillXP = 10000;
 
                 npc.Inventory[InventoryEquipSlot.Head] = npc.Inventory.Push(Item.TestItem);
+                npc.Inventory[InventoryEquipSlot.Weapon] = npc.Inventory.Push(Item.Thunderfury);
             });
 
         /// <summary>
