@@ -10,6 +10,10 @@ namespace TeamStor.AOD
     public static class CityTiles
     {
         public static Tile Wall = new Tile("city/wall", Tile.MapLayer.Decoration, "Wall", "tiles/city/wall_wood.png", true);
+        public static Tile WallOak = new Tile("city/wall-oak", Tile.MapLayer.Decoration, "Wall (Oak)", "tiles/city/wall_wood_oak.png", true);
+        public static Tile WallRed = new Tile("city/wall-red", Tile.MapLayer.Decoration, "Wall (Red)", "tiles/city/wall_wood_red.png", true);
+        public static Tile WallEbony = new Tile("city/wall-ebony", Tile.MapLayer.Decoration, "Wall (Ebony)", "tiles/city/wall_wood_ebony.png", true);
+
         public static Tile Bricks = new Tile("city/bricks", Tile.MapLayer.Decoration, "Bricks", "tiles/city/wall_bricks.png", true);
         public static Tile StoneBricks = new Tile("city/stone-bricks", Tile.MapLayer.Decoration, "Stone Bricks", "tiles/city/wall_stone.png", true);
 
@@ -33,7 +37,8 @@ namespace TeamStor.AOD
         public static Tile WindowOrange = new Tile("city/window-orange", Tile.MapLayer.Decoration, "Orange Window", "tiles/city/window/orange.png", true);
         public static Tile WindowPurple = new Tile("city/window-purple", Tile.MapLayer.Decoration, "Purple Window", "tiles/city/window/purple.png", true);
         public static Tile WindowRed = new Tile("city/window-red", Tile.MapLayer.Decoration, "Red Window", "tiles/city/window/red.png", true);
-
+       
+        public static Tile WindowBlinds = new Tile("city/window-blinds", Tile.MapLayer.Decoration, "Window Blinds", "tiles/city/window/blinds.png", true);
         public static Tile WindowStone = new Tile("city/window-stone", Tile.MapLayer.Decoration, "Stone Window", "tiles/city/window/stone.png", true);
 
         public static Tile RoofBeam = new RoofBeamTile("city/beam-roof", Tile.MapLayer.Decoration, "Roof Beam", "tiles/city/beam/side.png", true);

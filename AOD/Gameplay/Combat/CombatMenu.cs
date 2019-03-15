@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TeamStor.Engine;
 using TeamStor.Engine.Graphics;
-
+using TeamStor.Engine.Tween;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 
 namespace TeamStor.AOD.Gameplay
@@ -124,6 +124,21 @@ namespace TeamStor.AOD.Gameplay
         public CombatPendingPlayerAction PendingAction
         {
             get; private set;
+        }
+        
+        /// <summary>
+        /// Armor slots animation to show.
+        /// </summary>
+        public bool[] AttackSlots { get; set; } = null;
+        
+        /// <summary>
+        /// Armor slots animation (0.0f = arrow in middle of screen)
+        /// </summary>
+        public TweenedDouble AttackSlotAnimation { get; private set; }
+
+        public CombatMenu(CombatState combat)
+        {
+            AttackSlotAnimation = new TweenedDouble(combat.Game, 0);
         }
 
         /// <summary>
@@ -346,6 +361,18 @@ namespace TeamStor.AOD.Gameplay
             }
 
             batch.Text(font, 16, Message, new Vector2(menuRectangle.X + 20, menuRectangle.Y + 14), Color.White);
+
+            if(AttackSlots != null)
+            {
+                for(int i = 0; i < AttackSlots.Length; i++)
+                {
+                    int x = i * 8 - (int)AttackSlotAnimation.Value + 5;
+                    batch.Texture(new Vector2(x, menuRectangle.Y + 30),  state.Assets.Get<Texture2D>(AttackSlots[i] ? "combat/block.png" : "combat/hit.png"), Color.White);
+                }
+
+                int offsetY = (int)(Math.Sin(state.Game.Time * 10) * 2);
+                batch.Texture(new Vector2(menuRectangle.X + menuRectangle.Width / 2 - 3, menuRectangle.Y + 44 + offsetY), state.Assets.Get<Texture2D>("combat/arrow.png"), Color.White);
+            }
         }
     }
 }

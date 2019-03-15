@@ -175,6 +175,9 @@ namespace TeamStor.AOD.Editor
 
             Category walls = new Category("Wall", "");
             walls.Objects.Add(CityTiles.Wall);
+            walls.Objects.Add(CityTiles.WallOak);
+            walls.Objects.Add(CityTiles.WallRed);
+            walls.Objects.Add(CityTiles.WallEbony);
             walls.Objects.Add(CityTiles.Bricks);
             walls.Objects.Add(CityTiles.StoneBricks);
             walls.Objects.Add(Separator);
@@ -197,6 +200,7 @@ namespace TeamStor.AOD.Editor
             windows.Objects.Add(CityTiles.WindowRed);
             windows.Objects.Add(CityTiles.WindowPurple);
             windows.Objects.Add(Separator);
+            windows.Objects.Add(CityTiles.WindowBlinds);
             windows.Objects.Add(CityTiles.WindowStone);
             Categories.Last().Objects.Add(windows);
 

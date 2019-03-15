@@ -15,6 +15,8 @@ namespace TeamStor.AOD
             AttributeTransitionTexture((d, m, e) => { return "tiles/transitions/water_color.png"; });
 
         public static Tile ShallowWater = new AnimatedTile("shallow-water", Tile.MapLayer.Terrain, "Shallow Water", "tiles/water/shallow/{frame}.png", 4, 2, true, 995).
-            AttributeTransitionTexture((d, m, e) => { return "tiles/transitions/water_light_color.png"; });
+            AttributeName((d, m, e) => { return e == Map.Environment.Swamp ? "Swamp Water" : d; }).
+            AttributeTransitionTexture((d, m, e) => { return "tiles/transitions/water_color.png"; }).
+            AttributeTextureName((d, m, e) => { return e == Map.Environment.Swamp ? d.Replace("shallow", "swamp") : d; });
     }
 }

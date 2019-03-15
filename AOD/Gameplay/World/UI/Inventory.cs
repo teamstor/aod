@@ -386,7 +386,7 @@ namespace TeamStor.AOD.Gameplay.World.UI
                     }
                 }
 
-                if(_state is CombatState && !(_sortedList[_selectedSlot].Item is CombatItem) && _rightPaneSelected)
+                if(_state is CombatState && _selectedSlot != -1 && !(_sortedList[_selectedSlot].Item is CombatItem) && _rightPaneSelected)
                     _rightPaneSelected = false;
             }
         }

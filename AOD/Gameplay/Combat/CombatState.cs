@@ -51,7 +51,7 @@ namespace TeamStor.AOD.Gameplay
         public CombatMenu Menu
         {
             get; private set;
-        } = new CombatMenu();
+        }
 
         /// <summary>
         /// Entity that currently has the turn in combat.
@@ -97,6 +97,8 @@ namespace TeamStor.AOD.Gameplay
 
         public override void OnEnter(GameState previousState)
         {
+            Menu = new CombatMenu(this);
+            
             if(_transitionRenderTarget == null)
                 _transitionRenderTarget = new RenderTarget2D(Game.GraphicsDevice, 480, 270, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
 
@@ -130,22 +132,107 @@ namespace TeamStor.AOD.Gameplay
 
         private IEnumerator<ICoroutineOperation> AttackAction(bool fromEnemy, CombatActionArgs args)
         {
-            int armor = fromEnemy ? Combatant.PhysicalArmor : Enemy.PhysicalArmor;
-            if(armor > 100)
-                armor = 100;
-
-            bool didHit = (new Random()).Next() % 100 > armor;
-
             LivingEntity attackingEntity = fromEnemy ? Enemy : Combatant;
-            int damage = attackingEntity.MeleeAttackDamageRange.Item1 +
-                new Random().Next() % (attackingEntity.MeleeAttackDamageRange.Item2 - attackingEntity.MeleeAttackDamageRange.Item1);
+            LivingEntity attackedEntity = fromEnemy ? Combatant : Enemy;
 
-            if(fromEnemy)
+            Random random = new Random();
+            int armorSlots = attackedEntity.PhysicalArmor;
+            if(armorSlots > 100)
+                armorSlots = 100;
+            
+            bool didHit = random.Next() % 100 > armorSlots;
+            Inventory.ItemSlotReference hitArmorPiece = attackedEntity.Inventory[Inventory.EMPTY_SLOT];
+
+            if(!didHit)
             {
-
+                foreach(InventoryEquipSlot slot in ((InventoryEquipSlot[])Enum.GetValues(typeof(InventoryEquipSlot))).OrderBy(x => random.Next()))
+                {
+                    if(!attackedEntity.Inventory[slot].IsEmptyReference)
+                    {
+                        hitArmorPiece = attackedEntity.Inventory[slot];
+                        break;
+                    }
+                }
+            }
+                        
+            int damage = attackingEntity.MeleeAttackDamageRange.Item1;
+            if(attackingEntity.MeleeAttackDamageRange.Item2 != attackingEntity.MeleeAttackDamageRange.Item1)
+            {
+                damage = attackingEntity.MeleeAttackDamageRange.Item1 +
+                         random.Next() % (attackingEntity.MeleeAttackDamageRange.Item2 - attackingEntity.MeleeAttackDamageRange.Item1);
             }
 
-            yield return null;
+            if(!fromEnemy)
+            {
+                bool[] slots = new bool[200];
+
+                int slotsFilled = armorSlots;
+                while(slotsFilled > 0)
+                {
+                    int tries = 150;
+                    int rand;
+                    while(slots[(rand = random.Next()) % 100] && tries > 0) { tries--; }
+                    slots[rand % 100] = true;
+                    
+                    slotsFilled--;
+                }
+                
+                if(armorSlots == 100)
+                    for(int i = 0; i < 100; i++)
+                        slots[i] = true;
+                
+                // always land on 72
+                slots[64] = !didHit;
+
+                // duplicate
+                for(int i = 0; i < 100; i++)
+                    slots[i + 100] = slots[i];
+                
+                yield return Wait.Seconds(Game, 0.5);
+
+                Menu.AttackSlots = slots;
+                Menu.AttackSlotAnimation.TweenTo(0, TweenEaseType.Linear, 0);
+                Menu.AttackSlotAnimation.TweenTo((8 * 164) - 480 / 2, TweenEaseType.EaseOutSine, 2);
+
+                while(!Menu.AttackSlotAnimation.IsComplete)
+                {
+                    if(InputMap.FindMapping(InputAction.Action).Pressed(Input))
+                    {
+                        Menu.AttackSlotAnimation.TweenTo((8 * 164) - 480 / 2, TweenEaseType.Linear, 0);
+                        break;
+                    }
+                    
+                    yield return null;
+                }
+
+                yield return Wait.Seconds(Game, 1.5);
+                Menu.AttackSlots = null;
+            }
+
+            string attackMsg = "";
+
+            if(didHit)
+            {
+                if(damage > attackedEntity.MaxHealth / 2)
+                    attackMsg = "{attacker} hit {attacked} for an astonishing {dmg} damage!!!";
+                else if(damage < attackedEntity.MaxHealth / 10)
+                    attackMsg = "{attacker} hit {attacked} for {dmg} damage like a wet noodle.";
+                else
+                    attackMsg = "{attacker} hit {attacked} for {dmg} damage.";
+            }
+            else
+                attackMsg = "{attacker} got blocked by {attacked}'s {apiece}.";
+
+            attackMsg = attackMsg.
+                Replace("{attacker}", attackingEntity.Name).
+                Replace("{attacked}", attackedEntity.Name).
+                Replace("{dmg}", damage.ToString()).
+                Replace("{apiece}", hitArmorPiece.Item?.Name);
+
+            yield return Wait.Seconds(Game, 0.5);
+            Menu.ShowMessage(attackMsg, true, Game.Time + 3.5);
+            yield return Wait.Seconds(Game, 3.5);
+            yield return Wait.Seconds(Game, 0.5);
         }
 
         private IEnumerator<ICoroutineOperation> RunAwayAction(CombatActionArgs args)
@@ -232,10 +319,6 @@ namespace TeamStor.AOD.Gameplay
                         subAction = OpenInventoryAction(args);
                         while(subAction.MoveNext()) yield return subAction.Current;
                         break;
-
-                    default:
-                        // wtf
-                        break;
                 }
 
                 if(args.Stop)
@@ -308,8 +391,7 @@ namespace TeamStor.AOD.Gameplay
         
             batch.Transform = oldTransform;
 
-            if(Turn == CombatTurn.Player)
-                Menu.Draw(batch, new Rectangle(0, (int)(270 - (float)_offset.Value * 2), 270, Assets.Get<Texture2D>("combat/menu.png").Height), this);
+            Menu.Draw(batch, new Rectangle(0, (int)(270 - (float)_offset.Value * 2), 480, Assets.Get<Texture2D>("combat/menu.png").Height), this);
 
             if(_showWarning)
             {
