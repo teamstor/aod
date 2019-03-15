@@ -570,6 +570,16 @@ namespace TeamStor.AOD.Gameplay.World.UI
                         new Vector2(blockRectangle.X + 4, blockRectangle.Y - 4), Color.White);
                 }
 
+                if(reference.Item is WeaponItem)
+                {
+                    string text = "Damage: " + 
+                                  (reference.Item as WeaponItem).DamageRange.Item1 + "-" + (reference.Item as WeaponItem).DamageRange.Item2 + 
+                                  " (scales with " + ((reference.Item as WeaponItem).UsesAgility ? "agility" : "strength") + ")";
+                    measure = font.Measure(16, text);
+                    
+                    batch.Text(font, 16, text, new Vector2(infoRectangle.X + infoRectangle.Width / 2 - measure.X / 2, infoRectangle.Y + 90 - 8), Color.White);
+                }
+
                 int x = 0;
                 batch.Text(font, 16, "Actions", new Vector2(infoRectangle.X + x + 10, infoRectangle.Y + infoRectangle.Height - 72 - 8), Color.White);
 
