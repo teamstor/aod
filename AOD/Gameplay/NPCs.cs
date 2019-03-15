@@ -16,16 +16,7 @@ namespace TeamStor.AOD.Gameplay
         /// A pig. Nöff nöff.
         /// </summary>
         public static NPCTemplate Pig = new NPCTemplate("Pig", "pig", new PigNPCBehavior()).
-            AttributeInitializeSelf((npc) =>
-            {
-                npc.Level = 4;
-                npc.Vitality = 10;
-                npc.Health = npc.MaxHealth;
-                npc.KillXP = 10000;
-
-                npc.Inventory[InventoryEquipSlot.Head] = npc.Inventory.Push(Item.TestItem);
-                npc.Inventory[InventoryEquipSlot.Weapon] = npc.Inventory.Push(Item.Thunderfury);
-            });
+            AttributeInitializeSelf((npc) => { npc.KillXP = 10; });
 
         /// <summary>
         /// A green test pig.

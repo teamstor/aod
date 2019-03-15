@@ -21,7 +21,7 @@ namespace TeamStor.AOD
             if(!metadata.IsKeySet("map-file"))
                 return;
 
-            WorldState.SpawnArgs args = new WorldState.SpawnArgs(new Point(-1, -1), Gameplay.Direction.Down);
+            WorldState.SpawnArgs args = new WorldState.SpawnArgs(new Point(-1, -1), Gameplay.Direction.Down, world.Player);
 
             if(metadata.IsKeySet("custom-spawn-position"))
             {

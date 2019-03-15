@@ -64,10 +64,11 @@ namespace TeamStor.AOD.Gameplay.World
         // Used when spawning the player.
         public struct SpawnArgs
         {
-            public SpawnArgs(Point position, Direction direction)
+            public SpawnArgs(Point position, Direction direction, Player oldPlayer)
             {
                 Position = position;
                 Direction = direction;
+                OldPlayer = oldPlayer;
             }
 
             /// <summary>
@@ -79,6 +80,11 @@ namespace TeamStor.AOD.Gameplay.World
             /// Direction the player will spawn in.
             /// </summary>
             public Direction Direction;
+            
+            /// <summary>
+            /// Player to copy over.
+            /// </summary>
+            public Player OldPlayer;
         }
 
         private SpawnArgs _spawnArgs;
@@ -150,7 +156,7 @@ namespace TeamStor.AOD.Gameplay.World
             _useTransiton = transition;
         }
 
-        public WorldState(Map map, bool transition = false) : this(map, new SpawnArgs(new Point(-1, -1), Direction.Down), transition) { }
+        public WorldState(Map map, bool transition = false) : this(map, new SpawnArgs(new Point(-1, -1), Direction.Down, null), transition) { }
 
         public override void OnEnter(GameState previousState)
         {
@@ -348,14 +354,7 @@ namespace TeamStor.AOD.Gameplay.World
 
             batch.Transform = oldTransform;
 
-            batch.Rectangle(new Rectangle(8, 8, (int)(80 * ((float)Player.Health / Player.MaxHealth)), 20), Color.DarkRed);
-            batch.Outline(new Rectangle(8, 8, 80, 20), Color.White);
-
-            batch.Rectangle(new Rectangle(480 - 8 - 80, 8, (int)(80 * ((float)Player.Magicka / Player.MaxMagicka)), 20), Color.DarkBlue);
-            batch.Outline(new Rectangle(480 - 8 - 80, 8, 80, 20), Color.White);
-
-            batch.Text(Assets.Get<Font>("fonts/Alkhemikal.ttf"), 16, Player.Health.ToString(), new Vector2(14, 14 - 8), Color.White);
-            batch.Text(Assets.Get<Font>("fonts/Alkhemikal.ttf"), 16, Player.Magicka.ToString(), new Vector2(480 - 2 - 80, 14 - 8), Color.White);
+            Font alkhemikal = Assets.Get<Font>("fonts/Alkhemikal.ttf");
 
             Rectangle transitionRectangle = Rectangle.Empty;
             if(Player.Heading == Direction.Up)
@@ -363,9 +362,9 @@ namespace TeamStor.AOD.Gameplay.World
             if(Player.Heading == Direction.Down)
                 transitionRectangle = new Rectangle(0, (int)(270 * (1.0 - _transition)), 480, 270);
 
-            Vector2 measure = Assets.Get<Font>("fonts/Alkhemikal.ttf").Measure(16, Map.Info.Name);
+            Vector2 measure = alkhemikal.Measure(16, Map.Info.Name);
 
-            batch.Text(Assets.Get<Font>("fonts/Alkhemikal.ttf"), 16, Map.Info.Name,
+            batch.Text(alkhemikal, 16, Map.Info.Name,
                 new Vector2(screenSize.X / 2 - measure.X / 2, 40),
                 Color.Goldenrod * _drawNameAlpha);
 
@@ -503,7 +502,7 @@ namespace TeamStor.AOD.Gameplay.World
 
             WorldState newState =
                 spawnArgs.HasValue ? new WorldState(newMap, spawnArgs.Value, transition) :
-                new WorldState(newMap, transition);
+                new WorldState(newMap, new SpawnArgs(new Point(-1, -1), Direction.Down, Player), transition);
 
             if(transition)
             {

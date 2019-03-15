@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,13 +23,29 @@ namespace TeamStor.AOD.Gameplay
         private double _landWhen = 0;
         private double _keyHeld;
         private Keys _keyQueued = Keys.None;
+        
+        private SortedDictionary<string, Quest> _activeQuests = new SortedDictionary<string, Quest>();
 
+        /// <summary>
+        /// The maximum number of quests the player can have active at one time.
+        /// </summary>
+        public const int MAX_QUESTS = 3;
+        
+        /// <summary>
+        /// All active quests.
+        /// </summary>
+        public ICollection<Quest> Quests
+        {
+            get { return _activeQuests.Values; }
+        }
+
+        public Player(WorldState world, Player player) : this(world)
+        {
+            _activeQuests = player._activeQuests;
+        }
+        
         public Player(WorldState world) : base(world, "Player")
         {
-            Inventory.Push(Item.TestItem);
-            Inventory.Push(Item.TestItem2);
-            Inventory.Push(Item.Thunderfury);
-
             Speed = 3.5;
             MoveInstantly(new Point(0, 0));
 
@@ -42,13 +59,13 @@ namespace TeamStor.AOD.Gameplay
             }
 
             NextPosition = Position;
-
-            Level = 8;
-            XP = NeededXP / 3;
         }
 
         public void Update(double deltaTime, double totalTime, long count)
         {
+            foreach(Quest quest in Quests)
+                quest.OnQuestTick(this);
+            
             if(!IsWalking)
             {
                 if(InputMap.FindMapping(InputAction.Inventory).Pressed(World.Input))
@@ -185,6 +202,58 @@ namespace TeamStor.AOD.Gameplay
                 0,
                 null,
                 Heading == Direction.Right ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+        }
+
+        /// <summary>
+        /// Adds a new quest to the players quest list.
+        /// </summary>
+        /// <param name="quest">The quest to add.</param>
+        /// <returns>The added quest.</returns>
+        public Quest AddQuest(Quest quest)
+        {
+            string id = quest.Priority + quest.ID;
+
+            if(_activeQuests.ContainsKey(id))
+                throw new Exception("A quest with the ID " + id + " is already active.");
+            
+            if(_activeQuests.Count >= MAX_QUESTS)
+                throw new Exception("Max quest count exceeded.");
+            
+            _activeQuests.Add(id, quest);
+            quest.OnQuestAdded(this);
+
+            return quest;
+        }
+        
+        /// <summary>
+        /// Finds a quest in the players quest list.
+        /// </summary>
+        /// <param name="id">The ID of the quest.</param>
+        /// <returns>The quest, or null.</returns>
+        public Quest FindActiveQuestByID(string id)
+        {
+            if(_activeQuests.ContainsKey(QuestPriority.Main + id))
+                return _activeQuests[QuestPriority.Main + id];
+            if(_activeQuests.ContainsKey(QuestPriority.Side + id))
+                return _activeQuests[QuestPriority.Side + id];
+            if(_activeQuests.ContainsKey(id))
+                return _activeQuests[id];
+
+            return null;
+        }
+
+        /// <summary>
+        /// Finishes an active quest.
+        /// </summary>
+        /// <param name="id">ID of the quest.</param>
+        public void FinishQuest(string id)
+        {
+            Quest quest = FindActiveQuestByID(id);
+            if(quest != null)
+            {
+                quest.OnQuestFinished(this);
+                _activeQuests.Remove(quest.Priority + quest.ID);
+            }
         }
     }
 }

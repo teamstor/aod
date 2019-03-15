@@ -89,6 +89,7 @@
     <Compile Include="Gameplay\NPCs.cs" />
     <Compile Include="Gameplay\NPCTemplate.cs" />
     <Compile Include="Gameplay\Player.cs" />
+    <Compile Include="Gameplay\Quest.cs" />
     <Compile Include="Gameplay\Save\Save.cs" />
     <Compile Include="Gameplay\Save\SaveRecord.cs" />
     <Compile Include="Gameplay\World\Camera.cs" />
@@ -172,6 +173,9 @@
       <Project>{ac5ae28d-4948-4eb1-9be8-45b750b52b20}</Project>
       <Name>TeamStor.Engine</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Gameplay\Quests" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
