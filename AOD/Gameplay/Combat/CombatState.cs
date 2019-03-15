@@ -44,6 +44,8 @@ namespace TeamStor.AOD.Gameplay
 
         private TweenedDouble _offset;
         private bool _showWarning = false;
+        
+        private Vector2 _shakeOffset = Vector2.Zero;
 
         /// <summary>
         /// The combat menu.
@@ -209,6 +211,22 @@ namespace TeamStor.AOD.Gameplay
                 Menu.AttackSlots = null;
             }
 
+            if(didHit)
+            {
+                for(int i = 0; i < 6; i++)
+                {
+                    int factor = 3;
+                    if(damage > attackedEntity.MaxHealth / 2)
+                        factor = 5;
+                    if(damage < attackedEntity.MaxHealth / 10)
+                        factor = 2;
+                    _shakeOffset = new Vector2((random.Next() % factor) * (random.Next() % 3 - 1), (random.Next() % factor) * (random.Next() % 3 - 1));
+                    yield return Wait.Seconds(Game, 0.03);
+                }
+                
+                _shakeOffset = Vector2.Zero;
+            }
+
             string attackMsg = "";
 
             if(didHit)
@@ -232,6 +250,19 @@ namespace TeamStor.AOD.Gameplay
             yield return Wait.Seconds(Game, 0.5);
             Menu.ShowMessage(attackMsg, true, Game.Time + 3.5);
             yield return Wait.Seconds(Game, 3.5);
+
+            if(didHit)
+                attackedEntity.Health -= damage;
+
+            if(attackedEntity.Health <= 0)
+            {
+                yield return Wait.Seconds(Game, 0.5);
+                Menu.ShowMessage(fromEnemy ? "You died." : attackedEntity.Name + " was defeated. " + attackedEntity.KillXP + " XP gained.", true, Game.Time + 3.5);
+                yield return Wait.Seconds(Game, 3.5);
+
+                args.Stop = true;
+            }
+            
             yield return Wait.Seconds(Game, 0.5);
         }
 
@@ -326,8 +357,8 @@ namespace TeamStor.AOD.Gameplay
 
                 if(!args.BackToPlayerTurn)
                 {
-                    // enemy turn
-                    yield return null;
+                    subAction = AttackAction(true, args);
+                    while(subAction.MoveNext()) yield return subAction.Current;
                 }
 
                 args.BackToPlayerTurn = false;
@@ -372,6 +403,8 @@ namespace TeamStor.AOD.Gameplay
             }
             else
                 screenSize = Program.ScaleBatch(batch);
+            
+            batch.Transform = Matrix.CreateTranslation(_shakeOffset.X, _shakeOffset.Y, 0) * batch.Transform;
 
             string bg = "combat/plains.png";
 

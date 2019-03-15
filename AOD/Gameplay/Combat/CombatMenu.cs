@@ -366,7 +366,7 @@ namespace TeamStor.AOD.Gameplay
             {
                 for(int i = 0; i < AttackSlots.Length; i++)
                 {
-                    int x = i * 8 - (int)AttackSlotAnimation.Value + 5;
+                    int x = i * 8 - (int)AttackSlotAnimation.Value - 4;
                     batch.Texture(new Vector2(x, menuRectangle.Y + 30),  state.Assets.Get<Texture2D>(AttackSlots[i] ? "combat/block.png" : "combat/hit.png"), Color.White);
                 }
 

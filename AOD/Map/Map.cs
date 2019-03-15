@@ -793,7 +793,7 @@ namespace TeamStor.AOD
 
             if(layer == Tile.MapLayer.Terrain)
             {
-                (WaterTiles.DeepWaterOrVoid as AnimatedTile).UpdateCurrentFrameWithGame(game);
+                (WaterTiles.DeepWaterOrVoid as AnimatedTile).UpdateCurrentFrameWithGame(game, new Point(0, 0));
 
                 if(Info.Environment == Environment.Inside)
                     game.Batch.Rectangle(drawRectangle, Color.Black);

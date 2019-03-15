@@ -150,11 +150,7 @@ namespace TeamStor.AOD.Gameplay.World
         /// </summary>
         public int NeededXP
         {
-            get
-            {
-                // TODO: ändra ekvationen
-                return (Level * 100) + (Level * 5);
-            }
+            get { return Level * 10; }
         }
 
         /// <param name="entity">The entity (wow)</param>
@@ -207,6 +203,11 @@ namespace TeamStor.AOD.Gameplay.World
                 return new Tuple<int, int>(min, max);
             }
         }
+        
+        /// <summary>
+        /// Amount of XP rewarded when killing this entity.
+        /// </summary>
+        public int KillXP = 0;
 
         /// <summary>
         /// Affects how much of a chance there is an enemy will hit your armor rather than you with a physical attack.
