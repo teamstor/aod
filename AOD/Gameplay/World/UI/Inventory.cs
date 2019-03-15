@@ -70,6 +70,16 @@ namespace TeamStor.AOD.Gameplay.World.UI
                 return _offsetY;
             }
         }
+        
+        /// <summary>
+        /// If the inventory should close when an action was performed.
+        /// </summary>
+        public bool CloseOnAction { get; set; }
+        
+        /// <summary>
+        /// If an action was performed before closing.
+        /// </summary>
+        public bool WasActionPerformedOnClose { get; private set; }
 
         /// <summary>
         /// Creates a standalone inventory UI that needs to be updated manually.
@@ -353,6 +363,12 @@ namespace TeamStor.AOD.Gameplay.World.UI
                         }
 
                         _selectedAction = oldAction;
+
+                        if(CloseOnAction)
+                        {
+                            WasActionPerformedOnClose = true;
+                            _closed = true;
+                        }
                     }
                 }
                 else if(_selectedSlot != -1 && !_rightPaneSelected)

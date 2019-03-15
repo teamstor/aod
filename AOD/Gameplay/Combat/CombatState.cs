@@ -288,6 +288,7 @@ namespace TeamStor.AOD.Gameplay
                 yield return null;
 
             _inventoryUI = new InventoryUI(Combatant, this);
+            _inventoryUI.CloseOnAction = true;
 
             while(!_inventoryUI.IsShowingCompleted)
                 yield return null;
@@ -298,7 +299,7 @@ namespace TeamStor.AOD.Gameplay
             while(!_offset.IsComplete)
                 yield return null;
 
-            args.BackToPlayerTurn = true;
+            args.BackToPlayerTurn = _inventoryUI.WasActionPerformedOnClose;
             Menu.Page = CombatMenuPage.ActionSelection;
             Menu.SelectedButton = Menu.Buttons[CombatMenuPage.ActionSelection].IndexOf("Inventory");
         }

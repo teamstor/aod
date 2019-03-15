@@ -66,6 +66,7 @@
     <Compile Include="Editor\States\MapEditorEditAttributesState.cs" />
     <Compile Include="Editor\States\MapEditorEditInfoState.cs" />
     <Compile Include="Editor\States\MapEditorModeState.cs" />
+    <Compile Include="Editor\States\MapEditorPlayerViewState.cs" />
     <Compile Include="Editor\States\MapEditorShowKeybindsState.cs" />
     <Compile Include="Editor\States\MapEditorTileEditState.cs" />
     <Compile Include="Editor\ChoiceField.cs" />

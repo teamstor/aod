@@ -167,11 +167,25 @@ namespace TeamStor.AOD.Editor
 				Active = false
 			});
 			
+			Buttons.Add("player-view-mode", new Button
+			{
+				Text = "",
+				Icon = Assets.Get<Texture2D>("editor/player.png"),
+				Position = new TweenedVector2(Game, new Vector2(-200, 114 + 32 * 4)),
+				Font = Game.DefaultFonts.Normal,
+				Clicked = (btn) =>
+				{
+					CurrentState = new MapEditorPlayerViewState();
+				},
+
+				Active = false
+			});
+			
 			Buttons.Add("playtest", new Button
 			{
 				Text = "",
 				Icon = Assets.Get<Texture2D>("editor/arrow.png"),
-				Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 4)),
+				Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 5)),
 				Font = Game.DefaultFonts.Normal,
 				Clicked = (btn) =>
 				{
@@ -185,7 +199,7 @@ namespace TeamStor.AOD.Editor
             {
                 Text = "",
                 Icon = Assets.Get<Texture2D>("editor/load.png"),
-                Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 5)),
+                Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 6)),
                 Font = Game.DefaultFonts.Normal,
                 Clicked = (btn) =>
                 {
@@ -215,7 +229,7 @@ namespace TeamStor.AOD.Editor
 			{
 				Text = "",
 				Icon = Assets.Get<Texture2D>("editor/save.png"),
-				Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 6)),
+				Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 7)),
 				Font = Game.DefaultFonts.Normal,
 				Clicked = (btn) =>
 				{
@@ -244,7 +258,7 @@ namespace TeamStor.AOD.Editor
 			{
 				Text = "",
 				Icon = Assets.Get<Texture2D>("editor/exit.png"),
-				Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 7)),
+				Position = new TweenedVector2(Game, new Vector2(-200, 118 + 32 * 8)),
 				Font = Game.DefaultFonts.Normal,
 				Clicked = (btn) => { _exiting = true; },
 
@@ -255,11 +269,12 @@ namespace TeamStor.AOD.Editor
             Buttons["edit-attributes-mode"].Position.TweenTo(new Vector2(10, 114 + 32), TweenEaseType.EaseOutQuad, 0.65f);
             Buttons["edit-info-mode"].Position.TweenTo(new Vector2(10, 114 + 32 * 2), TweenEaseType.EaseOutQuad, 0.65f);
 			Buttons["keybinds-help-mode"].Position.TweenTo(new Vector2(10, 114 + 32 * 3), TweenEaseType.EaseOutQuad, 0.65f);
+			Buttons["player-view-mode"].Position.TweenTo(new Vector2(10, 114 + 32 * 4), TweenEaseType.EaseOutQuad, 0.65f);
 
-            Buttons["playtest"].Position.TweenTo(new Vector2(10, 118 + 32 * 4), TweenEaseType.EaseOutQuad, 0.65f);
-            Buttons["load"].Position.TweenTo(new Vector2(10, 118 + 32 * 5), TweenEaseType.EaseOutQuad, 0.65f);
-			Buttons["save"].Position.TweenTo(new Vector2(10, 118 + 32 * 6), TweenEaseType.EaseOutQuad, 0.65f);
-			Buttons["exit"].Position.TweenTo(new Vector2(10, 118 + 32 * 7), TweenEaseType.EaseOutQuad, 0.65f);
+            Buttons["playtest"].Position.TweenTo(new Vector2(10, 118 + 32 * 5), TweenEaseType.EaseOutQuad, 0.65f);
+            Buttons["load"].Position.TweenTo(new Vector2(10, 118 + 32 * 6), TweenEaseType.EaseOutQuad, 0.65f);
+			Buttons["save"].Position.TweenTo(new Vector2(10, 118 + 32 * 7), TweenEaseType.EaseOutQuad, 0.65f);
+			Buttons["exit"].Position.TweenTo(new Vector2(10, 118 + 32 * 8), TweenEaseType.EaseOutQuad, 0.65f);
 
             _topTextY = new TweenedDouble(Game, -300);
             _topTextY.TweenTo(10, TweenEaseType.EaseOutQuad, 0.65f);
@@ -292,6 +307,8 @@ namespace TeamStor.AOD.Editor
 					return "Edit map info";
 				if(!Buttons["keybinds-help-mode"].Active && Buttons["keybinds-help-mode"].Rectangle.Contains(Input.MousePosition))
 					return "Show key bindings";
+				if(!Buttons["player-view-mode"].Active && Buttons["player-view-mode"].Rectangle.Contains(Input.MousePosition))
+					return "Show player view";
 
                 if(!Buttons["playtest"].Active && Buttons["playtest"].Rectangle.Contains(Input.MousePosition))
                     return "Playtest map";
@@ -350,6 +367,7 @@ namespace TeamStor.AOD.Editor
             Buttons["edit-attributes-mode"].Active = CurrentState is MapEditorEditAttributesState;
             Buttons["edit-info-mode"].Active = CurrentState is MapEditorEditInfoState;
 			Buttons["keybinds-help-mode"].Active = CurrentState is MapEditorShowKeybindsState;
+			Buttons["player-view-mode"].Active = CurrentState is MapEditorPlayerViewState;
 
             if(_dataOperation == DataOperation.None && !CurrentState.IsPointObscured(Game.Input.MousePosition))
             {
