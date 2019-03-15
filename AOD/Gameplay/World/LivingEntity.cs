@@ -193,6 +193,22 @@ namespace TeamStor.AOD.Gameplay.World
         public int Spirit;
 
         /// <summary>
+        /// Base melee attack damage based on what weapon is equipped.
+        /// </summary>
+        public Tuple<int, int> MeleeAttackDamageRange
+        {
+            get
+            {
+                int min = !Inventory[InventoryEquipSlot.Weapon].IsEmptyReference && Inventory[InventoryEquipSlot.Weapon].Item is WeaponItem ?
+                    (Inventory[InventoryEquipSlot.Weapon].Item as WeaponItem).DamageRange.Item1 : 1;
+                int max = !Inventory[InventoryEquipSlot.Weapon].IsEmptyReference && Inventory[InventoryEquipSlot.Weapon].Item is WeaponItem ? 
+                    (Inventory[InventoryEquipSlot.Weapon].Item as WeaponItem).DamageRange.Item2 : 1;
+
+                return new Tuple<int, int>(min, max);
+            }
+        }
+
+        /// <summary>
         /// Affects how much of a chance there is an enemy will hit your armor rather than you with a physical attack.
         /// 1-100, 100 is a guaranteed block.
         /// A random physical armor item should lose durability when hit.

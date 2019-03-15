@@ -37,6 +37,11 @@ namespace TeamStor.AOD.Gameplay
         None,
 
         /// <summary>
+        /// Attacks the enemy with a melee weapon.
+        /// </summary>
+        AttackMelee,
+
+        /// <summary>
         /// Attempts to run away from the enemy.
         /// </summary>
         AttemptRunAway,
@@ -174,7 +179,12 @@ namespace TeamStor.AOD.Gameplay
                     switch(Page)
                     {
                         case CombatMenuPage.ActionSelection:
-                            if(Buttons[Page][SelectedButton] == "Magic")
+                            if(Buttons[Page][SelectedButton] == "Attack")
+                            {
+                                PendingAction = CombatPendingPlayerAction.AttackMelee;
+                                Page = CombatMenuPage.None;
+                            }
+                            else if(Buttons[Page][SelectedButton] == "Magic")
                                 Page = CombatMenuPage.MagicSelection;
                             else if(Buttons[Page][SelectedButton] == "Inventory")
                             {
