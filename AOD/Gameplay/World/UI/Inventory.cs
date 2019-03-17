@@ -505,14 +505,14 @@ namespace TeamStor.AOD.Gameplay.World.UI
                         {
                             if(slot != InventoryEquipSlot.None && _entity.Inventory[slot].Slot == reference.Slot)
                             {
-                                batch.Texture(new Vector2(statusX, y), _state.Assets.Get<Texture2D>("items/icons/status/equipped.png"), Color.White * 0.5f);
+                                batch.Texture(new Vector2(statusX, y), _state.Assets.Get<Texture2D>("icons/equipped.png"), Color.White * 0.5f);
                                 drawn = true;
                                 break;
                             }
                         }
 
                         if(!drawn)
-                            batch.Texture(new Vector2(statusX, y), _state.Assets.Get<Texture2D>("items/icons/status/not_equipped.png"), Color.White * 0.5f);
+                            batch.Texture(new Vector2(statusX, y), _state.Assets.Get<Texture2D>("icons/not_equipped.png"), Color.White * 0.5f);
 
                         statusX -= 10;
                     }
@@ -520,7 +520,7 @@ namespace TeamStor.AOD.Gameplay.World.UI
                     // unusable
                     if(_state is CombatState && !(reference.Item is CombatItem))
                     {
-                        batch.Texture(new Vector2(statusX, y), _state.Assets.Get<Texture2D>("items/icons/status/unusable.png"), Color.White * 0.5f);
+                        batch.Texture(new Vector2(statusX, y), _state.Assets.Get<Texture2D>("icons/unusable.png"), Color.White * 0.5f);
                         statusX -= 10;
                     }
                 }

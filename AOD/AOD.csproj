@@ -141,7 +141,11 @@
     <Compile Include="Map\Tile\Categories\WaterTiles.cs" />
     <Compile Include="Map\Tile\TileMetadata.cs" />
     <Compile Include="Map\Tile\TileTransitionCache.cs" />
+    <Compile Include="Menu\Elements\MenuButton.cs" />
+    <Compile Include="Menu\Elements\MenuLabel.cs" />
     <Compile Include="Menu\MainMenuState.cs" />
+    <Compile Include="Menu\MenuElement.cs" />
+    <Compile Include="Menu\MenuPage.cs" />
     <Compile Include="Menu\MenuUI.cs" />
     <Compile Include="OpenMapState.cs" />
     <Compile Include="PreloaderState.cs" />
