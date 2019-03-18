@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using TeamStor.Engine;
@@ -10,10 +11,12 @@ namespace TeamStor.AOD.Menu
 	/// <summary>
 	/// A menu UI page.
 	/// </summary>
-	public class MenuPage
+	public class MenuPage : IEnumerable<MenuElement>
 	{
 		private double _timeUpHeld = 0;
 		private double _timeDownHeld = 0;
+
+        private List<MenuElement> _elements = new List<MenuElement>();
 		
 		/// <summary>
 		/// Parent menu.
@@ -28,7 +31,7 @@ namespace TeamStor.AOD.Menu
 		/// <summary>
 		/// Menu elements on this page.
 		/// </summary>
-		public List<MenuElement> Elements { get; private set; } = new List<MenuElement>();
+		public ICollection<MenuElement> Elements { get { return _elements; } }
 		
 		/// <summary>
 		/// Current selected element.
@@ -36,46 +39,96 @@ namespace TeamStor.AOD.Menu
 		/// </summary>
 		public int SelectedElement { get; private set; }
 
-		public MenuPage(int fixedWidth, MenuElement initialElement)
+        public Vector2 Area
+        {
+            get
+            {
+                int maxWidth = FixedWidth;
+                int height = 0;
+
+                foreach(MenuElement element in _elements)
+                {
+                    Vector2 measure = element.Measure;
+                    Vector4 margins = element.Margins;
+                    height += (int)margins.Y;
+                    height += (int)measure.Y;
+                    height += (int)margins.W;
+
+                    if(FixedWidth == -1)
+                    {
+                        int width = (int)margins.X + (int)measure.Y + (int)margins.Z;
+                        if(width > maxWidth)
+                            maxWidth = width;
+                    }
+                }
+
+                return new Vector2(maxWidth, height);
+            }
+        }
+
+        public MenuPage(int fixedWidth = -1)
 		{
 			FixedWidth = fixedWidth;
-			
-			Elements.Add(initialElement);
-			initialElement.Page = this;
-			initialElement.OnSelected(null);
 		}
 
-		public Vector2 Area
-		{
-			get
-			{
-				int maxWidth = FixedWidth;
-				int height = 0;
+        /// <summary>
+        /// Adds a new element to this page.
+        /// </summary>
+        /// <param name="element">The element to add.</param>
+        /// <param name="after">The element this element should be added after (null = end or start of page)</param>
+        /// <param name="over">If the element should be added over <paramref name="after"/>. </param>
+        /// <returns>The added element, or an exception if the element does not belong to this page.</returns>
+        public MenuElement Add(MenuElement element, MenuElement after = null, bool over = false)
+        {
+            if(element.Page == null)
+                element.Page = this;
+            if(element.Page != this)
+                throw new Exception("MenuElement must be created with the correct page");
 
-				foreach(MenuElement element in Elements)
-				{
-					Vector2 measure = element.Measure;
-					Vector4 margins = element.Margins;
-					height += (int)margins.Y;
-					height += (int)measure.Y;
-					height += (int)margins.W;
+            int indexOf = _elements.IndexOf(after);
+            if(after == null || indexOf == -1 || (indexOf == 0 && over) || (indexOf == _elements.Count - 1 && !over))
+            {
+                if(over)
+                    _elements.Insert(0, element);
+                else
+                    _elements.Add(element);
+            }
+            else
+                _elements.Insert(indexOf + (over ? -1 : 1), element);
 
-					if(FixedWidth == -1)
-					{
-						int width = (int)margins.X + (int)measure.Y + (int)margins.Z;
-						if(width > maxWidth)
-							maxWidth = width;
-					}
-				}
-				
-				return new Vector2(maxWidth, height);
-			}
-		}
+            if(_elements.Count == 1)
+                _elements[0].OnSelected(null);
+
+            return element;
+        }
+
+        /// <summary>
+        /// Removes a menu element. 
+        /// </summary>
+        /// <param name="element">The element to remove</param>
+        /// <returns>True if menu element was removed.</returns>
+        public bool Remove(MenuElement element)
+        {
+            if(element.Selected)
+                element.OnDeselected(null);
+            return _elements.Remove(element);
+        }
+
+        /// <summary>
+        /// Removes the element at the specified index.
+        /// </summary>
+        /// <param name="index">The index to remove an element from.</param>
+        public void RemoveAt(int index)
+        {
+            if(_elements[index].Selected)
+                _elements[index].OnDeselected(null);
+            _elements.RemoveAt(index);
+        }
 
 		private IEnumerator<ICoroutineOperation> ChangeSelectionCoroutine(int selection, MenuElement oldElement, float waitTimeBefore, float waitTimeAfter)
 		{
 			yield return Wait.Seconds(Parent.Parent.Game, waitTimeBefore);
-			Elements[selection].OnSelected(oldElement);
+            _elements[selection].OnSelected(oldElement);
 			yield return Wait.Seconds(Parent.Parent.Game, waitTimeAfter);
 			SelectedElement = selection;
 		}
@@ -105,6 +158,7 @@ namespace TeamStor.AOD.Menu
 		{
 			if(SelectedElement != -1)
 			{
+                int direction = 1;
 				int nextElement = SelectedElement;
 
 				double lastTimeUpHeld = _timeUpHeld;
@@ -124,20 +178,36 @@ namespace TeamStor.AOD.Menu
 
 				if(InputMap.FindMapping(InputAction.Up).Pressed(input) || _timeUpHeld > 0.3)
 				{
-					nextElement = SelectedElement == 0 ? Elements.Count - 1 : SelectedElement - 1;
+					nextElement = SelectedElement == 0 ? _elements.Count - 1 : SelectedElement - 1;
 					isKeyRepeat = !InputMap.FindMapping(InputAction.Up).Pressed(input);
-				}
+                    direction = -1;
+                }
 
 				if(InputMap.FindMapping(InputAction.Down).Pressed(input) || _timeDownHeld > 0.3)
 				{
-					nextElement = SelectedElement == Elements.Count - 1 ? 0 : SelectedElement + 1;
+					nextElement = SelectedElement == _elements.Count - 1 ? 0 : SelectedElement + 1;
 					isKeyRepeat = !InputMap.FindMapping(InputAction.Down).Pressed(input);
+                    direction = 1;
 				}
+
+                int originPoint = nextElement;
+                while(!_elements[nextElement].Selectable)
+                {
+                    nextElement += direction;
+                    if(direction == -1 && nextElement < 0)
+                        nextElement = _elements.Count - 1;
+                    if(direction == 1 && nextElement > _elements.Count - 1)
+                        nextElement = 0;
+
+                    // if we've gone a full loop there's no point in trying
+                    if(nextElement == originPoint)
+                        break;
+                }
 
 				if(nextElement != SelectedElement)
 				{
-					MenuElement oldElement = Elements[SelectedElement];
-					Elements[SelectedElement].OnDeselected(Elements[nextElement]);
+					MenuElement oldElement = _elements[SelectedElement];
+                    _elements[SelectedElement].OnDeselected(_elements[nextElement]);
 					
 					SelectedElement = -1;
 					Parent.Parent.Coroutine.AddExisting(ChangeSelectionCoroutine(nextElement, oldElement, 0.05f, isKeyRepeat ? 0.03f : 0f));
@@ -146,12 +216,12 @@ namespace TeamStor.AOD.Menu
 				}
 				
 				if(InputMap.FindMapping(InputAction.Action).Held(input))
-					Elements[SelectedElement].OnClicked(!InputMap.FindMapping(InputAction.Action).Pressed(input));
+                    _elements[SelectedElement].OnClicked(!InputMap.FindMapping(InputAction.Action).Pressed(input));
 				
 				if(InputMap.FindMapping(InputAction.Left).Held(input))
-					Elements[SelectedElement].OnLeftButton(!InputMap.FindMapping(InputAction.Left).Pressed(input));
+                    _elements[SelectedElement].OnLeftButton(!InputMap.FindMapping(InputAction.Left).Pressed(input));
 				if(InputMap.FindMapping(InputAction.Right).Held(input))
-					Elements[SelectedElement].OnRightButton(!InputMap.FindMapping(InputAction.Right).Pressed(input));
+                    _elements[SelectedElement].OnRightButton(!InputMap.FindMapping(InputAction.Right).Pressed(input));
 			}
 		}
 
@@ -163,17 +233,26 @@ namespace TeamStor.AOD.Menu
 		{
 			int y = area.Y;
 			
-			foreach(MenuElement element in Elements)
+			foreach(MenuElement element in _elements)
 			{
 				Vector2 measure = element.Measure;
 				Vector4 margins = element.Margins;
 
 				y += (int)margins.Y;
-				measure.X += margins.X + margins.Z;
-				element.OnDraw(batch, new Vector2(element.Center ? area.X + area.Width / 2 - measure.X / 2 : area.X + margins.X, y));
+				element.OnDraw(batch, new Vector2(element.Center ? area.X + area.Width / 2 - measure.X / 2 : area.X + margins.X, y), measure);
 				y += (int)measure.Y;
 				y += (int)margins.W;
 			}
 		}
-	}
+
+        public IEnumerator<MenuElement> GetEnumerator()
+        {
+            return Elements.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return Elements.GetEnumerator();
+        }
+    }
 }

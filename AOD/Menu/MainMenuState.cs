@@ -22,18 +22,9 @@ namespace TeamStor.AOD.Menu
         
         public override void OnEnter(GameState previousState)
         {
-            UI = new MenuUI(this, "main", new MenuPage(150, new MenuButton(null)), true);
-            UI.SelectedPage.Elements.Add(new MenuButton(UI.SelectedPage));
-            UI.SelectedPage.Elements.Add(new MenuButton(UI.SelectedPage));
-            UI.SelectedPage.Elements.Add(new MenuButton(UI.SelectedPage));
-            UI.SelectedPage.Elements.Add(new MenuButton(UI.SelectedPage));
-            UI.SelectedPage.Elements.Add(new MenuButton(UI.SelectedPage));
-            UI.SelectedPage.Elements.Add(new MenuButton(UI.SelectedPage));
-            UI.SelectedPage.Elements.Add(new MenuButton(UI.SelectedPage));
-            UI.SelectedPage.Elements.Add(new MenuButton(UI.SelectedPage));
-            UI.SelectedPage.Elements.Add(new MenuButton(UI.SelectedPage));
+            MenuPage mainPage = new MenuPage(150);
 
-
+            UI = new MenuUI(this, "main", mainPage, true);
             UI.Toggle();
             
             Game.IsMouseVisible = false;

@@ -43,6 +43,11 @@ namespace TeamStor.AOD.Menu
 		/// </summary>
 		public bool Selected = false;
 
+        /// <summary>
+        /// If this element can be selected.
+        /// </summary>
+        public virtual bool Selectable { get { return true; } }
+
 		public MenuElement(MenuPage page)
 		{
 			Page = page;
@@ -89,6 +94,7 @@ namespace TeamStor.AOD.Menu
 		/// </summary>
 		/// <param name="batch">The sprite batch to draw with.</param>
 		/// <param name="position">The position to draw the element at.</param>
-		public abstract void OnDraw(SpriteBatch batch, Vector2 position);
+        /// <param name="mySize">Size of the element being drawn.</param>
+		public abstract void OnDraw(SpriteBatch batch, Vector2 position, Vector2 mySize);
 	}
 }
