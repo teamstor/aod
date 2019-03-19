@@ -47,7 +47,7 @@ namespace TeamStor.AOD.Gameplay.World.UI
             MenuPage mainPage = new MenuPage(150);
             mainPage.Add(new MenuButton(mainPage, "Resume Game", "icons/start_game.png")).
                 RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) _closed = true; });
-            mainPage.Add(new MenuButton(mainPage, "Options", "icons/settings.png", "", "", true)).
+            mainPage.Add(new MenuButton(mainPage, "Options", "icons/settings.png", "", "")).
                 RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) _options.SwitchToOptionsPage(); });
             // TODO: add "are you sure"
             mainPage.Add(new MenuButton(mainPage, "Return To Main Menu", "icons/arrow_left.png")).

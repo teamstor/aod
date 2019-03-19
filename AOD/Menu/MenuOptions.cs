@@ -33,9 +33,9 @@ namespace TeamStor.AOD.Menu
                 (e, h) => { if(!h) ui.Parent.Game.VSync = !ui.Parent.Game.VSync; });
 
             optionsPage.Add(new MenuSpacer(4));
-            optionsPage.Add(new MenuButton(optionsPage, "Audio", "icons/audio.png", "", "", true)).
+            optionsPage.Add(new MenuButton(optionsPage, "Audio", "icons/audio.png", "", "")).
                 RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) ui.SwitchPage("__options/audio", false); });
-            optionsPage.Add(new MenuButton(optionsPage, "Input", "icons/input.png", "", "", true)).
+            optionsPage.Add(new MenuButton(optionsPage, "Input", "icons/input.png", "", "")).
                 RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) ui.SwitchPage("__options/input", false); });
             optionsPage.Add(new MenuSpacer(4));
             optionsPage.Add(new MenuButton(optionsPage, "Back", "icons/arrow_left.png")).

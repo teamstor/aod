@@ -27,7 +27,7 @@ namespace TeamStor.AOD.Menu
             mainPage.Add(new MenuButton(mainPage, "Start New Game", "icons/start_game.png"));
             mainPage.Add(new MenuButton(mainPage, "Load Game", "icons/load_game.png"));
             mainPage.Add(new MenuSpacer(4));
-            mainPage.Add(new MenuButton(mainPage, "Options", "icons/settings.png", "", "", true)).
+            mainPage.Add(new MenuButton(mainPage, "Options", "icons/settings.png", "", "")).
                 RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) OptionsUI.SwitchToOptionsPage(); });
             mainPage.Add(new MenuButton(mainPage, "Exit Game", "icons/arrow_left.png")).
                 RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) Game.Exit(); });
