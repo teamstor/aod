@@ -45,16 +45,27 @@ namespace TeamStor.AOD.Gameplay.World.UI
         private IEnumerator<ICoroutineOperation> ShowCoroutine()
         {
             MenuPage mainPage = new MenuPage(150);
+            mainPage.Add(new MenuLabel(mainPage, "Level " + _world.Player.Level + " " + _world.Player.Name + ", " + _world.Map.Info.Name));
+            mainPage.Add(new MenuSpacer(8));
             mainPage.Add(new MenuButton(mainPage, "Resume Game", "icons/start_game.png")).
                 RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) _closed = true; });
             mainPage.Add(new MenuButton(mainPage, "Options", "icons/settings.png", "", "")).
                 RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) _options.SwitchToOptionsPage(); });
-            // TODO: add "are you sure"
             mainPage.Add(new MenuButton(mainPage, "Return To Main Menu", "icons/arrow_left.png")).
+                RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) _menu.SwitchPage("confirm"); });
+            
+            MenuPage confirmPage = new MenuPage(180);
+            confirmPage.Add(new MenuLabel(confirmPage, "Are you sure you want to quit?"));
+            confirmPage.Add(new MenuLabel(confirmPage, "Unsaved progress will be lost", "", "", 0.8f));
+            confirmPage.Add(new MenuSpacer(4));
+            confirmPage.Add(new MenuButton(confirmPage, "Go Back", "icons/arrow_right.png")).
+                RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) _menu.SwitchPage("main", true); });
+            confirmPage.Add(new MenuButton(confirmPage, "Return To Main Menu", "icons/arrow_left.png")).
                 RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) _world.Game.CurrentState = new MainMenuState(); });
-
+            
             _menu = new MenuUI(_world, "main", mainPage, true);
             _options = new MenuOptions(_menu, "main");
+            _menu.AddPage("confirm", confirmPage);
 
             _alpha = new TweenedDouble(_world.Game, 0);
 

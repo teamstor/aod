@@ -37,14 +37,14 @@ namespace TeamStor.AOD.Menu
             
             MenuPage creditsPage = new MenuPage(250);
             creditsPage.Add(new MenuLabel(creditsPage, "Age of Darkness " + Program.VERSION));
-            creditsPage.Add(new MenuLabel(creditsPage, "Made with MonoGame and Team STOR Engine", "", "", 0.6f));
+            creditsPage.Add(new MenuLabel(creditsPage, "Made with MonoGame and Team STOR Engine"));
             creditsPage.Add(new MenuLabel(creditsPage, ""));
             creditsPage.Add(new MenuLabel(creditsPage, "Programming"));
-            creditsPage.Add(new MenuLabel(creditsPage, "Hannes Mann", "", "", 0.6f));
+            creditsPage.Add(new MenuLabel(creditsPage, "Hannes Mann", "", "", 0.8f));
             creditsPage.Add(new MenuLabel(creditsPage, ""));
             creditsPage.Add(new MenuLabel(creditsPage, "Game Design and Art"));
-            creditsPage.Add(new MenuLabel(creditsPage, "Kasper Kjällström", "", "", 0.6f));
-            creditsPage.Add(new MenuLabel(creditsPage, "Henrik Eriksson", "", "", 0.6f));
+            creditsPage.Add(new MenuLabel(creditsPage, "Kasper Kjällström", "", "", 0.8f));
+            creditsPage.Add(new MenuLabel(creditsPage, "Henrik Eriksson", "", "", 0.8f));
             creditsPage.Add(new MenuSpacer(4));
             creditsPage.Add(new MenuButton(creditsPage, "Back", "icons/arrow_left.png")).
                 RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) UI.SwitchPage("main", true); });
