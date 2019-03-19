@@ -107,15 +107,15 @@ namespace TeamStor.AOD.Menu
 
 			if(closing)
 			{
-				Area.TweenTo(new Vector2(RecalculateArea(SelectedPageID).X, 7 * 2), TweenEaseType.Linear, 0.14f);
+				Area.TweenTo(new Vector2(RecalculateArea(SelectedPageID).X, 7 * 2), TweenEaseType.EaseInOutSine, 0.14f);
 				yield return Wait.Seconds(Parent.Game, 0.14f - 0.06f);
-				_alpha.TweenTo(closing ? 0 : 1, TweenEaseType.Linear, 0.06f);
+				_alpha.TweenTo(closing ? 0 : 1, TweenEaseType.EaseInOutSine, 0.06f);
 				yield return Wait.Seconds(Parent.Game, 0.06f);
 			}
 			else
 			{
-				Area.TweenTo(RecalculateArea(SelectedPageID), TweenEaseType.Linear, 0.14f);
-				_alpha.TweenTo(closing ? 0 : 1, TweenEaseType.Linear, 0.06f);
+				Area.TweenTo(RecalculateArea(SelectedPageID), TweenEaseType.EaseInOutSine, 0.14f);
+				_alpha.TweenTo(closing ? 0 : 1, TweenEaseType.EaseInOutSine, 0.06f);
 				yield return Wait.Seconds(Parent.Game, 0.14f);
 			}
 
@@ -143,8 +143,8 @@ namespace TeamStor.AOD.Menu
         {
             string lastID = SelectedPageID;
             SelectedPage.OnPageLeave(_nextPageID);
-            Area.TweenTo(RecalculateArea(_nextPageID), TweenEaseType.Linear, 0.2f);
-            _pageTransition.TweenTo(1, TweenEaseType.Linear, 0.2f);
+            Area.TweenTo(RecalculateArea(_nextPageID), TweenEaseType.EaseInOutSine, 0.2f);
+            _pageTransition.TweenTo(1, TweenEaseType.EaseInOutSine, 0.2f);
 
             yield return Wait.Seconds(Parent.Game, 0.2f);
             SelectedPageID = _nextPageID;
