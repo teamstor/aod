@@ -37,7 +37,7 @@ namespace TeamStor.AOD
             if(game.VSync != Settings.VSync)
                 game.VSync = Settings.VSync;
 
-            MediaPlayer.Volume = MathHelper.Clamp((float)(Settings.MasterVolume * Settings.MusicVolume), 0.0f, 1.0f);
+            MediaPlayer.Volume = MathHelper.Clamp((float)(Settings.MasterVolume / 100f * Settings.MusicVolume / 100f), 0.0f, 1.0f);
             
             // makes sure all tiles and npcs are available at startup
             System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(DefaultTiles).TypeHandle);
@@ -92,7 +92,7 @@ namespace TeamStor.AOD
             if(Settings.VSync != game.VSync)
                 Settings.VSync = game.VSync;
             
-            MediaPlayer.Volume = MathHelper.Clamp((float)(Settings.MasterVolume * Settings.MusicVolume), 0.0f, 1.0f);
+            MediaPlayer.Volume = MathHelper.Clamp((float)(Settings.MasterVolume / 100f * Settings.MusicVolume / 100f), 0.0f, 1.0f);
             
             if(game.Input.Key(Keys.LeftShift) && 
                 game.Input.KeyPressed(Keys.F8) && 

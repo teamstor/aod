@@ -146,6 +146,7 @@
     <Compile Include="Menu\Elements\MenuSpacer.cs" />
     <Compile Include="Menu\MainMenuState.cs" />
     <Compile Include="Menu\MenuElement.cs" />
+    <Compile Include="Menu\MenuOptions.cs" />
     <Compile Include="Menu\MenuPage.cs" />
     <Compile Include="Menu\MenuUI.cs" />
     <Compile Include="OpenMapState.cs" />

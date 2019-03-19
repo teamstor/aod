@@ -18,9 +18,8 @@ namespace TeamStor.AOD.Menu
 {
     public class MenuState : GameState
     {
-        private MenuButton fullscreenButton, vsyncButton;
-
         public MenuUI UI;
+        public MenuOptions OptionsUI;
         
         public override void OnEnter(GameState previousState)
         {
@@ -29,28 +28,12 @@ namespace TeamStor.AOD.Menu
             mainPage.Add(new MenuButton(mainPage, "Load Game", "icons/load_game.png"));
             mainPage.Add(new MenuSpacer(4));
             mainPage.Add(new MenuButton(mainPage, "Options", "icons/settings.png", "", "", true)).
-                RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) UI.SwitchPage("options", false); });
+                RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) OptionsUI.SwitchToOptionsPage(); });
             mainPage.Add(new MenuButton(mainPage, "Exit Game", "icons/arrow_left.png")).
                 RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) Game.Exit(); });
 
-            MenuPage optionsPage = new MenuPage(150);
-            fullscreenButton = optionsPage.Add(new MenuButton(optionsPage, "Fullscreen: ?", "icons/fullscreen.png", "", "Displays the game over the\nwhole monitor")) as MenuButton;
-            fullscreenButton.RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) Game.Fullscreen = !Game.Fullscreen; });
-            
-            vsyncButton = optionsPage.Add(new MenuButton(optionsPage, "V-sync: ?", "icons/vsync.png", "", "Synchronizes the game to\nthe monitor")) as MenuButton;
-            vsyncButton.RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) Game.VSync = !Game.VSync; });
-
-            optionsPage.Add(new MenuSpacer(4));
-            optionsPage.Add(new MenuButton(optionsPage, "Audio", "icons/audio.png", "", "", true)).
-                RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) UI.SwitchPage("options/audio", false); });
-            optionsPage.Add(new MenuButton(optionsPage, "Input", "icons/input.png", "", "", true)).
-                RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) UI.SwitchPage("options/input", false); });
-            optionsPage.Add(new MenuSpacer(4));
-            optionsPage.Add(new MenuButton(optionsPage, "Back", "icons/arrow_left.png")).
-                RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) UI.SwitchPage("main", true); });
-
             UI = new MenuUI(this, "main", mainPage, true);
-            UI.AddPage("options", optionsPage);
+            OptionsUI = new MenuOptions(UI, "main");
 
             UI.Toggle();
             
@@ -64,9 +47,7 @@ namespace TeamStor.AOD.Menu
 
         public override void Update(double deltaTime, double totalTime, long count)
         {
-            fullscreenButton.Label = "Fullscreen: " + (Game.Fullscreen ? "On" : "Off");
-            vsyncButton.Label = "V-sync: " + (Game.VSync ? "On" : "Off");
-
+            OptionsUI.UpdateLabels();
             UI.Update(deltaTime, Input);
         }
 

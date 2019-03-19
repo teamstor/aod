@@ -24,12 +24,12 @@ namespace TeamStor.AOD
 		/// <summary>
 		/// Volume of all audio in the game.
 		/// </summary>
-		public static double MasterVolume = 0.5;
+		public static int MasterVolume = 50;
 		
 		/// <summary>
 		/// Volume of music relative to the master volume.
 		/// </summary>
-		public static double MusicVolume = 1.0;
+		public static int MusicVolume = 100;
 		
 		/// <summary>
 		/// Windows = %appdata%/teamstor/aod
@@ -98,10 +98,10 @@ namespace TeamStor.AOD
 											token = (string)reader.Value;
 
 											if(token == "master")
-												MasterVolume = reader.ReadAsInt32().Value / 100.0;
+												MasterVolume = reader.ReadAsInt32().Value;
 
 											if(token == "music")
-												MusicVolume = reader.ReadAsInt32().Value / 100.0;
+												MusicVolume = reader.ReadAsInt32().Value;
 										}
 										else if(reader.TokenType == JsonToken.EndObject)
 											break;
@@ -184,9 +184,9 @@ namespace TeamStor.AOD
                     writer.WritePropertyName("volume");
 					writer.WriteStartObject();
 					writer.WritePropertyName("master");
-					writer.WriteValue((int)(MasterVolume * 100.0));
+					writer.WriteValue(MasterVolume);
 					writer.WritePropertyName("music");
-					writer.WriteValue((int)(MusicVolume * 100.0));
+					writer.WriteValue(MusicVolume);
 					writer.WriteEndObject();
 					
 					writer.WritePropertyName("keyboard");
