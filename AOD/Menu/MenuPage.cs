@@ -127,7 +127,8 @@ namespace TeamStor.AOD.Menu
 
 		private IEnumerator<ICoroutineOperation> ChangeSelectionCoroutine(int selection, MenuElement oldElement, float waitTimeBefore, float waitTimeAfter)
 		{
-			yield return Wait.Seconds(Parent.Parent.Game, waitTimeBefore);
+            SelectedElement = -1;
+            yield return Wait.Seconds(Parent.Parent.Game, waitTimeBefore);
             _elements[selection].OnSelected(oldElement);
 			yield return Wait.Seconds(Parent.Parent.Game, waitTimeAfter);
 			SelectedElement = selection;
@@ -139,7 +140,13 @@ namespace TeamStor.AOD.Menu
 		/// <param name="lastPageID">The last page, or "".</param>
 		public void OnPageEnter(string lastPageID)
 		{
-			
+            if(SelectedElement != 0)
+            {
+                int lastElement = SelectedElement;
+                _elements[SelectedElement].OnDeselected(_elements[0]);
+                SelectedElement = 0;
+                _elements[SelectedElement].OnSelected(_elements[lastElement]);
+            }
 		}
 		
 		/// <summary>

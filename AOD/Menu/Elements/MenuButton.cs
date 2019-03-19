@@ -43,6 +43,12 @@ namespace TeamStor.AOD.Menu.Elements
         /// </summary>
         public MenuTextAlignment SublabelAlignment { get; set; } = MenuTextAlignment.Left;
 
+        /// <summary>
+        /// If an arrow should be shown besides the text when hovering.
+        /// Used for showing this button goes to another page.
+        /// </summary>
+        public bool ShowArrowOnHover { get; set; }
+
 
         public override Vector2 Measure
 		{
@@ -66,6 +72,8 @@ namespace TeamStor.AOD.Menu.Elements
                         firstLineWidth += Page.Parent.Parent.Assets.Get<Texture2D>(IconLeft).Bounds.Width + 5;
                     if(IconRight != "")
                         firstLineWidth += Page.Parent.Parent.Assets.Get<Texture2D>(IconRight).Bounds.Width + 5;
+                    if(ShowArrowOnHover)
+                        firstLineWidth += 5 * 2;
 
                     int secondLineWidth = 0;
 
@@ -100,11 +108,12 @@ namespace TeamStor.AOD.Menu.Elements
 			}
 		}
 
-        public MenuButton(MenuPage page, 
-            string label, 
-            string icon = "", 
-            string iconRight = "", 
-            string sublabel = "", 
+        public MenuButton(MenuPage page,
+            string label,
+            string icon = "",
+            string iconRight = "",
+            string sublabel = "",
+            bool showArrow = false,
             MenuTextAlignment labelAlign = MenuTextAlignment.Left, 
             MenuTextAlignment sublabelAlign = MenuTextAlignment.Left) : base(page)
 		{
@@ -113,6 +122,8 @@ namespace TeamStor.AOD.Menu.Elements
 
             IconLeft = icon;
             IconRight = iconRight;
+
+            ShowArrowOnHover = showArrow;
 
             LabelAlignment = labelAlign;
             SublabelAlignment = sublabelAlign;
@@ -154,9 +165,15 @@ namespace TeamStor.AOD.Menu.Elements
 
                         if(IconRight != "")
                             x -= iconRight.Bounds.Width + 5;
+                        if(ShowArrowOnHover)
+                            x -= 5 * 2;
                     }
 
                     batch.Text(_font, 16, s, new Vector2(x, y), Color.White * alpha);
+
+                    if(ShowArrowOnHover && Selected)
+                        batch.Texture(new Vector2(x + measure.X + 5, y + 9), Page.Parent.Parent.Assets.Get<Texture2D>("icons/arrow_right.png"), Color.White * alpha);
+
                     y += 8;
                 }
             }
@@ -183,6 +200,8 @@ namespace TeamStor.AOD.Menu.Elements
 
                         if(IconRight != "")
                             x -= iconRight.Width + 5;
+                        if(ShowArrowOnHover)
+                            x -= 5 * 2;
                     }
 
                     batch.Text(_font, 16, s, new Vector2(x, y), Color.White * alpha * 0.6f);
