@@ -185,6 +185,9 @@ namespace TeamStor.AOD.Menu
             _pageTransitionGoingBack = goingBack;
             _nextPageID = nextPageID;
 
+            if(!goingBack)
+	            _pages[_nextPageID].ResetSelectedElement();
+
             Parent.Coroutine.AddExisting(switchOperation);
             return switchOperation;
         }

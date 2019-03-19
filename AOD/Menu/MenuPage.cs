@@ -134,19 +134,23 @@ namespace TeamStor.AOD.Menu
 			SelectedElement = selection;
 		}
 
+		public void ResetSelectedElement()
+		{
+			if(SelectedElement != 0)
+			{
+				int lastElement = SelectedElement;
+				_elements[SelectedElement].OnDeselected(_elements[0]);
+				SelectedElement = 0;
+				_elements[SelectedElement].OnSelected(_elements[lastElement]);
+			}
+		}
+
 		/// <summary>
 		/// Called when this page is entered.
 		/// </summary>
 		/// <param name="lastPageID">The last page, or "".</param>
 		public void OnPageEnter(string lastPageID)
 		{
-            if(SelectedElement != 0)
-            {
-                int lastElement = SelectedElement;
-                _elements[SelectedElement].OnDeselected(_elements[0]);
-                SelectedElement = 0;
-                _elements[SelectedElement].OnSelected(_elements[lastElement]);
-            }
 		}
 		
 		/// <summary>

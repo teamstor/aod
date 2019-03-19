@@ -42,6 +42,11 @@ namespace TeamStor.AOD.Menu.Elements
         /// Alignment of the label.
         /// </summary>
         public MenuTextAlignment Alignment { get; set; } = MenuTextAlignment.Left;
+        
+        /// <summary>
+        /// Opacity of the text.
+        /// </summary>
+        public float Opacity { get; set; } = 1.0f;
 
         public override Vector2 Measure
         {
@@ -98,13 +103,14 @@ namespace TeamStor.AOD.Menu.Elements
             }
         }
 
-        public MenuLabel(MenuPage page, string label, string icon = "", string iconRight = "", MenuTextAlignment align = MenuTextAlignment.Left) : base(page)
+        public MenuLabel(MenuPage page, string label, string icon = "", string iconRight = "", float opacity = 1, MenuTextAlignment align = MenuTextAlignment.Left) : base(page)
         {
             Text = label;
 
             IconLeft = icon;
             IconRight = iconRight;
 
+            Opacity = opacity;
             Alignment = align;
         }
 
@@ -117,9 +123,9 @@ namespace TeamStor.AOD.Menu.Elements
             Texture2D iconRight = IconRight == "" ? null : Page.Parent.Parent.Assets.Get<Texture2D>(IconRight);
 
             if(iconLeft != null)
-                batch.Texture(position + new Vector2(0, (int)mySize.Y / 2 - iconLeft.Height / 2), iconLeft, Color.White);
+                batch.Texture(position + new Vector2(0, (int)mySize.Y / 2 - iconLeft.Height / 2), iconLeft, Color.White * Opacity);
             if(iconRight != null)
-                batch.Texture(position + new Vector2(myWidth - iconRight.Width, (int)mySize.Y / 2 - iconRight.Height / 2), iconRight, Color.White);
+                batch.Texture(position + new Vector2(myWidth - iconRight.Width, (int)mySize.Y / 2 - iconRight.Height / 2), iconRight, Color.White * Opacity);
 
             if(!string.IsNullOrWhiteSpace(Text))
             {
@@ -142,7 +148,7 @@ namespace TeamStor.AOD.Menu.Elements
                             x -= iconRight.Bounds.Width + 5;
                     }
 
-                    batch.Text(_font, 16, s, new Vector2(x, y), Color.White);
+                    batch.Text(_font, 16, s, new Vector2(x, y), Color.White * Opacity);
                     y += 8;
                 }
             }
