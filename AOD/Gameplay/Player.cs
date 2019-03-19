@@ -90,6 +90,13 @@ namespace TeamStor.AOD.Gameplay
                     return;
                 }
 
+                if(InputMap.FindMapping(InputAction.Menu).Pressed(World.Input))
+                {
+                    PauseMenuUI.Show(World);
+                    return;
+                }
+
+
                 Direction _lastHeading = Heading;
 
                 if(InputMap.FindMapping(InputAction.Up).Held(World.Input))

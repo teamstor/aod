@@ -16,7 +16,7 @@ using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
 
 namespace TeamStor.AOD.Menu
 {
-    public class MenuState : GameState
+    public class MainMenuState : GameState
     {
         public MenuUI UI;
         public MenuOptions OptionsUI;

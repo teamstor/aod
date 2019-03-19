@@ -104,7 +104,7 @@ namespace TeamStor.AOD
 			while(!_mapsLoaded)
 				yield return null;
 			
-			Game.CurrentState = new MenuState();
+			Game.CurrentState = new MainMenuState();
 		}
 
 		public override void Update(double deltaTime, double totalTime, long count)

@@ -52,8 +52,8 @@ namespace TeamStor.AOD
         SwitchTabRight,
 
         /// <summary>
-        /// Used for running.
+        /// Used for opening/closing the pause menu
         /// </summary>
-        Run
+        Menu
     }
 }

@@ -410,7 +410,7 @@ namespace TeamStor.AOD.Editor
                 CurrentState.Update(deltaTime, totalTime, count);
 
             if(_exiting)
-                Game.CurrentState = new MenuState();
+                Game.CurrentState = new MainMenuState();
 
             if(_doPlaytest)
             {
