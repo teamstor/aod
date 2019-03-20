@@ -47,8 +47,8 @@ namespace TeamStor.AOD.Menu
             UI.Toggle();
             yield return Wait.Seconds(Game, 0.3f);
 
-            _exitTransition.TweenTo(1, TweenEaseType.Linear, 2f);
-            yield return Wait.Seconds(Game, 2.5f);
+            _exitTransition.TweenTo(1, TweenEaseType.Linear, 1.5f);
+            yield return Wait.Seconds(Game, 2f);
 
             Game.CurrentState = new StoryMenuState();
         }
