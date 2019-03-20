@@ -150,6 +150,7 @@
     <Compile Include="Menu\MenuOptions.cs" />
     <Compile Include="Menu\MenuPage.cs" />
     <Compile Include="Menu\MenuUI.cs" />
+    <Compile Include="Menu\StoryMenuState.cs" />
     <Compile Include="OpenMapState.cs" />
     <Compile Include="PreloaderState.cs" />
     <Compile Include="Program.cs" />

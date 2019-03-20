@@ -13,6 +13,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TeamStor.AOD.Menu.Elements;
 using SpriteBatch = TeamStor.Engine.Graphics.SpriteBatch;
+using TeamStor.Engine.Tween;
+using TeamStor.Engine.Coroutine;
 
 namespace TeamStor.AOD.Menu
 {
@@ -20,11 +22,49 @@ namespace TeamStor.AOD.Menu
     {
         public MenuUI UI;
         public MenuOptions OptionsUI;
+
+        private TweenedDouble _exitTransition;
+
+        private IEnumerator<ICoroutineOperation> TransitionToStoryCoroutine()
+        {
+            foreach(MenuElement e in UI.SelectedPage)
+            {
+                if(e is MenuButton && (e as MenuButton).IconLeft == "icons/start_game.png")
+                {
+                    for(int i = 0; i < 3; i++)
+                    {
+                        e.OnDeselected(null);
+                        yield return Wait.Seconds(Game, 0.08f);
+                        e.OnSelected(null);
+                        yield return Wait.Seconds(Game, 0.08f);
+                    }
+
+                    e.OnDeselected(null);
+                    yield return Wait.Seconds(Game, 0.4f);
+                }
+            }
+
+            UI.Toggle();
+            yield return Wait.Seconds(Game, 0.3f);
+
+            _exitTransition.TweenTo(1, TweenEaseType.Linear, 2f);
+            yield return Wait.Seconds(Game, 2.5f);
+
+            Game.CurrentState = new StoryMenuState();
+        }
         
         public override void OnEnter(GameState previousState)
         {
+            _exitTransition = new TweenedDouble(Game, 0);
+
             MenuPage mainPage = new MenuPage(150);
-            mainPage.Add(new MenuButton(mainPage, "Start New Game", "icons/start_game.png"));
+            mainPage.Add(new MenuButton(mainPage, "Start New Game", "icons/start_game.png")).
+                RegisterEvent(MenuElement.EventType.Clicked, (e, h) => 
+                {
+                    if(!h && Coroutine.Active.Count == 0)
+                        Coroutine.Start(TransitionToStoryCoroutine);
+                });
+
             mainPage.Add(new MenuButton(mainPage, "Load Game", "icons/load_game.png"));
             mainPage.Add(new MenuSpacer(4));
             mainPage.Add(new MenuButton(mainPage, "Options", "icons/settings.png", "", "")).
@@ -79,9 +119,8 @@ namespace TeamStor.AOD.Menu
         {
             screenSize = Program.ScaleBatch(batch);
 
-            batch.Texture(new Vector2(0, 0), Assets.Get<Texture2D>("menu/bg.png"), Color.White);
+            batch.Texture(new Vector2(0, 0), Assets.Get<Texture2D>("menu/bg.png", true), Color.White);
             batch.Rectangle(new Rectangle(0, 0, (int)screenSize.X, (int)screenSize.Y), Color.Black * 0.5f);
-            batch.Texture(new Vector2(screenSize.X / 2 - 160 / 2, 20), Assets.Get<Texture2D>("ui/logo.png"), Color.White);
 
             Font font = Assets.Get<Font>("fonts/Poco.ttf", true);
             string copyrightString = "Copyright (C) 2018-2019 Hannes Mann, Kasper Kjällström, Henrik Eriksson";
@@ -91,7 +130,10 @@ namespace TeamStor.AOD.Menu
 
             Vector2 uiPos = screenSize / 2 - UI.Area.Value / 2 + new Vector2(0, 20);
             UI.Draw(uiPos, batch, screenSize);
-            
+
+            batch.Rectangle(new Rectangle(0, 0, (int)screenSize.X, (int)screenSize.Y), Color.Black * _exitTransition);
+            batch.Texture(new Vector2(screenSize.X / 2 - 160 / 2, 20), Assets.Get<Texture2D>("ui/logo.png", true), Color.White);
+
             Program.BlackBorders(batch);
         }
     }
