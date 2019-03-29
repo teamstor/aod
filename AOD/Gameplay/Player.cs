@@ -40,12 +40,12 @@ namespace TeamStor.AOD.Gameplay
             get { return _activeQuests.Values; }
         }
 
-        public Player(WorldState world, Player player) : this(world)
+        public Player(WorldState world, Player player) : this(world, player.Name)
         {
             _activeQuests = player._activeQuests;
         }
         
-        public Player(WorldState world) : base(world, "Player")
+        public Player(WorldState world, string name) : base(world, name)
         {
             AddQuest(new TestQuest1());
             AddQuest(new TestQuest2());

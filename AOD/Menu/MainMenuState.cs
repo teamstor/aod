@@ -24,6 +24,7 @@ namespace TeamStor.AOD.Menu
         public MenuOptions OptionsUI;
 
         private TweenedDouble _exitTransition;
+        private bool _doneWithName = false;
 
         private IEnumerator<ICoroutineOperation> TransitionToStoryCoroutine()
         {
@@ -44,18 +45,39 @@ namespace TeamStor.AOD.Menu
                 }
             }
 
+            UI.SwitchPage("start-game");
+
+            while(!_doneWithName)
+                yield return null;
+
             UI.Toggle();
             yield return Wait.Seconds(Game, 0.3f);
 
             _exitTransition.TweenTo(1, TweenEaseType.Linear, 1.5f);
             yield return Wait.Seconds(Game, 2f);
 
-            Game.CurrentState = new StoryMenuState();
+            string pname = "";
+            foreach(MenuElement e in UI.SelectedPage)
+            {
+                if(e is MenuTextInput)
+                    pname = (e as MenuTextInput).Text.Trim();
+            }
+
+            if(pname == "")
+                pname = "Player";
+
+            Game.CurrentState = new StoryMenuState(pname);
         }
         
         public override void OnEnter(GameState previousState)
         {
             _exitTransition = new TweenedDouble(Game, 0);
+
+            MenuPage startGamePage = new MenuPage(150);
+            startGamePage.Add(new MenuLabel(startGamePage, "Choose a name to begin"));
+            startGamePage.Add(new MenuSpacer(4));
+            startGamePage.Add(new MenuTextInput(startGamePage, "Player", "Name: "));
+            startGamePage.Add(new MenuButton(startGamePage, "Start Game")).RegisterEvent(MenuElement.EventType.Clicked, (e, h) => { if(!h) _doneWithName = true; });
 
             MenuPage mainPage = new MenuPage(150);
             mainPage.Add(new MenuButton(mainPage, "Start New Game", "icons/start_game.png")).
@@ -91,7 +113,8 @@ namespace TeamStor.AOD.Menu
 
             UI = new MenuUI(this, "main", mainPage, true);
             UI.AddPage("credits", creditsPage);
-            
+            UI.AddPage("start-game", startGamePage);
+
             OptionsUI = new MenuOptions(UI, "main");
 
             UI.Toggle();

@@ -57,8 +57,6 @@ namespace TeamStor.AOD
 			{
 				PreloadedMaps.Add(map.Replace("\\", "/"), Map.Load(map));
 				LatestAsset = map;
-				
-				Thread.Sleep(50);
 			}
 			
 			_mapsLoaded = true;

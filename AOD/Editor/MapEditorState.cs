@@ -39,8 +39,6 @@ namespace TeamStor.AOD.Editor
 
 		private MapEditorModeState _state;
 
-        private double _returnFromPlaytestWarning = 0;
-
         private enum DataOperation
         {
             None,
@@ -401,11 +399,6 @@ namespace TeamStor.AOD.Editor
             else if(!topTextRectangle.Contains(Input.MousePosition) && topTextRectangle.Contains(Input.PreviousMousePosition))
                 _topTextFade.TweenTo(2.0, TweenEaseType.EaseOutQuad, 0.4f);
 
-            if(_returnFromPlaytestWarning > 0)
-                _returnFromPlaytestWarning -= deltaTime;
-            if(_returnFromPlaytestWarning < 0)
-                _returnFromPlaytestWarning = 0;
-
             if(_dataOperation == DataOperation.None)
                 CurrentState.Update(deltaTime, totalTime, count);
 
@@ -414,7 +407,7 @@ namespace TeamStor.AOD.Editor
 
             if(_doPlaytest)
             {
-                WorldState world = new WorldState(Map, true);
+                WorldState world = new WorldState(Map, "Map Editor Player", true);
                 EventHandler<Engine.Game.UpdateEventArgs> watcher = null;
                 watcher = (s, e) =>
                 {
@@ -426,7 +419,6 @@ namespace TeamStor.AOD.Editor
                         typeof(Engine.Game).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(Game, world);
 
                         MapEditorState mapState = new MapEditorState();
-                        mapState._returnFromPlaytestWarning = 5;
                         Game.CurrentState = mapState;
                         Game.OnUpdateAfterState -= watcher;
                     }
@@ -621,14 +613,6 @@ namespace TeamStor.AOD.Editor
 
                 batch.Rectangle(new Rectangle(0, 0, (int)screenSize.X, (int)screenSize.Y), Color.Black * alpha);
                 batch.Text(FontStyle.Bold, 32, text, screenSize / 2 - measure / 2, Color.White);
-            }
-
-            if(_returnFromPlaytestWarning > 0)
-            {
-                Vector2 measure = Game.DefaultFonts.ItalicBold.Measure(24, "Using a map portal during playtest is not allowed.");
-                batch.Text(FontStyle.ItalicBold, 24, "Using a map portal during playtest is not allowed.", screenSize / 2 - measure / 2 + new Vector2(0, 60), Color.White * (float)Math.Min(_returnFromPlaytestWarning, 1));
-
-                batch.Texture(new Vector2(screenSize.X / 2 - 160 / 2, screenSize.Y / 2 - 140), Assets.Get<Texture2D>("crash_recovery/angrymonkey" + ((Game.TotalFixedUpdates / 6) % 7) + ".png"), Color.White * (float)Math.Min(_returnFromPlaytestWarning, 1));
             }
 
             batch.UseSmartRound = true;

@@ -83,7 +83,7 @@ namespace TeamStor.AOD
 
 			if(!string.IsNullOrEmpty(FindClosestMatch()) && Input.KeyPressed(Keys.Enter))
 			{
-				WorldState state = new WorldState(Map.Load(FindClosestMatch()));
+				WorldState state = new WorldState(Map.Load(FindClosestMatch()), "Player");
 				_lastState.OnLeave(state);
 
 				Game.CurrentState = state;

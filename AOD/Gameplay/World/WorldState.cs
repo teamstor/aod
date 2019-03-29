@@ -22,6 +22,7 @@ namespace TeamStor.AOD.Gameplay.World
     {
         private bool _debug;
         private float _drawNameAlpha = 0;
+        private string _playerName = "";
         
         /// <summary>
         /// The player.
@@ -156,14 +157,17 @@ namespace TeamStor.AOD.Gameplay.World
             _useTransiton = transition;
         }
 
-        public WorldState(Map map, bool transition = false) : this(map, new SpawnArgs(new Point(-1, -1), Direction.Down, null), transition) { }
+        public WorldState(Map map, string playerName, bool transition = false) : this(map, new SpawnArgs(new Point(-1, -1), Direction.Down, null), transition) { _playerName = playerName;  }
 
         public override void OnEnter(GameState previousState)
         {
             if(_transitionRenderTarget == null)
                 _transitionRenderTarget = new RenderTarget2D(Game.GraphicsDevice, 480, 270, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
 
-            Player = new Player(this);
+            if(_spawnArgs.OldPlayer != null)
+                Player = new Player(this, _spawnArgs.OldPlayer);
+            else
+                Player = new Player(this, _playerName);
 
             if(_spawnArgs.Position != new Point(-1, -1))
                 Player.MoveInstantly(_spawnArgs.Position);

@@ -18,8 +18,15 @@ namespace TeamStor.AOD.Menu
         private string _story = "";
         private string _writtenStory = "";
 
+        private string _playerName;
+
         private long _startCount = -1;
         private float _scroll = 0;
+
+        public StoryMenuState(string playerName)
+        {
+            _playerName = playerName;
+        }
 
         public override void OnEnter(GameState previousState)
         {
@@ -37,11 +44,11 @@ namespace TeamStor.AOD.Menu
                 if(_writtenStory.Length != _story.Length)
                     _writtenStory = _story;
                 else
-                    Game.CurrentState = new WorldState(Map.Load("data/maps/mapt.json"), true);
+                    Game.CurrentState = new WorldState(Map.Load("data/maps/mapt.json"), _playerName, true);
             }
 
             float targetScroll = Math.Min(-_writtenStory.Split('\n').Length * 18 + (18 * 6), 0);
-            _scroll = MathHelper.Lerp(_scroll, targetScroll, (float)deltaTime * 0.5f);
+            _scroll = MathHelper.Lerp(_scroll, targetScroll, (float)deltaTime * (_writtenStory.Length == _story.Length ? 2f : 1.2f));
         }
 
         public override void FixedUpdate(long count)
@@ -61,7 +68,7 @@ namespace TeamStor.AOD.Menu
 
             Font alkhemikal = Assets.Get<Font>("fonts/Alkhemikal.ttf", true);
 
-            int y = (int)(110 + _scroll);
+            int y = (int)(105 + _scroll);
             string[] split = _story.Split('\n');
             string[] writtenSplit = _writtenStory.Split('\n');
 

@@ -98,6 +98,8 @@ namespace TeamStor.AOD.Gameplay
 
             foreach(InventoryEquipSlot slot in Enum.GetValues(typeof(InventoryEquipSlot)))
                 _equips.Add(slot, EMPTY_SLOT);
+
+            Push(Item.Thunderfury);
         }
 
         public ItemSlotReference this[int slot]

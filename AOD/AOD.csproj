@@ -145,6 +145,7 @@
     <Compile Include="Menu\Elements\MenuButton.cs" />
     <Compile Include="Menu\Elements\MenuLabel.cs" />
     <Compile Include="Menu\Elements\MenuSpacer.cs" />
+    <Compile Include="Menu\Elements\MenuTextInput.cs" />
     <Compile Include="Menu\MainMenuState.cs" />
     <Compile Include="Menu\MenuElement.cs" />
     <Compile Include="Menu\MenuOptions.cs" />
